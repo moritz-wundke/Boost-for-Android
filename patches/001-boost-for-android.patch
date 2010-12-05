@@ -1,0 +1,246 @@
+diff --git a/boost/asio/detail/fenced_block.hpp b/boost/asio/detail/fenced_block.hpp
+index 443f487..b5ef619 100644
+--- a/boost/asio/detail/fenced_block.hpp
++++ b/boost/asio/detail/fenced_block.hpp
+@@ -25,14 +25,15 @@
+ # include <boost/asio/detail/macos_fenced_block.hpp>
+ #elif defined(__sun)
+ # include <boost/asio/detail/solaris_fenced_block.hpp>
+-#elif defined(__GNUC__) && defined(__arm__)
++#elif defined(__GNUC__) && defined(__arm__) && !defined(__thumb__)
+ # include <boost/asio/detail/gcc_arm_fenced_block.hpp>
+ #elif defined(__GNUC__) && (defined(__hppa) || defined(__hppa__))
+ # include <boost/asio/detail/gcc_hppa_fenced_block.hpp>
+ #elif defined(__GNUC__) \
+   && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)) \
+   && !defined(__INTEL_COMPILER) && !defined(__ICL) \
+-  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__)
++  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__) \
++  && !defined(ANDROID) && !defined(__ANDROID__)
+ # include <boost/asio/detail/gcc_sync_fenced_block.hpp>
+ #elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+ # include <boost/asio/detail/gcc_x86_fenced_block.hpp>
+@@ -54,14 +55,15 @@ typedef null_fenced_block fenced_block;
+ typedef macos_fenced_block fenced_block;
+ #elif defined(__sun)
+ typedef solaris_fenced_block fenced_block;
+-#elif defined(__GNUC__) && defined(__arm__)
++#elif defined(__GNUC__) && defined(__arm__) && !defined(__thumb__)
+ typedef gcc_arm_fenced_block fenced_block;
+ #elif defined(__GNUC__) && (defined(__hppa) || defined(__hppa__))
+ typedef gcc_hppa_fenced_block fenced_block;
+ #elif defined(__GNUC__) \
+   && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)) \
+   && !defined(__INTEL_COMPILER) && !defined(__ICL) \
+-  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__)
++  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__) \
++  && !defined(ANDROID) && !defined(__ANDROID__)
+ typedef gcc_sync_fenced_block fenced_block;
+ #elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+ typedef gcc_x86_fenced_block fenced_block;
+diff --git a/boost/asio/detail/socket_types.hpp b/boost/asio/detail/socket_types.hpp
+index 616e85a..5887474 100644
+--- a/boost/asio/detail/socket_types.hpp
++++ b/boost/asio/detail/socket_types.hpp
+@@ -122,7 +122,12 @@ const int max_iov_len = 16;
+ typedef int socket_type;
+ const int invalid_socket = -1;
+ const int socket_error_retval = -1;
++// @Moss - Some platforms do not define it (Android)
++#if defined(INET_ADDRSTRLEN)
+ const int max_addr_v4_str_len = INET_ADDRSTRLEN;
++#else // defined(INET_ADDRSTRLEN)
++const int max_addr_v4_str_len = 16;
++#endif // defined(INET_ADDRSTRLEN)
+ #if defined(INET6_ADDRSTRLEN)
+ const int max_addr_v6_str_len = INET6_ADDRSTRLEN + 1 + IF_NAMESIZE;
+ #else // defined(INET6_ADDRSTRLEN)
+diff --git a/boost/asio/ip/impl/address_v6.ipp b/boost/asio/ip/impl/address_v6.ipp
+index a06dfe5..4112079 100644
+--- a/boost/asio/ip/impl/address_v6.ipp
++++ b/boost/asio/ip/impl/address_v6.ipp
+@@ -11,6 +11,23 @@
+ #ifndef BOOST_ASIO_IP_IMPL_ADDRESS_V6_IPP
+ #define BOOST_ASIO_IP_IMPL_ADDRESS_V6_IPP
+ 
++// @Moss - Define IPv6 macros
++#if !defined(IN6_IS_ADDR_MULTICAST) 
++#define IN6_IS_ADDR_MULTICAST(a) (((__const uint8_t *) (a))[0] == 0xff)
++#endif
++
++#if !defined(IN6_IS_ADDR_MC_NODELOCAL)
++#define IN6_IS_ADDR_MC_NODELOCAL(a) \
++        (IN6_IS_ADDR_MULTICAST(a) \
++         && ((((__const uint8_t *) (a))[1] & 0xf) == 0x1))
++#endif
++
++#if !defined(IN6_IS_ADDR_MC_GLOBAL)
++#define IN6_IS_ADDR_MC_GLOBAL(a) \
++        (IN6_IS_ADDR_MULTICAST(a) \
++         && ((((__const uint8_t *) (a))[1] & 0xf) == 0xe))
++#endif
++
+ #if defined(_MSC_VER) && (_MSC_VER >= 1200)
+ # pragma once
+ #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+diff --git a/libs/filesystem/v2/src/v2_operations.cpp b/libs/filesystem/v2/src/v2_operations.cpp
+index 10df199..179ad77 100644
+--- a/libs/filesystem/v2/src/v2_operations.cpp
++++ b/libs/filesystem/v2/src/v2_operations.cpp
+@@ -58,13 +58,15 @@ using boost::system::system_category;
+ 
+ # else // BOOST_POSIX_API
+ #   include <sys/types.h>
+-#   if !defined(__APPLE__) && !defined(__OpenBSD__)
++#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) && !defined(ANDROID)
+ #     include <sys/statvfs.h>
+ #     define BOOST_STATVFS statvfs
+ #     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize
+ #   else
+ #ifdef __OpenBSD__
+ #     include <sys/param.h>
++#elif defined(__ANDROID__) || defined(ANDROID) // @Moss - Android messes up a bit with some headers, this one is the correct one :D
++#     include <sys/vfs.h>
+ #endif
+ #     include <sys/mount.h>
+ #     define BOOST_STATVFS statfs
+@@ -1262,7 +1264,11 @@ namespace boost
+         if ( max == 0 )
+         {
+           errno = 0;
++#     ifdef __ANDROID__ || ANDROID
++          long tmp = 4096;
++#     else
+           long tmp = ::pathconf( "/", _PC_NAME_MAX );
++#     endif
+           if ( tmp < 0 )
+           {
+             if ( errno == 0 ) // indeterminate
+diff --git a/libs/filesystem/v3/src/operations.cpp b/libs/filesystem/v3/src/operations.cpp
+index 04d9c17..7054eff 100644
+--- a/libs/filesystem/v3/src/operations.cpp
++++ b/libs/filesystem/v3/src/operations.cpp
+@@ -66,13 +66,15 @@ using std::wstring;
+ # ifdef BOOST_POSIX_API
+ 
+ #   include <sys/types.h>
+-#   if !defined(__APPLE__) && !defined(__OpenBSD__)
++#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) && !defined(ANDROID)
+ #     include <sys/statvfs.h>
+ #     define BOOST_STATVFS statvfs
+ #     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize
+ #   else
+ #     ifdef __OpenBSD__
+ #     include <sys/param.h>
++#     elif defined(__ANDROID__) || defined(ANDROID) // @Moss - Android messes up a bit with some headers, this one is the correct one :D
++#     include <sys/vfs.h>
+ #     endif
+ #     include <sys/mount.h>
+ #     define BOOST_STATVFS statfs
+@@ -201,7 +203,19 @@ typedef struct _REPARSE_DATA_BUFFER {
+          || ::mkdir(to.c_str(),from_stat.st_mode)!= 0))
+ #   define BOOST_COPY_FILE(F,T,FailIfExistsBool)copy_file_api(F, T, FailIfExistsBool)
+ #   define BOOST_MOVE_FILE(OLD,NEW)(::rename(OLD, NEW)== 0)
++#if defined(__ANDROID__) || defined(ANDROID)
++    int BOOST_RESIZE_FILE(const char *path, off_t size)
++    {
++      int result = -1;
++      int fd = open(path, O_WRONLY);
++      if (fd != -1)
++	    result = ftruncate(fd, size);
++      close(fd);
++      return result;
++    }
++#else
+ #   define BOOST_RESIZE_FILE(P,SZ)(::truncate(P, SZ)== 0)
++#endif
+ 
+ #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
+ #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
+diff --git a/project-config.jam b/project-config.jam
+index 271ceb1..0b45250 100644
+--- a/project-config.jam
++++ b/project-config.jam
+@@ -21,11 +21,12 @@ using python : 2.6 : /usr ;
+ # options. If left empty, all libraries will be built.
+ # Options specified on the command line completely
+ # override this variable.
+-libraries =  ;
++# @Moss - Adding needed libs to be valid for android
++libraries = --with-date_time --with-filesystem --with-program_options --with-regex --with-signals --with-system --with-thread ; 
+ 
+ # These settings are equivivalent to corresponding command-line
+ # options.
+-option.set prefix : /usr/local ;
+-option.set exec-prefix : /usr/local ;
+-option.set libdir : /usr/local/lib ;
+-option.set includedir : /usr/local/include ;
++option.set prefix : ./../build/ ;
++option.set exec-prefix : ./../build/ ;
++option.set libdir : ./../build/lib ;
++option.set includedir : ./../build/include ;
+diff --git a/tools/build/v2/user-config.jam b/tools/build/v2/user-config.jam
+index 54718bb..31cd786 100644
+--- a/tools/build/v2/user-config.jam
++++ b/tools/build/v2/user-config.jam
+@@ -84,3 +84,60 @@
+ 
+ # Configure with an explicit installation prefix.
+ # using qt : /usr/opt/qt ;
++
++# ----------------------
++# Android configuration.
++# ----------------------
++
++import os ;
++if [ os.name ] = CYGWIN || [ os.name ] = NT
++{
++  platform = windows ;
++}
++  else if [ os.name ] = LINUX
++{
++  platform = linux-x86 ;
++}
++else if [ os.name ] = MACOSX
++{
++  platform = darwin-x86 ;
++}
++
++using android : arm : $(AndroidNDKPatch)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-c++ :
++<archiver>$(AndroidNDKPatch)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-ar
++<compileflags>-I$(AndroidNDKPatch)/build/platforms/android-8/arch-arm/usr/include/
++<compileflags>-fpic
++<compileflags>-mthumb-interwork
++<compileflags>-ffunction-sections
++<compileflags>-funwind-tables
++<compileflags>-fstack-protector
++<compileflags>-fno-short-enums
++<compileflags>-D__ARM_ARCH_5__
++<compileflags>-D__ARM_ARCH_5T__
++<compileflags>-D__ARM_ARCH_5E__
++<compileflags>-D__ARM_ARCH_5TE__
++<compileflags>-Wno-psabi
++<compileflags>-march=armv5te
++<compileflags>-mtune=xscale
++<compileflags>-msoft-float
++<compileflags>-mthumb
++<compileflags>-Os
++<compileflags>-fomit-frame-pointer
++<compileflags>-fno-strict-aliasing
++<compileflags>-finline-limit=64
++<compileflags>-DANDROID
++<compileflags>-D__ANDROID__
++<compileflags>-Wa,--noexecstack
++# @Moss - Above are the 'oficial' android flags
++<architecture>arm
++<compileflags>-fvisibility=hidden
++<compileflags>-fvisibility-inlines-hidden
++<compileflags>-fdata-sections
++<cxxflags>-DBOOST_THREAD_LINUX
++<cxxflags>-DBOOST_HAS_PTHREADS
++<cxxflags>-D__arm__
++<cxxflags>-D_REENTRANT
++<cxxflags>-D_GLIBCXX__PTHREADS
++<cxxflags>-DBOOST_HAS_GETTIMEOFDAY
++;
++
