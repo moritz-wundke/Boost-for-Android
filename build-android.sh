@@ -57,7 +57,7 @@ PROGRAM_DESCRIPTION=\
 extract_parameters $@
 
 export AndroidNDKRoot=$PARAMETERS
-if [ -z "$NDK_ROOT" ] ; then
+if [ -z "$AndroidNDKRoot" ] ; then
     dump "ERROR: You need to provide a <ndk-root>!"
     exit 1
 fi
@@ -80,10 +80,25 @@ then
 	read AndroidNDKPatch
 fi
 
+# Check platform patch
+case "$HOST_OS" in
+    linux)
+        Platfrom=linux-x86
+        ;;
+    darwin|freebsd)
+        Platfrom=darwin-x86
+        ;;
+    windows|cygwin)
+        Platfrom=windows
+        ;;
+    *)  # let's play safe here
+        Platfrom=inux-x86
+esac
+
 # Check if the ndk is valid or not
-if [ ! -f $AndroidNDKRoot/build/prebuilt/linux-x86/arm-eabi-4.4.0/bin/arm-eabi-c++ ]
+if [ ! -f $AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-c++ ]
 then
-	echo "Invalid path. Aborting"
+	echo "Invalid path: '$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-c++'"
 	exit 1
 fi
 
