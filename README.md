@@ -14,7 +14,7 @@ The port and it's toolset is still in alpha but will be improoved
 
 ## Usage
 
-./build-android.sh <crystax/ndk/root>
+./build-android.sh crystax/ndk/root
 
 This command will download and build boost against the Crystax NDK and output the final headsr and libs and in the build folder.
 
