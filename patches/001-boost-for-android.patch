@@ -206,9 +206,9 @@ index 54718bb..31cd786 100644
 +  platform = darwin-x86 ;
 +}
 +
-+using android : arm : $(AndroidNDKPatch)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-c++ :
-+<archiver>$(AndroidNDKPatch)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-ar
-+<compileflags>-I$(AndroidNDKPatch)/build/platforms/android-8/arch-arm/usr/include/
++using android : arm : $(AndroidNDKRoot)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-c++ :
++<archiver>$(AndroidNDKRoot)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-ar
++<compileflags>-I$(AndroidNDKRoot)/build/platforms/android-8/arch-arm/usr/include/
 +<compileflags>-fpic
 +<compileflags>-mthumb-interwork
 +<compileflags>-ffunction-sections

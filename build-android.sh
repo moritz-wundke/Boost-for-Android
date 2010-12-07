@@ -30,8 +30,6 @@ BOOST_TAR="boost_1_45_0.tar.bz2"
 BOOST_DIR="boost_1_45_0"
 BUILD_DIR="./build/"
 
-export AndroidNDKPatch="/home/arimoss/Android/android-ndk-r4-crystax/"
-
 CLEAN=no
 register_option "--clean"          do_clean     "Perform a clean build deleting all previus build files."
 
@@ -50,12 +48,19 @@ do_download ()
 	CLEAN=yes
 }
 
+PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
 "Copyright (C) 2010 Mystic Tree Games\n"\
 "------------------------------------"
 
 extract_parameters $@
+
+export AndroidNDKRoot=$PARAMETERS
+if [ -z "$NDK_ROOT" ] ; then
+    dump "ERROR: You need to provide a <ndk-root>!"
+    exit 1
+fi
 
 if [ $CLEAN = yes ] ; then
 	echo "Cleaning: $BUILD_DIR"
@@ -69,14 +74,14 @@ if [ $CLEAN = yes ] ; then
 fi
 
 # Check if android NDK path has been set 
-if [ ! -n "${AndroidNDKPatch:+x}" ]
+if [ ! -n "${AndroidNDKRoot:+x}" ]
 then
-	echo "Environment variable: AndroidNDKPatch not set! Please enter tell me where you got the NDK root:"
+	echo "Environment variable: AndroidNDKRoot not set! Please enter tell me where you got the NDK root:"
 	read AndroidNDKPatch
 fi
 
 # Check if the ndk is valid or not
-if [ ! -f $AndroidNDKPatch/build/prebuilt/linux-x86/arm-eabi-4.4.0/bin/arm-eabi-c++ ]
+if [ ! -f $AndroidNDKRoot/build/prebuilt/linux-x86/arm-eabi-4.4.0/bin/arm-eabi-c++ ]
 then
 	echo "Invalid path. Aborting"
 	exit 1
