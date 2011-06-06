@@ -167,7 +167,7 @@ index 271ceb1..0b45250 100644
  # override this variable.
 -libraries =  ;
 +# @Moss - Adding needed libs to be valid for android
-+libraries = --with-date_time --with-filesystem --with-program_options --with-regex --with-signals --with-system --with-thread ; 
++libraries = --with-date_time --with-filesystem --with-program_options --with-regex --with-signals --with-system --with-thread --with-iostreams ; 
  
  # These settings are equivivalent to corresponding command-line
  # options.
@@ -181,66 +181,3 @@ index 271ceb1..0b45250 100644
 +option.set includedir : ./../build/include ;
 diff --git a/tools/build/v2/user-config.jam b/tools/build/v2/user-config.jam
 index 54718bb..31cd786 100644
---- a/tools/build/v2/user-config.jam
-+++ b/tools/build/v2/user-config.jam
-@@ -84,3 +84,60 @@
- 
- # Configure with an explicit installation prefix.
- # using qt : /usr/opt/qt ;
-+
-+# ----------------------
-+# Android configuration.
-+# ----------------------
-+
-+import os ;
-+if [ os.name ] = CYGWIN || [ os.name ] = NT
-+{
-+  platform = windows ;
-+}
-+  else if [ os.name ] = LINUX
-+{
-+  platform = linux-x86 ;
-+}
-+else if [ os.name ] = MACOSX
-+{
-+  platform = darwin-x86 ;
-+}
-+
-+using android : arm : $(AndroidNDKRoot)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-c++ :
-+<archiver>$(AndroidNDKRoot)/build/prebuilt/$(platform)/arm-eabi-4.4.0/bin/arm-eabi-ar
-+<compileflags>-I$(AndroidNDKRoot)/build/platforms/android-8/arch-arm/usr/include/
-+<compileflags>-fpic
-+<compileflags>-mthumb-interwork
-+<compileflags>-ffunction-sections
-+<compileflags>-funwind-tables
-+<compileflags>-fstack-protector
-+<compileflags>-fno-short-enums
-+<compileflags>-D__ARM_ARCH_5__
-+<compileflags>-D__ARM_ARCH_5T__
-+<compileflags>-D__ARM_ARCH_5E__
-+<compileflags>-D__ARM_ARCH_5TE__
-+<compileflags>-Wno-psabi
-+<compileflags>-march=armv5te
-+<compileflags>-mtune=xscale
-+<compileflags>-msoft-float
-+<compileflags>-mthumb
-+<compileflags>-Os
-+<compileflags>-fomit-frame-pointer
-+<compileflags>-fno-strict-aliasing
-+<compileflags>-finline-limit=64
-+<compileflags>-DANDROID
-+<compileflags>-D__ANDROID__
-+<compileflags>-Wa,--noexecstack
-+# @Moss - Above are the 'oficial' android flags
-+<architecture>arm
-+<compileflags>-fvisibility=hidden
-+<compileflags>-fvisibility-inlines-hidden
-+<compileflags>-fdata-sections
-+<cxxflags>-DBOOST_THREAD_LINUX
-+<cxxflags>-DBOOST_HAS_PTHREADS
-+<cxxflags>-D__arm__
-+<cxxflags>-D_REENTRANT
-+<cxxflags>-D_GLIBCXX__PTHREADS
-+<cxxflags>-DBOOST_HAS_GETTIMEOFDAY
-+;
-+

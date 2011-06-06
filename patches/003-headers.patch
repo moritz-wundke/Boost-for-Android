@@ -1,0 +1,33 @@
+diff --git a/boost/config/user.hpp b/boost/config/user.hpp
+index 5a4a9d4..cc268fe 100644
+--- a/boost/config/user.hpp
++++ b/boost/config/user.hpp
+@@ -13,6 +13,15 @@
+ //  configuration policy:
+ //
+ 
++// Android defines
++#define BOOST_THREAD_LINUX 1
++#define BOOST_HAS_PTHREADS 1
++#define __arm__ 1
++#define _REENTRANT 1
++#define _GLIBCXX__PTHREADS 1
++#define BOOST_HAS_GETTIMEOFDAY 1
++#define BOOST_HAS_UNISTD_H 1
++
+ // define this to locate a compiler config file:
+ // #define BOOST_COMPILER_CONFIG <myheader>
+ 
+diff --git a/boost/interprocess/detail/workaround.hpp b/boost/interprocess/detail/workaround.hpp
+index cb3d4a5..221967f 100644
+--- a/boost/interprocess/detail/workaround.hpp
++++ b/boost/interprocess/detail/workaround.hpp
+@@ -64,7 +64,7 @@
+    #endif
+ 
+    //Check for XSI shared memory objects. They are available in nearly all UNIX platforms
+-   #if !defined(__QNXNTO__)
++   #if !defined(__QNXNTO__) && !defined(ANDROID)
+    # define BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
+    #endif
+ 

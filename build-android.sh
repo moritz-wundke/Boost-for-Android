@@ -140,7 +140,7 @@ then
 	echo "Performing boost boostrap"
 
 	cd $BOOST_DIR 
-	run ./bootstrap.sh	
+	run ./bootstrap.sh
 	if [ $? != 0 ] ; then
 		dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
 		exit 1
@@ -184,7 +184,11 @@ fi
 # Build boost for android
 echo "Building boost for android"
 cd $BOOST_DIR
-run ./bjam link=static threading=multi --layout=versioned install
+run env PATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin:$PATH \
+ AndroidNDKRoot=$AndroidNDKRoot NO_BZIP2=1 \
+ ./bjam toolset=gcc-android target-os=$HOST_OS \
+ cxxflags=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include \
+ link=static threading=multi --layout=versioned install
 if [ $? != 0 ] ; then
 	dump "ERROR: Failed to build boost for android!"
 	exit 1
