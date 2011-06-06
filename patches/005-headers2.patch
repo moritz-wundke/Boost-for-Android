@@ -1,0 +1,25 @@
+diff --git a/include/boost/config/user.hpp b/include/boost/config/user.hpp
+index cc268fe..5b7f5a4 100644
+--- a/include/boost/config/user.hpp
++++ b/include/boost/config/user.hpp
+@@ -21,6 +21,7 @@
+ #define _GLIBCXX__PTHREADS 1
+ #define BOOST_HAS_GETTIMEOFDAY 1
+ #define BOOST_HAS_UNISTD_H 1
++#define BOOST_INTERPROCESS_POSIX_PROCESS_SHARED 1
+ 
+ // define this to locate a compiler config file:
+ // #define BOOST_COMPILER_CONFIG <myheader>
+diff --git a/include/boost/interprocess/detail/atomic.hpp b/include/boost/interprocess/detail/atomic.hpp
+index 71b7a55..dbfb2cd 100644
+--- a/include/boost/interprocess/detail/atomic.hpp
++++ b/include/boost/interprocess/detail/atomic.hpp
+@@ -265,7 +265,7 @@ inline void atomic_write32(volatile boost::uint32_t *mem, boost::uint32_t val)
+ }  //namespace interprocess{
+ }  //namespace boost{
+ 
+-#elif defined(__GNUC__) && ( __GNUC__ * 100 + __GNUC_MINOR__ >= 401 )
++#elif defined(__GNUC__) && ( __GNUC__ * 100 + __GNUC_MINOR__ >= 401 ) && !defined(ANDROID)
+ 
+ namespace boost {
+ namespace interprocess {
