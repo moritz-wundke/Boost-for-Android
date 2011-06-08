@@ -58,9 +58,23 @@ extract_parameters $@
 
 export AndroidNDKRoot=$PARAMETERS
 if [ -z "$AndroidNDKRoot" ] ; then
-    dump "ERROR: You need to provide a <ndk-root>!"
-    exit 1
+	if [ -z "`which ndk-build`" ]; then
+		dump "ERROR: You need to provide a <ndk-root>!"
+		exit 1
+	fi
+	AndroidNDKRoot=`which ndk-build`
+	AndroidNDKRoot=`dirname $AndroidNDKRoot`
+	echo "Using AndroidNDKRoot = $AndroidNDKRoot"
 fi
+
+NDK_R5=
+if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r5'`" ]; then
+	NDK_R5=1
+	if [ -n "`echo $NDK | grep 'android-ndk-r5-crystax-1.beta3'`" ]; then
+		CRYSTAX_WCHAR=1
+	fi
+fi
+
 
 if [ $CLEAN = yes ] ; then
 	echo "Cleaning: $BUILD_DIR"
@@ -89,16 +103,30 @@ case "$HOST_OS" in
         Platfrom=darwin-x86
         ;;
     windows|cygwin)
-        Platfrom=windows
+        Platfrom=windows-x86
         ;;
     *)  # let's play safe here
-        Platfrom=inux-x86
+        Platfrom=linux-x86
 esac
 
+CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
+TOOLSET=gcc-androidR4
+if [ -n "$NDK_R5" ]; then
+	CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+	CXXFLAGS="-I$AndroidNDKRoot/platforms/android-8/arch-arm/usr/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include \
+				-I$AndroidNDKRoot/sources/wchar-support/include"
+	TOOLSET=gcc-androidR5
+fi
+
+echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
+
 # Check if the ndk is valid or not
-if [ ! -f $AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-c++ ]
+if [ ! -f $CXXPATH ]
 then
-	echo "Invalid path: '$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-c++'"
+	echo "Cannot find C++ compiler at: $CXXPATH"
 	exit 1
 fi
 
@@ -140,7 +168,7 @@ then
 	echo "Performing boost boostrap"
 
 	cd $BOOST_DIR 
-	run ./bootstrap.sh
+	./bootstrap.sh 2>&1 | tee -a $PROGDIR/build.log
 	if [ $? != 0 ] ; then
 		dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
 		exit 1
@@ -184,11 +212,11 @@ fi
 # Build boost for android
 echo "Building boost for android"
 cd $BOOST_DIR
-run env PATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin:$PATH \
+env PATH=`dirname $CXXPATH`:$PATH \
  AndroidNDKRoot=$AndroidNDKRoot NO_BZIP2=1 \
- ./bjam toolset=gcc-android target-os=$HOST_OS \
- cxxflags=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include \
- link=static threading=multi --layout=versioned install
+ ./bjam toolset=$TOOLSET \
+ cxxflags="$CXXFLAGS" \
+ link=static threading=multi --layout=versioned install 2>&1 | tee -a $PROGDIR/build.log
 if [ $? != 0 ] ; then
 	dump "ERROR: Failed to build boost for android!"
 	exit 1
