@@ -1,15 +1,14 @@
 # Boost for Android
 Boost for android is a set of tools to compile the main part of the [Boost C++ Libraries](http://www.boost.org/) for the Android platform.
 
-To compile Boost for Android you must use the customized NDK r4b provided by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php)
-Or you may download [official NDK r5b](http://developer.android.com), however it will crash on pre-2.2 devices,
-the latest NDK r5 from CrystaX does not have this bug.
+To compile Boost for Android you may use the customized NDK r4b provided by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php).
+Or you may download [official NDK r5c](http://developer.android.com).
 
 # Quick Start
 
 ## Dependencies
 
- * [Crysrax NDK](http://www.crystax.net/android/ndk.php)
+ * [NDK r5c](http://developer.android.com)
  * GNU Make
 
 ## Usage
