@@ -88,7 +88,7 @@ run ()
         if [ -n "$TMPLOG" ] ; then
             echo "##### NEW COMMAND" >> $TMPLOG
             echo "$@" >> $TMPLOG
-            $@ >>$TMPLOG 2>&1
+            $@ 2>&1 | tee -a $TMPLOG
         else
             $@ > /dev/null 2>&1
         fi
