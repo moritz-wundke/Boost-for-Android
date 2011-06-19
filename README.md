@@ -1,15 +1,14 @@
 # Boost for Android
 Boost for android is a set of tools to compile the main part of the [Boost C++ Libraries](http://www.boost.org/) for the Android platform.
 
-To compile Boost for Android you must use the customized NDK provided by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php) 
-
-The port and it's toolset iare still in alpha but will be improoved
+To compile Boost for Android you may use the customized NDK r4b provided by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php).
+Or you may download [official NDK r5c](http://developer.android.com).
 
 # Quick Start
 
 ## Dependencies
 
- * [Crysrax NDK](http://www.crystax.net/android/ndk.php)
+ * [NDK r5c](http://developer.android.com)
  * GNU Make
 
 ## Usage
@@ -24,16 +23,12 @@ Now that you got boost compiled you must add it to your Android.mk file. First c
 
 Add the following to your Android.mk:
 
-    LOCAL_CFLAGS += -DMYSTIC -I$(LOCAL_PATH)/boost/include/ 
-    LOCAL_LDLIBS += -L$(LOCAL_PATH)/external/boost/lib/
-    
+    LOCAL_CFLAGS += -I$(LOCAL_PATH)/boost/include/ 
+    LOCAL_LDLIBS += -L$(LOCAL_PATH)/external/boost/lib/ -lboost_system -lboost_...
+
     LOCAL_CPPFLAGS += -fexceptions
     LOCAL_CPPFLAGS += -frtti
-    LOCAL_CPPFLAGS +=-DBOOST_THREAD_LINUX
-    LOCAL_CPPFLAGS +=-DBOOST_HAS_PTHREADS
-    LOCAL_CPPFLAGS +=-D__arm__
-    LOCAL_CPPFLAGS +=-D_REENTRANT
-    LOCAL_CPPFLAGS +=-D_GLIBCXX__PTHREADS
-    LOCAL_CPPFLAGS +=-DBOOST_HAS_GETTIMEOFDAY
 
 Now use crystax ndk-build and have fun with it!
+Also note that you should build your projct and Boost with one version of NDK -
+STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
