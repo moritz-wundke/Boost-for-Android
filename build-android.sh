@@ -242,7 +242,7 @@ echo "Building boost for android"
 cd $BOOST_DIR
 env PATH=`dirname $CXXPATH`:$PATH \
  AndroidNDKRoot=$AndroidNDKRoot NO_BZIP2=1 \
- ./bjam toolset=$TOOLSET \
+ ./bjam toolset=$TOOLSET -q \
  cxxflags="$CXXFLAGS" \
  link=static threading=multi --layout=versioned install 2>&1 | tee -a $PROGDIR/build.log
 if [ $? != 0 ] ; then
