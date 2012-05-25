@@ -67,8 +67,13 @@ if [ -z "$AndroidNDKRoot" ] ; then
 	echo "Using AndroidNDKRoot = $AndroidNDKRoot"
 fi
 
+# Set deafult NDK release number
+NDK_R4=1
+NDK_RN=4
+
 NDK_R5=
 if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r5'`" ]; then
+	NDK_RN=5
 	NDK_R5=1
 	if [ -n "`echo $NDK | grep 'android-ndk-r5-crystax-1.beta3'`" ]; then
 		CRYSTAX_WCHAR=1
@@ -109,17 +114,25 @@ case "$HOST_OS" in
         Platfrom=linux-x86
 esac
 
-CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
-CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
-TOOLSET=gcc-androidR4
-if [ -n "$NDK_R5" ]; then
-	CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
-	CXXFLAGS="-I$AndroidNDKRoot/platforms/android-8/arch-arm/usr/include \
+
+case "$NDK_RN" in
+	4)
+		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+		CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
+		TOOLSET=gcc-androidR4
+		;;
+	5)
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-8/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include \
 				-I$AndroidNDKRoot/sources/wchar-support/include"
-	TOOLSET=gcc-androidR5
-fi
+		TOOLSET=gcc-androidR5
+		;;
+	*)
+		echo "Undefined or not supported Android NDK version!"
+		exit 1
+esac
 
 echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
