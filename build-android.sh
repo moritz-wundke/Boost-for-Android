@@ -79,6 +79,13 @@ if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r5'`" ]; then
 		CRYSTAX_WCHAR=1
 	fi
 fi
+NDK_R7=
+if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r7-crystax-5.beta2'`" ]; then
+	NDK_RN=7
+	NDK_R7=1
+	CRYSTAX_WCHAR=1
+fi
+
 
 
 if [ $CLEAN = yes ] ; then
@@ -128,6 +135,14 @@ case "$NDK_RN" in
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include \
 				-I$AndroidNDKRoot/sources/wchar-support/include"
 		TOOLSET=gcc-androidR5
+		;;
+	7)
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include/4.6.3 \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/4.6.3/include \
+				-I$AndroidNDKRoot/sources/crystax/include"
+		TOOLSET=gcc-androidR7
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
