@@ -23,11 +23,20 @@
 # Add common build methods
 . `dirname $0`/build-common.sh
 
+BOOST_VER1=1
+BOOST_VER2=48
+BOOST_VER3=0
+
+rm -r boost_${BOOST_VER1}_${$BOOST_VER2}_${$BOOST_VER3}
+rm -r build
+rm -r logs
+rm -r build.log
+
 # Build constants
 # TODO: Make boost stuff be configurable
-BOOST_DOWNLOAD_LINK="http://downloads.sourceforge.net/project/boost/boost/1.45.0/boost_1_45_0.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.45.0%2F&ts=1291326673&use_mirror=garr"
-BOOST_TAR="boost_1_45_0.tar.bz2"
-BOOST_DIR="boost_1_45_0"
+BOOST_DOWNLOAD_LINK="http://downloads.sourceforge.net/project/boost/boost/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3}%2F&ts=1291326673&use_mirror=garr"
+BOOST_TAR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
+BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
 BUILD_DIR="./build/"
 
 CLEAN=no
@@ -162,17 +171,17 @@ fi
 # Download required files
 # -----------------------
 
-# Downalod and unzip boost 1_45_0 in a temporal folder and
+# Downalod and unzip boost in a temporal folder and
 if [ ! -f $BOOST_TAR ]
 then
-	echo "Downloading boost 1.45.0 please wait..."
+	echo "Downloading boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} please wait..."
 	prepare_download
 	download_file $BOOST_DOWNLOAD_LINK $PROGDIR/$BOOST_TAR
 fi
 
 if [ ! -f $PROGDIR/$BOOST_TAR ]
 then
-	echo "Failed to download boost! Please download boost 1.45.0 manually\nand save it in this directory as $BOOST_TAR"
+	echo "Failed to download boost! Please download boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} manually\nand save it in this directory as $BOOST_TAR"
 	exit 1
 fi
 
@@ -208,9 +217,9 @@ then
 	# -------------------------------------------------------------
 
 	# Apply patches to boost
-	PATCHES_DIR=$PROGDIR/patches
+	PATCHES_DIR=$PROGDIR/patches-${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
 	if [ -d "$PATCHES_DIR" ] ; then
-		mkdir -p $PROGDIR/patches
+		mkdir -p $PATCHES_DIR
 	fi
 
 	PATCHES=`(cd $PATCHES_DIR && find . -name "*.patch" | sort) 2> /dev/null`
