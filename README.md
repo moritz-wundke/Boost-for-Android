@@ -32,3 +32,25 @@ Add the following to your Android.mk:
 Now use crystax ndk-build and have fun with it!
 Also note that you should build your projct and Boost with one version of NDK -
 STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
+
+
+## What works and what not
+
+### NDK 7 Crystax + boost 1.45
+
+Works, but `-lgnustl_static` has to be added *AFTER* all boost libraries to
+the LOCAL_LDLIBS line in Android.mk. Example:
+
+  LOCAL_LDLIBS += lboost_system-gcc-md lboost_thread-gcc-md -lgnustl_static
+
+### NDK 8 (vanilla) + boost 1.45
+
+Works. Everything that is in the NDK 7 Crystax + boost 1.45 section has to be
+done and additionally full path to the gnustl_static library has to be added
+to the link paths. Example:
+
+  LOCAL_LDLIBS += lboost_system-gcc-md lboost_thread-gcc-md \
+               -L$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi \
+               -lgnustl_static
+
+
