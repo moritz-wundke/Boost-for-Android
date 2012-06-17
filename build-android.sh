@@ -95,8 +95,6 @@ if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r7-crystax-5.beta2'`" ]; then
 	CRYSTAX_WCHAR=1
 fi
 
-
-
 if [ $CLEAN = yes ] ; then
 	echo "Cleaning: $BUILD_DIR"
 	rm -f -r $PROGDIR/$BUILD_DIR
@@ -133,7 +131,7 @@ esac
 
 case "$NDK_RN" in
 	4)
-		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+s		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
 		CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
 		TOOLSET=gcc-androidR4
 		;;
@@ -242,9 +240,9 @@ then
 	done
 fi
 
-# ---------------
-# Build using NDK
-# ---------------
+echo "# ---------------"
+echo "# Build using NDK"
+echo "# ---------------"
 
 # Build boost for android
 echo "Building boost for android"
