@@ -31,15 +31,11 @@ BOOST_DIR="boost_1_45_0"
 BUILD_DIR="./build/"
 
 CLEAN=no
-register_option "--clean"          do_clean     "Perform a clean build deleting all previus build files."
-
-do_clean ()
-{
-	CLEAN=yes
-}
+register_option "--clean"    do_clean     "Perform a clean build deleting all previus build files."
+do_clean () {	CLEAN=yes; }
 
 DOWNLOAD=no
-register_option "--download"       do_download  "Only download required files and clean up previus build. No build will be performed."
+register_option "--download" do_download  "Only download required files and clean up previus build. No build will be performed."
 
 do_download ()
 {
@@ -47,6 +43,16 @@ do_download ()
 	# Clean previus stuff too!
 	CLEAN=yes
 }
+
+LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams
+
+register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
+do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
+
+register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
+do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
+
+
 
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
@@ -197,10 +203,13 @@ fi
 if [ ! -f ./$BOOST_DIR/bjam ]
 then
 	# Make the initial bootstrap
-	echo "Performing boost boostrap"
+	echo "Performing boost bootstrap"
 
 	cd $BOOST_DIR 
-	./bootstrap.sh 2>&1 | tee -a $PROGDIR/build.log
+	./bootstrap.sh --prefix="./../$BUILD_DIR/" 			\
+								 $LIBRARIES 											\
+								 2>&1 | tee -a $PROGDIR/build.log
+
 	if [ $? != 0 ] ; then
 		dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
 		exit 1
