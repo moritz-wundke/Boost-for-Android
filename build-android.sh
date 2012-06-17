@@ -77,22 +77,19 @@ if [ -z "$AndroidNDKRoot" ] ; then
 fi
 
 # Set deafult NDK release number
-NDK_R4=1
 NDK_RN=4
 
-NDK_R5=
-if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r5'`" ]; then
+if [ -n "`echo $AndroidNDKRoot | grep 'ndk-r5'`" ]; then
 	NDK_RN=5
-	NDK_R5=1
-	if [ -n "`echo $NDK | grep 'android-ndk-r5-crystax-1.beta3'`" ]; then
+
+	if [ -n "`echo $AndroidNDKRoot | grep 'crystax'`" ]; then
 		CRYSTAX_WCHAR=1
 	fi
-fi
-NDK_R7=
-if [ -n "`echo $AndroidNDKRoot | grep 'android-ndk-r7-crystax-5.beta2'`" ]; then
+elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r7-crystax'`" ]; then
 	NDK_RN=7
-	NDK_R7=1
 	CRYSTAX_WCHAR=1
+elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r8'`" ]; then
+	NDK_RN=8
 fi
 
 if [ $CLEAN = yes ] ; then
@@ -151,6 +148,13 @@ s		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-
 				-I$AndroidNDKRoot/sources/crystax/include"
 		TOOLSET=gcc-androidR7
 		;;
+	8)
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include"
+		TOOLSET=gcc-androidR8
+		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
 		exit 1
@@ -186,7 +190,7 @@ fi
 if [ ! -d $PROGDIR/$BOOST_DIR ]
 then
 	echo "Unpack boost"
-	tar xvjf $PROGDIR/$BOOST_TAR
+	tar xjf $PROGDIR/$BOOST_TAR
 fi
 
 if [ $DOWNLOAD = yes ] ; then
