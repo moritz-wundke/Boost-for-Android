@@ -27,7 +27,7 @@ BOOST_VER1=1
 BOOST_VER2=48
 BOOST_VER3=0
 
-rm -r boost_${BOOST_VER1}_${$BOOST_VER2}_${$BOOST_VER3}
+rm -r boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
 rm -r build
 rm -r logs
 rm -r build.log
@@ -61,7 +61,6 @@ PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
 "Copyright (C) 2010 Mystic Tree Games\n"\
-"------------------------------------"
 
 extract_parameters $@
 
@@ -189,7 +188,7 @@ fi
 
 if [ ! -d $PROGDIR/$BOOST_DIR ]
 then
-	echo "Unpack boost"
+	echo "Unpacking boost"
 	tar xjf $PROGDIR/$BOOST_TAR
 fi
 
@@ -219,29 +218,37 @@ then
 	# -------------------------------------------------------------
 
 	# Apply patches to boost
-	PATCHES_DIR=$PROGDIR/patches-${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-	if [ -d "$PATCHES_DIR" ] ; then
-		mkdir -p $PATCHES_DIR
-	fi
+	PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
+	PATCH_NDK_DIR=$PATCH_BOOST_DIR/ndk-androidR${NDK_RN}
 
-	PATCHES=`(cd $PATCHES_DIR && find . -name "*.patch" | sort) 2> /dev/null`
-	if [ -z "$PATCHES" ] ; then
-		echo "No patches files in $PATCHES_DIR"
-		exit 0
-	fi
+  for dir in $PATCH_BOOST_DIR $PATCH_NDK_DIR; do
+	  if [ ! -d "$dir" ]; then
+      echo "Could not find directory '$dir' while looking for patches"
+      exit 1
+    fi
 
-	PATCHES=`echo $PATCHES | sed -e s%^\./%%g`
-	SRC_DIR=$PROGDIR/$BOOST_DIR
-	for PATCH in $PATCHES; do
-		PATCHDIR=`dirname $PATCH`
-		PATCHNAME=`basename $PATCH`
-		log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
-		cd $SRC_DIR && patch -p1 < $PATCHES_DIR/$PATCH && cd $PROGDIR
-		if [ $? != 0 ] ; then
-			dump "ERROR: Patch failure !! Please check your patches directory! Try to perform a clean build using --clean"
-			exit 1
-		fi
-	done
+	  PATCHES=`(cd $dir && ls *.patch | sort) 2> /dev/null`
+
+    if [ -z "$PATCHES" ]; then
+		  echo "No patches found in directory '$dir'"
+      exit 1
+    fi
+
+    for PATCH in $PATCHES; do
+      PATCH=`echo $PATCH | sed -e s%^\./%%g`
+      SRC_DIR=$PROGDIR/$BOOST_DIR
+		  PATCHDIR=`dirname $PATCH`
+		  PATCHNAME=`basename $PATCH`
+		  log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
+		  cd $SRC_DIR && patch -p1 < $dir/$PATCH && cd $PROGDIR
+		  if [ $? != 0 ] ; then
+		  	dump "ERROR: Patch failure !! Please check your patches directory!"
+        dump "       Try to perform a clean build using --clean ."
+        dump "       Problem patch: $dir/$PATCHNAME"
+		  	exit 1
+		  fi
+    done
+  done
 fi
 
 echo "# ---------------"
