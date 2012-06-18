@@ -127,10 +127,6 @@ if [ $CLEAN = yes ] ; then
 	
 	echo "Cleaning: $BOOST_TAR"
 	rm -f $PROGDIR/$BOOST_TAR
-
-	echo "Cleaning: logs"
-	rm -f -r logs
-	rm -f build.log
 fi
 
 # Check if android NDK path has been set 
