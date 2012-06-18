@@ -1,6 +1,6 @@
 --- boost_1_45_0-old/tools/build/v2/user-config.jam	2008-07-15 16:53:41.000000000 +0300
 +++ boost_1_45_0/tools/build/v2/user-config.jam	2011-06-08 17:38:13.677497695 +0300
-@@ -84,3 +84,49 @@
+@@ -84,3 +84,46 @@
  
  # Configure with an explicit installation prefix.
  # using qt : /usr/opt/qt ;
@@ -43,10 +43,7 @@
 +<compileflags>-fvisibility=hidden
 +<compileflags>-fvisibility-inlines-hidden
 +<compileflags>-fdata-sections
-+<cxxflags>-DBOOST_THREAD_LINUX
-+<cxxflags>-DBOOST_HAS_PTHREADS
 +<cxxflags>-D__arm__
 +<cxxflags>-D_REENTRANT
 +<cxxflags>-D_GLIBCXX__PTHREADS
-+<cxxflags>-DBOOST_HAS_GETTIMEOFDAY
 +;

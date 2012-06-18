@@ -218,31 +218,6 @@ diff -ruN boost_1_48_0-boot/libs/filesystem/v3/src/operations.cpp boost_1_48_0-p
  
  #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
  #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
-diff -ruN boost_1_48_0-boot/project-config.jam boost_1_48_0-patched/project-config.jam
---- boost_1_48_0-boot/project-config.jam	2012-06-17 00:11:38.000000000 +0200
-+++ boost_1_48_0-patched/project-config.jam	2012-06-17 00:21:03.000000000 +0200
-@@ -24,14 +24,16 @@
- # options. If left empty, all libraries will be built.
- # Options specified on the command line completely
- # override this variable.
--libraries =  ;
-+# @Moss - Adding needed libs to be valid for android
-+libraries = --with-date_time --with-filesystem --with-program_options --with-regex --with-signals --with-system --with-thread --with-iostreams ; 
-+
- 
- # These settings are equivivalent to corresponding command-line
- # options.
--option.set prefix : /usr/local ;
--option.set exec-prefix : /usr/local ;
--option.set libdir : /usr/local/lib ;
--option.set includedir : /usr/local/include ;
-+option.set prefix : ./../build/ ;
-+option.set exec-prefix : ./../build/ ;
-+option.set libdir : ./../build//lib ;
-+option.set includedir : ./../build//include ;
- 
- # Stop on first error
- option.set keep-going : false ;
 diff -ruN boost_1_48_0-boot/tools/build/v2/tools/android.jam boost_1_48_0-patched/tools/build/v2/tools/android.jam
 --- boost_1_48_0-boot/tools/build/v2/tools/android.jam	1970-01-01 01:00:00.000000000 +0100
 +++ boost_1_48_0-patched/tools/build/v2/tools/android.jam	2012-06-17 00:16:04.000000000 +0200
