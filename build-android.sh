@@ -30,7 +30,7 @@
 BOOST_VER1=1
 BOOST_VER2=48
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.48.0, 1.45.0}, default is 1.48.0"
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.48.0, 1.45.0}, default is 1.48.0."
 boost_version()
 {
   if [ "$1" = "1.48.0" ]; then
@@ -48,7 +48,7 @@ boost_version()
 }
 
 CLEAN=no
-register_option "--clean"    do_clean     "Perform a clean build deleting all previus build files."
+register_option "--clean"    do_clean     "Delete all previously downloaded and built files, then exit."
 do_clean () {	CLEAN=yes; }
 
 DOWNLOAD=no
@@ -105,7 +105,7 @@ if [ $CLEAN = yes ] ; then
 	rm -f -r logs
 	rm -f build.log
 
-  exit 0
+  [ "$DOWNLOAD" = "yes" ] || exit 0
 fi
 
 # It is almost never desirable to have the
