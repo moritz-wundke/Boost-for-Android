@@ -91,6 +91,41 @@ BUILD_DIR="./build/"
 
 # -----------------------
 
+if [ $CLEAN = yes ] ; then
+	echo "Cleaning: $BUILD_DIR"
+	rm -f -r $PROGDIR/$BUILD_DIR
+	
+	echo "Cleaning: $BOOST_DIR"
+	rm -f -r $PROGDIR/$BOOST_DIR
+	
+	echo "Cleaning: $BOOST_TAR"
+	rm -f $PROGDIR/$BOOST_TAR
+
+	echo "Cleaning: logs"
+	rm -f -r logs
+	rm -f build.log
+
+  exit 0
+fi
+
+# It is almost never desirable to have the
+# boost-X_Y_Z directory from previous builds
+# as this script doesn't check in which state
+# it's been left (bootstrapped, patched, built, ...).
+# Unless maybe during debug, in which case it's
+# easy for a developer to commen out this code.
+
+if [ -d "$PROGDIR/$BOOST_DIR" ]; then
+	echo "Cleaning: $BOOST_DIR"
+	rm -f -r $PROGDIR/$BOOST_DIR
+fi
+
+if [ -d "$PROGDIR/$BUILD_DIR" ]; then
+	echo "Cleaning: $BUILD_DIR"
+	rm -f -r $PROGDIR/$BUILD_DIR
+fi
+
+
 export AndroidNDKRoot=$PARAMETERS
 if [ -z "$AndroidNDKRoot" ] ; then
 	if [ -z "`which ndk-build`" ]; then
@@ -116,17 +151,6 @@ elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r7-crystax'`" ]; then
 	CRYSTAX_WCHAR=1
 elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r8'`" ]; then
 	NDK_RN=8
-fi
-
-if [ $CLEAN = yes ] ; then
-	echo "Cleaning: $BUILD_DIR"
-	rm -f -r $PROGDIR/$BUILD_DIR
-	
-	echo "Cleaning: $BOOST_DIR"
-	rm -f -r $PROGDIR/$BOOST_DIR
-	
-	echo "Cleaning: $BOOST_TAR"
-	rm -f $PROGDIR/$BOOST_TAR
 fi
 
 # Check if android NDK path has been set 
