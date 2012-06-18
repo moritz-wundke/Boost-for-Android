@@ -1,10 +1,9 @@
---- boost_1_45_0-old/tools/build/v2/user-config.jam	2008-07-15 16:53:41.000000000 +0300
-+++ boost_1_45_0/tools/build/v2/user-config.jam	2011-06-08 17:38:13.677497695 +0300
-@@ -90,3 +90,53 @@
-
-# Configure specific Python version.
-# using python : 3.1 : /usr/bin/python3 : /usr/include/python3.1 : /usr/lib ;
-+
+--- boost_1_45_0-old/tools/build/v2/user-config.jam	2012-06-18 02:00:37.000000000 +0200
++++ boost_1_45_0/tools/build/v2/user-config.jam	2012-06-18 02:05:15.000000000 +0200
+@@ -74,6 +74,56 @@
+ # using stlport : : /usr/include/stlport /usr/lib ;
+ 
+ 
 +# ----------------------
 +# Android configuration.
 +# ----------------------
@@ -54,3 +53,7 @@
 +<cxxflags>-D_GLIBCXX__PTHREADS
 +<cxxflags>-DBOOST_HAS_GETTIMEOFDAY
 +;
++
+ # -----------------
+ # QT configuration.
+ # -----------------

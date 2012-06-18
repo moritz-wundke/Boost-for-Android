@@ -27,17 +27,26 @@ BOOST_VER1=1
 BOOST_VER2=48
 BOOST_VER3=0
 
-rm -r boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-rm -r build
-rm -r logs
-rm -r build.log
-
 # Build constants
 # TODO: Make boost stuff be configurable
 BOOST_DOWNLOAD_LINK="http://downloads.sourceforge.net/project/boost/boost/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3}%2F&ts=1291326673&use_mirror=garr"
 BOOST_TAR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
 BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
 BUILD_DIR="./build/"
+
+# TODO: This functionality should be performed by --clean .
+#       I'm not sure whether it's usable to keep the data
+#       intact before this script does it's job. (from experience
+#       it's always desirable to start clean). But if it is,
+#       I don't mind having this code deleted.
+if [ -d "$BOOST_DIR" -o -d "build" -o -d "logs" -o -f "build.log" ]; then
+  echo "Cleaning from previous builds."
+  rm -r $BOOST_DIR 2>/dev/null
+  rm -r build      2>/dev/null
+  rm -r logs       2>/dev/null
+  rm -r build.log  2>/dev/null
+  echo "Done (cleaning)"
+fi
 
 CLEAN=no
 register_option "--clean"          do_clean     "Perform a clean build deleting all previus build files."
