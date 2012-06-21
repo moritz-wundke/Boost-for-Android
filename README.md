@@ -9,6 +9,8 @@ For boost 1.45.0
 - NDK r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php).
 - NDK r5 from the [official android repository](http://developer.android.com).
 - NDK r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
+- NDK r7 from the [official android repository](http://developer.android.com).
+- NDK r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
 - NDK r8 from the [official android repository](http://developer.android.com).
 
 For boost 1.48.0
