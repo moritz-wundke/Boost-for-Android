@@ -28,12 +28,16 @@
 # -----------------------
 
 BOOST_VER1=1
-BOOST_VER2=48
+BOOST_VER2=49
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.48.0, 1.45.0}, default is 1.48.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.49.0, 1.48.0, 1.45.0}, default is 1.49.0."
 boost_version()
 {
-  if [ "$1" = "1.48.0" ]; then
+  if [ "$1" = "1.49.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=49
+    BOOST_VER3=0
+  elif [ "$1" = "1.48.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=48
     BOOST_VER3=0

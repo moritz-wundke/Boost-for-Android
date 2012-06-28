@@ -1,7 +1,7 @@
 # Boost for Android
 Boost for android is a set of tools to compile the main part of the [Boost C++ Libraries](http://www.boost.org/) for the Android platform.
 
-Currently supported boost versions are 1.45.0 and 1.48.0.
+Currently supported boost versions are 1.45.0, 1.48.0 and 1.49.0.
 
 To compile Boost for Android you may use one of the following NDKs:
 
@@ -13,7 +13,7 @@ For boost 1.45.0
 - NDK r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
 - NDK r8 from the [official android repository](http://developer.android.com).
 
-For boost 1.48.0
+For boost 1.48.0 & 1.49.0
 - NDK r7 from the [official android repository](http://developer.android.com).
 - NDK r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
 - NDK r8 from the [official android repository](http://developer.android.com).
