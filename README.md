@@ -35,7 +35,7 @@ For more info about usage and available commands use --help
 
 Now that you got boost compiled you must add it to your Android.mk file. First copy the inlcude and lib filder over to your jni folder. I copied it just into: /jni/boost/.
 
-Add the following to your Android.mk:
+Add the following to your Android.mk (example for boost 1.48):
 
     LOCAL_CFLAGS += -I$(LOCAL_PATH)/boost/include/boost-1_48
     LOCAL_LDLIBS += -L$(LOCAL_PATH)/boost/lib/ -lboost_system -lboost_...
