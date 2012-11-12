@@ -144,16 +144,19 @@ fi
 # Set default NDK release number
 NDK_RN=4
 
-if [ -n "`echo $AndroidNDKRoot | grep 'ndk-r5'`" ]; then
+NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
+# TODO: Remove this mess with selecting compiler version
+# Most have now multiple compiler versions available
+if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
 	NDK_RN=5
 
-	if [ -n "`echo $AndroidNDKRoot | grep 'crystax'`" ]; then
+	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
 		CRYSTAX_WCHAR=1
 	fi
-elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r7-crystax'`" ]; then
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
 	NDK_RN=7
 	CRYSTAX_WCHAR=1
-elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r8'`" ]; then
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
 fi
 
