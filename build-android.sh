@@ -141,7 +141,7 @@ if [ -z "$AndroidNDKRoot" ] ; then
 	echo "Using AndroidNDKRoot = $AndroidNDKRoot"
 fi
 
-# Set deafult NDK release number
+# Set default NDK release number
 NDK_RN=4
 
 if [ -n "`echo $AndroidNDKRoot | grep 'ndk-r5'`" ]; then
