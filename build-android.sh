@@ -187,7 +187,7 @@ esac
 
 case "$NDK_RN" in
 	4)
-s		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
 		CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
 		TOOLSET=gcc-androidR4
 		;;
