@@ -141,19 +141,24 @@ if [ -z "$AndroidNDKRoot" ] ; then
 	echo "Using AndroidNDKRoot = $AndroidNDKRoot"
 fi
 
-# Set deafult NDK release number
+# Set default NDK release number
 NDK_RN=4
 
-if [ -n "`echo $AndroidNDKRoot | grep 'ndk-r5'`" ]; then
+NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
+# TODO: Remove this mess with selecting compiler version
+# Most have now multiple compiler versions available
+if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
 	NDK_RN=5
 
-	if [ -n "`echo $AndroidNDKRoot | grep 'crystax'`" ]; then
+	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
 		CRYSTAX_WCHAR=1
 	fi
-elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r7-crystax'`" ]; then
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
 	NDK_RN=7
 	CRYSTAX_WCHAR=1
-elif [ -n "`echo $AndroidNDKRoot | grep 'ndk-r8'`" ]; then
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
+	NDK_RN=8b
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
 fi
 
@@ -182,7 +187,7 @@ esac
 
 case "$NDK_RN" in
 	4)
-s		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
 		CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
 		TOOLSET=gcc-androidR4
 		;;
@@ -207,6 +212,13 @@ s		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include"
+		TOOLSET=gcc-androidR8
+		;;
+	8b)
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
+				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include"
 		TOOLSET=gcc-androidR8
 		;;
 	*)
