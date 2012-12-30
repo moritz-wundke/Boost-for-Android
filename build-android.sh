@@ -156,6 +156,8 @@ if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
 	NDK_RN=7
 	CRYSTAX_WCHAR=1
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8d'`" ]; then
+  NDK_RN=8d  
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8c'`" ]; then
 	NDK_RN=8c
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
@@ -217,14 +219,7 @@ case "$NDK_RN" in
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include"
 		TOOLSET=gcc-androidR8
 		;;
-	8b)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
-		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include"
-		TOOLSET=gcc-androidR8
-		;;
-	8c)
+	8b|8c|8d)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
