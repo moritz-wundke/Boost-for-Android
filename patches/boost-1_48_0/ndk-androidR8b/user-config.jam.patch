@@ -1,0 +1,56 @@
+--- boost_1_45_0-old/tools/build/v2/user-config.jam	2012-06-18 02:00:37.000000000 +0200
++++ boost_1_45_0/tools/build/v2/user-config.jam	2012-06-18 02:05:15.000000000 +0200
+@@ -74,6 +74,53 @@
+ # using stlport : : /usr/include/stlport /usr/lib ;
+ 
+ 
++# ----------------------
++# Android configuration.
++# ----------------------
++
++
++using gcc : androidR8b
++:
++arm-linux-androideabi-g++
++:
++<archiver>arm-linux-androideabi-ar
++<compileflags>-fexceptions
++<compileflags>-frtti
++<compileflags>-fpic
++<compileflags>-ffunction-sections
++<compileflags>-funwind-tables
++<compileflags>-D__ARM_ARCH_5__
++<compileflags>-D__ARM_ARCH_5T__
++<compileflags>-D__ARM_ARCH_5E__
++<compileflags>-D__ARM_ARCH_5TE__
++<compileflags>-Wno-psabi
++<compileflags>-march=armv5te
++<compileflags>-mtune=xscale
++<compileflags>-msoft-float
++<compileflags>-mthumb
++<compileflags>-Os
++<compileflags>-fomit-frame-pointer
++<compileflags>-fno-strict-aliasing
++<compileflags>-finline-limit=64
++<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
++<compileflags>-Wa,--noexecstack
++<compileflags>-DANDROID
++<compileflags>-D__ANDROID__
++<compileflags>-DNDEBUG
++<compileflags>-O2
++<compileflags>-g
++<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.6/include
++<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include
++# @Moss - Above are the 'oficial' android flags
++<architecture>arm
++<compileflags>-fvisibility=hidden
++<compileflags>-fvisibility-inlines-hidden
++<compileflags>-fdata-sections
++<cxxflags>-D__arm__
++<cxxflags>-D_REENTRANT
++<cxxflags>-D_GLIBCXX__PTHREADS
++;
++
+ # -----------------
+ # QT configuration.
+ # -----------------
