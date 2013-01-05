@@ -156,7 +156,7 @@ if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
 	NDK_RN=7
 	CRYSTAX_WCHAR=1
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8[b-z]'`" ]; then
 	NDK_RN=8b
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
@@ -219,7 +219,7 @@ case "$NDK_RN" in
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include"
-		TOOLSET=gcc-androidR8
+		TOOLSET=gcc-androidR8b
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
