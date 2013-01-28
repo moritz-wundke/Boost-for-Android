@@ -155,15 +155,21 @@ if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
 	fi
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7'`" ]; then
 	NDK_RN=7
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
-	NDK_RN=7
-	CRYSTAX_WCHAR=1
+	EABI_VER=4.4.3
+	
+	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
+		CRYSTAX_WCHAR=1
+	    EABI_VER=4.6.3
+	fi	
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
 	NDK_RN=8b
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
 fi
 echo "Detected Android NDK version $NDK_RN"
+if [ "$CRYSTAX_WCHAR" == 1 ]; then
+    echo "Using Crystax NDK"
+fi
 
 # Check if android NDK path has been set 
 if [ ! -n "${AndroidNDKRoot:+x}" ]
@@ -203,7 +209,7 @@ case "$NDK_RN" in
 		TOOLSET=gcc-androidR5
 		;;
 	7)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include/4.6.3 \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/4.6.3/include \
