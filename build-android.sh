@@ -153,6 +153,8 @@ if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
 	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
 		CRYSTAX_WCHAR=1
 	fi
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7'`" ]; then
+	NDK_RN=7
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
 	NDK_RN=7
 	CRYSTAX_WCHAR=1
@@ -161,6 +163,7 @@ elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
 fi
+echo "Detected Android NDK version $NDK_RN"
 
 # Check if android NDK path has been set 
 if [ ! -n "${AndroidNDKRoot:+x}" ]
