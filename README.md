@@ -27,7 +27,7 @@ For boost 1.48.0 & 1.49.0
 
 ## Usage
 
-    ./build-android.sh $(NDK_ROOT)
+    $ ./build-android.sh $(NDK_ROOT)
 
 This command will download and build boost against the NDK specified and output the final headers and libs and in the build folder.
 
@@ -52,6 +52,15 @@ STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
 
 In case you encounter bunch of linker errors when building your app with boost, 
 this might help:
+
+### Building from a 64 bit machine (linux)
+
+Make sure you have installed the 32 bit libraries. Those are required to be able
+to use the NDK.
+
+To install them just use the following
+
+    $ sudo apt-get install ia32-libs
 
 ### NDK 7 (CrystaX)
 
