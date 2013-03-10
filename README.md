@@ -18,6 +18,9 @@ For boost 1.48.0, 1.49.0 & 1.53.0
 - NDK r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
 - NDK r8 from the [official android repository](http://developer.android.com).
 
+For boost 1.49.0
+- NDK r8, r8c and r8d from the [official android repository](http://developer.android.com).
+
 # Quick Start
 
 ## Dependencies
