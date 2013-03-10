@@ -28,12 +28,16 @@
 # -----------------------
 
 BOOST_VER1=1
-BOOST_VER2=49
+BOOST_VER2=53
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.49.0, 1.48.0, 1.45.0}, default is 1.49.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0,1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
-  if [ "$1" = "1.49.0" ]; then
+  if [ "$1" = "1.53.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=53
+    BOOST_VER3=0
+  elif [ "$1" = "1.49.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=49
     BOOST_VER3=0
@@ -158,6 +162,8 @@ elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7-crystax'`" ]; then
 	CRYSTAX_WCHAR=1
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
 	NDK_RN=8b
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8d'`" ]; then
+	NDK_RN=8d
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
 fi
@@ -214,7 +220,7 @@ case "$NDK_RN" in
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include"
 		TOOLSET=gcc-androidR8
 		;;
-	8b)
+	8b|8d)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
