@@ -5,21 +5,16 @@ Currently supported boost versions are 1.45.0, 1.48.0, 1.49.0 and 1.53.0.
 
 To compile Boost for Android you may use one of the following NDKs:
 
-For boost 1.45.0
-- NDK r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php).
-- NDK r5 from the [official android repository](http://developer.android.com).
-- NDK r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
-- NDK r7 from the [official android repository](http://developer.android.com).
-- NDK r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
-- NDK r8 from the [official android repository](http://developer.android.com).
-
-For boost 1.48.0, 1.49.0 & 1.53.0
-- NDK r7 from the [official android repository](http://developer.android.com).
-- NDK r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).
-- NDK r8 from the [official android repository](http://developer.android.com).
-
-For boost 1.49.0
-- NDK r8, r8c and r8d from the [official android repository](http://developer.android.com).
+| NDK / boost | 1.45 | 1.48 | 1.49 | 1.53 |
+| ----------- | ---- | ---- | ---- | ---- |
+| r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php). | x |   |   |   |
+| r5 from the [official android repository](http://developer.android.com).                  | x |   |   |   |
+| r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x |   |   |   |
+| r7 from the [official android repository](http://developer.android.com).                  | x | x | x |   |
+| r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x | x | x |   |
+| r8 from the [official android repository](http://developer.android.com).                  | x | x | x |   |
+| r8c from the [official android repository](http://developer.android.com).                 |   |   | x |   |
+| r8d from the [official android repository](http://developer.android.com).                 |   |   | x | x |
 
 # Quick Start
 
