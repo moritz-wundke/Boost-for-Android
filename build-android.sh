@@ -163,7 +163,7 @@ elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7'`" ]; then
 	
 	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
 		CRYSTAX_WCHAR=1
-	    EABI_VER=4.6.3
+		EABI_VER=4.6.3
 	fi
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8c'`" ]; then
 	NDK_RN=8c
@@ -176,8 +176,8 @@ elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 fi
 
 echo "Detected Android NDK version $NDK_RN"
-if [ "$CRYSTAX_WCHAR" == 1 ]; then
-    echo "Using Crystax NDK"
+if [ "$CRYSTAX_WCHAR" = 1 ]; then
+	echo "Using Crystax NDK"
 fi
 
 # Check if android NDK path has been set 
@@ -236,12 +236,13 @@ case "$NDK_RN" in
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include"
-		TOOLSET=gcc-androidR8
+		TOOLSET=gcc-androidR8b
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
 		exit 1
 esac
+
 
 echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
