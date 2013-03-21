@@ -171,6 +171,8 @@ elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
 	NDK_RN=8b
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8d'`" ]; then
 	NDK_RN=8d
+elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8e'`" ]; then
+	NDK_RN=8e
 elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
 	NDK_RN=8
 fi
@@ -237,6 +239,10 @@ case "$NDK_RN" in
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include"
 		TOOLSET=gcc-androidR8b
+		;;
+	8e)
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		TOOLSET=gcc-androidR8e
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
@@ -346,11 +352,18 @@ echo "# ---------------"
 # Build boost for android
 echo "Building boost for android"
 cd $BOOST_DIR
+
+bjam_params="-q"
+[ -n "$TOOLSET" ]  && bjam_params="$bjam_params toolset=$TOOLSET"
+[ -n "$CXXFLAGS" ] && bjam_params="$bjam_params cxxflags=$CXXFLAGS"
+bjam_params="$bjam_params link=static threading=multi"
+bjam_params="$bjam_params --layout=versioned"
+bjam_params="$bjam_params install"
+
 env PATH=`dirname $CXXPATH`:$PATH \
  AndroidNDKRoot=$AndroidNDKRoot NO_BZIP2=1 \
- ./bjam toolset=$TOOLSET -q \
- cxxflags="$CXXFLAGS" \
- link=static threading=multi --layout=versioned install 2>&1 | tee -a $PROGDIR/build.log
+ ./bjam $bjam_params 2>&1 | tee -a $PROGDIR/build.log
+
 if [ $? != 0 ] ; then
 	dump "ERROR: Failed to build boost for android!"
 	exit 1
