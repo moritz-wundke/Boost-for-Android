@@ -1,47 +1,6 @@
-diff -ruN boost_1_48_0-boot/boost/asio/detail/fenced_block.hpp boost_1_48_0-patched/boost/asio/detail/fenced_block.hpp
---- boost_1_48_0-boot/boost/asio/detail/fenced_block.hpp	2011-10-09 23:59:57.000000000 +0200
-+++ boost_1_48_0-patched/boost/asio/detail/fenced_block.hpp	2012-06-16 23:59:57.000000000 +0200
-@@ -25,7 +25,7 @@
- # include <boost/asio/detail/macos_fenced_block.hpp>
- #elif defined(__sun)
- # include <boost/asio/detail/solaris_fenced_block.hpp>
--#elif defined(__GNUC__) && defined(__arm__)
-+#elif defined(__GNUC__) && defined(__arm__) && !defined(__thumb__)
- # include <boost/asio/detail/gcc_arm_fenced_block.hpp>
- #elif defined(__GNUC__) && (defined(__hppa) || defined(__hppa__))
- # include <boost/asio/detail/gcc_hppa_fenced_block.hpp>
-@@ -34,7 +34,8 @@
- #elif defined(__GNUC__) \
-   && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)) \
-   && !defined(__INTEL_COMPILER) && !defined(__ICL) \
--  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__)
-+  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__) \
-+  && !defined(ANDROID) && !defined(__ANDROID__)
- # include <boost/asio/detail/gcc_sync_fenced_block.hpp>
- #elif defined(BOOST_WINDOWS) && !defined(UNDER_CE)
- # include <boost/asio/detail/win_fenced_block.hpp>
-@@ -54,7 +55,7 @@
- typedef macos_fenced_block fenced_block;
- #elif defined(__sun)
- typedef solaris_fenced_block fenced_block;
--#elif defined(__GNUC__) && defined(__arm__)
-+#elif defined(__GNUC__) && defined(__arm__) && !defined(__thumb__)
- typedef gcc_arm_fenced_block fenced_block;
- #elif defined(__GNUC__) && (defined(__hppa) || defined(__hppa__))
- typedef gcc_hppa_fenced_block fenced_block;
-@@ -63,7 +64,8 @@
- #elif defined(__GNUC__) \
-   && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)) \
-   && !defined(__INTEL_COMPILER) && !defined(__ICL) \
--  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__)
-+  && !defined(__ICC) && !defined(__ECC) && !defined(__PATHSCALE__) \
-+  && !defined(ANDROID) && !defined(__ANDROID__)
- typedef gcc_sync_fenced_block fenced_block;
- #elif defined(BOOST_WINDOWS) && !defined(UNDER_CE)
- typedef win_fenced_block fenced_block;
-diff -ruN boost_1_48_0-boot/boost/asio/detail/socket_types.hpp boost_1_48_0-patched/boost/asio/detail/socket_types.hpp
---- boost_1_48_0-boot/boost/asio/detail/socket_types.hpp	2011-06-06 01:21:43.000000000 +0200
-+++ boost_1_48_0-patched/boost/asio/detail/socket_types.hpp	2012-06-16 23:55:05.000000000 +0200
+diff -ruN boost_1_53_0-boot/boost/asio/detail/socket_types.hpp boost_1_53_0-patched/boost/asio/detail/socket_types.hpp
+--- boost_1_53_0-boot/boost/asio/detail/socket_types.hpp	2012-01-15 14:46:25.000000000 +0100
++++ boost_1_53_0-patched/boost/asio/detail/socket_types.hpp	2012-06-27 19:19:01.279562338 +0200
 @@ -123,7 +123,12 @@
  typedef int socket_type;
  const int invalid_socket = -1;
@@ -55,9 +14,9 @@ diff -ruN boost_1_48_0-boot/boost/asio/detail/socket_types.hpp boost_1_48_0-patc
  #if defined(INET6_ADDRSTRLEN)
  const int max_addr_v6_str_len = INET6_ADDRSTRLEN + 1 + IF_NAMESIZE;
  #else // defined(INET6_ADDRSTRLEN)
-diff -ruN boost_1_48_0-boot/boost/asio/ip/impl/address_v6.ipp boost_1_48_0-patched/boost/asio/ip/impl/address_v6.ipp
---- boost_1_48_0-boot/boost/asio/ip/impl/address_v6.ipp	2011-06-06 01:21:43.000000000 +0200
-+++ boost_1_48_0-patched/boost/asio/ip/impl/address_v6.ipp	2012-06-16 23:53:27.000000000 +0200
+diff -ruN boost_1_53_0-boot/boost/asio/ip/impl/address_v6.ipp boost_1_53_0-patched/boost/asio/ip/impl/address_v6.ipp
+--- boost_1_53_0-boot/boost/asio/ip/impl/address_v6.ipp	2012-01-15 14:46:25.000000000 +0100
++++ boost_1_53_0-patched/boost/asio/ip/impl/address_v6.ipp	2012-06-27 19:19:11.029581297 +0200
 @@ -11,6 +11,23 @@
  #ifndef BOOST_ASIO_IP_IMPL_ADDRESS_V6_IPP
  #define BOOST_ASIO_IP_IMPL_ADDRESS_V6_IPP
@@ -82,9 +41,9 @@ diff -ruN boost_1_48_0-boot/boost/asio/ip/impl/address_v6.ipp boost_1_48_0-patch
  #if defined(_MSC_VER) && (_MSC_VER >= 1200)
  # pragma once
  #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
-diff -ruN boost_1_48_0-boot/boost/config/user.hpp boost_1_48_0-patched/boost/config/user.hpp
---- boost_1_48_0-boot/boost/config/user.hpp	2004-01-10 13:10:00.000000000 +0100
-+++ boost_1_48_0-patched/boost/config/user.hpp	2012-06-16 23:58:53.000000000 +0200
+diff -ruN boost_1_53_0-boot/boost/config/user.hpp boost_1_53_0-patched/boost/config/user.hpp
+--- boost_1_53_0-boot/boost/config/user.hpp	2004-01-10 13:10:00.000000000 +0100
++++ boost_1_53_0-patched/boost/config/user.hpp	2012-06-27 19:18:46.129532736 +0200
 @@ -13,6 +13,15 @@
  //  configuration policy:
  //
@@ -101,9 +60,9 @@ diff -ruN boost_1_48_0-boot/boost/config/user.hpp boost_1_48_0-patched/boost/con
  // define this to locate a compiler config file:
  // #define BOOST_COMPILER_CONFIG <myheader>
  
-diff -ruN boost_1_48_0-boot/boost/detail/endian.hpp boost_1_48_0-patched/boost/detail/endian.hpp
---- boost_1_48_0-boot/boost/detail/endian.hpp	2011-03-29 23:58:48.000000000 +0200
-+++ boost_1_48_0-patched/boost/detail/endian.hpp	2012-06-16 23:57:19.000000000 +0200
+diff -ruN boost_1_53_0-boot/boost/detail/endian.hpp boost_1_53_0-patched/boost/detail/endian.hpp
+--- boost_1_53_0-boot/boost/detail/endian.hpp	2011-03-29 23:58:48.000000000 +0200
++++ boost_1_53_0-patched/boost/detail/endian.hpp	2012-06-27 19:18:39.359519453 +0200
 @@ -31,7 +31,7 @@
  // GNU libc offers the helpful header <endian.h> which defines
  // __BYTE_ORDER
@@ -113,78 +72,25 @@ diff -ruN boost_1_48_0-boot/boost/detail/endian.hpp boost_1_48_0-patched/boost/d
  # include <endian.h>
  # if (__BYTE_ORDER == __LITTLE_ENDIAN)
  #  define BOOST_LITTLE_ENDIAN
-diff -ruN boost_1_48_0-boot/boost/interprocess/detail/workaround.hpp boost_1_48_0-patched/boost/interprocess/detail/workaround.hpp
---- boost_1_48_0-boot/boost/interprocess/detail/workaround.hpp	2011-08-30 17:46:15.000000000 +0200
-+++ boost_1_48_0-patched/boost/interprocess/detail/workaround.hpp	2012-06-17 00:05:30.000000000 +0200
-@@ -64,7 +64,7 @@
+diff -ruN boost_1_53_0-boot/boost/interprocess/detail/workaround.hpp boost_1_53_0-patched/boost/interprocess/detail/workaround.hpp
+--- boost_1_53_0-boot/boost/interprocess/detail/workaround.hpp	2011-12-26 18:21:36.000000000 +0100
++++ boost_1_53_0-patched/boost/interprocess/detail/workaround.hpp	2012-06-27 19:18:52.909546004 +0200
+@@ -54,7 +54,7 @@
     #endif
  
     //Check for XSI shared memory objects. They are available in nearly all UNIX platforms
 -   #if !defined(__QNXNTO__)
 +   #if !defined(__QNXNTO__) && !defined(ANDROID)
-    # define BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
+       #define BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
     #endif
  
-diff -ruN boost_1_48_0-boot/bootstrap.log boost_1_48_0-patched/bootstrap.log
---- boost_1_48_0-boot/bootstrap.log	2012-06-17 00:11:38.000000000 +0200
-+++ boost_1_48_0-patched/bootstrap.log	1970-01-01 01:00:00.000000000 +0100
-@@ -1,17 +0,0 @@
--###
--### Using 'gcc' toolset.
--###
--rm -rf bootstrap
--mkdir bootstrap
--gcc -o bootstrap/jam0 command.c compile.c debug.c expand.c glob.c hash.c hdrmacro.c headers.c jam.c jambase.c jamgram.c lists.c make.c make1.c newstr.c option.c output.c parse.c pathunix.c pathvms.c regexp.c rules.c scan.c search.c subst.c timestamp.c variable.c modules.c strings.c filesys.c builtins.c pwd.c class.c native.c md5.c w32_getreg.c modules/set.c modules/path.c modules/regex.c modules/property-set.c modules/sequence.c modules/order.c execunix.c fileunix.c
--./bootstrap/jam0 -f build.jam --toolset=gcc --toolset-root= clean
--...found 1 target...
--...updating 1 target...
--...updated 1 target...
--./bootstrap/jam0 -f build.jam --toolset=gcc --toolset-root=
--...found 49 targets...
--...updating 3 targets...
--[MKDIR] bin.linuxx86
--[COMPILE] bin.linuxx86/b2
--[COPY] bin.linuxx86/bjam
--...updated 3 targets...
-diff -ruN boost_1_48_0-boot/libs/filesystem/v2/src/v2_operations.cpp boost_1_48_0-patched/libs/filesystem/v2/src/v2_operations.cpp
---- boost_1_48_0-boot/libs/filesystem/v2/src/v2_operations.cpp	2011-07-29 21:51:24.000000000 +0200
-+++ boost_1_48_0-patched/libs/filesystem/v2/src/v2_operations.cpp	2012-06-17 00:02:25.000000000 +0200
-@@ -58,13 +58,15 @@
- 
- # else // BOOST_POSIX_API
- #   include <sys/types.h>
--#   if !defined(__APPLE__) && !defined(__OpenBSD__)
-+#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) && !defined(ANDROID)
- #     include <sys/statvfs.h>
- #     define BOOST_STATVFS statvfs
- #     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize
- #   else
- #ifdef __OpenBSD__
- #     include <sys/param.h>
-+#elif defined(__ANDROID__) || defined(ANDROID) // @Moss - Android messes up a bit with some headers, this one is the correct one :D
-+#     include <sys/vfs.h>
- #endif
- #     include <sys/mount.h>
- #     define BOOST_STATVFS statfs
-@@ -1265,7 +1267,11 @@
-         if ( max == 0 )
-         {
-           errno = 0;
-+#     ifdef __ANDROID__ || ANDROID
-+          long tmp = 4096;
-+#     else
-           long tmp = ::pathconf( "/", _PC_NAME_MAX );
-+#     endif
-           if ( tmp < 0 )
-           {
-             if ( errno == 0 ) // indeterminate
-diff -ruN boost_1_48_0-boot/libs/filesystem/v3/src/operations.cpp boost_1_48_0-patched/libs/filesystem/v3/src/operations.cpp
---- boost_1_48_0-boot/libs/filesystem/v3/src/operations.cpp	2011-10-09 15:54:09.000000000 +0200
-+++ boost_1_48_0-patched/libs/filesystem/v3/src/operations.cpp	2012-06-17 00:04:37.000000000 +0200
-@@ -80,13 +80,15 @@
-     const fs::path dot_path(".");
+diff -ruN boost_1_53_0-boot/libs/filesystem/src/operations.cpp boost_1_53_0-patched/libs/filesystem/src/operations.cpp
+--- boost_1_53_0-boot/libs/filesystem/src/operations.cpp	2012-01-28 15:40:16.000000000 +0100
++++ boost_1_53_0-patched/libs/filesystem/src/operations.cpp	2012-06-27 19:19:19.269597266 +0200
+@@ -73,13 +73,15 @@
      const fs::path dot_dot_path("..");
  #   include <sys/types.h>
+ #   include <sys/stat.h>
 -#   if !defined(__APPLE__) && !defined(__OpenBSD__)
 +#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) && !defined(ANDROID)
  #     include <sys/statvfs.h>
@@ -198,7 +104,7 @@ diff -ruN boost_1_48_0-boot/libs/filesystem/v3/src/operations.cpp boost_1_48_0-p
  #     endif
  #     include <sys/mount.h>
  #     define BOOST_STATVFS statfs
-@@ -212,7 +214,19 @@
+@@ -206,7 +208,19 @@
           || ::mkdir(to.c_str(),from_stat.st_mode)!= 0))
  #   define BOOST_COPY_FILE(F,T,FailIfExistsBool)copy_file_api(F, T, FailIfExistsBool)
  #   define BOOST_MOVE_FILE(OLD,NEW)(::rename(OLD, NEW)== 0)
@@ -208,7 +114,7 @@ diff -ruN boost_1_48_0-boot/libs/filesystem/v3/src/operations.cpp boost_1_48_0-p
 +      int result = -1;
 +      int fd = open(path, O_WRONLY);
 +      if (fd != -1)
-+	    result = ftruncate(fd, size);
++        result = ftruncate(fd, size);
 +      close(fd);
 +      return result;
 +    }
@@ -218,9 +124,9 @@ diff -ruN boost_1_48_0-boot/libs/filesystem/v3/src/operations.cpp boost_1_48_0-p
  
  #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
  #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
-diff -ruN boost_1_48_0-boot/tools/build/v2/tools/android.jam boost_1_48_0-patched/tools/build/v2/tools/android.jam
---- boost_1_48_0-boot/tools/build/v2/tools/android.jam	1970-01-01 01:00:00.000000000 +0100
-+++ boost_1_48_0-patched/tools/build/v2/tools/android.jam	2012-06-17 00:16:04.000000000 +0200
+diff -ruN boost_1_53_0-boot/tools/build/v2/tools/android.jam boost_1_53_0-patched/tools/build/v2/tools/android.jam
+--- boost_1_53_0-boot/tools/build/v2/tools/android.jam	1970-01-01 01:00:00.000000000 +0100
++++ boost_1_53_0-patched/tools/build/v2/tools/android.jam	2012-06-27 19:19:24.829608011 +0200
 @@ -0,0 +1,1064 @@
 +# Copyright 2001 David Abrahams.
 +# Copyright 2002-2006 Rene Rivera.
@@ -1286,9 +1192,9 @@ diff -ruN boost_1_48_0-boot/tools/build/v2/tools/android.jam boost_1_48_0-patche
 +cpu-flags android OPTIONS : power : rs64a : -mcpu=rs64 ;
 +# AIX variant of RS/6000 & PowerPC
 +toolset.flags android AROPTIONS <address-model>64/<target-os>aix : "-X 64" ;
-diff -ruN boost_1_48_0-boot/tools/build/v2/tools/android.py boost_1_48_0-patched/tools/build/v2/tools/android.py
---- boost_1_48_0-boot/tools/build/v2/tools/android.py	1970-01-01 01:00:00.000000000 +0100
-+++ boost_1_48_0-patched/tools/build/v2/tools/android.py	2012-06-17 00:15:47.000000000 +0200
+diff -ruN boost_1_53_0-boot/tools/build/v2/tools/android.py boost_1_53_0-patched/tools/build/v2/tools/android.py
+--- boost_1_53_0-boot/tools/build/v2/tools/android.py	1970-01-01 01:00:00.000000000 +0100
++++ boost_1_53_0-patched/tools/build/v2/tools/android.py	2012-06-27 19:19:30.359618678 +0200
 @@ -0,0 +1,798 @@
 +# Status: being ported by Steven Watanabe
 +# Base revision: 47077
