@@ -77,8 +77,6 @@ do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
 register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
 do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
 
-
-
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
@@ -116,12 +114,11 @@ if [ $CLEAN = yes ] ; then
   [ "$DOWNLOAD" = "yes" ] || exit 0
 fi
 
-# It is almost never desirable to have the
-# boost-X_Y_Z directory from previous builds
-# as this script doesn't check in which state
-# it's been left (bootstrapped, patched, built, ...).
-# Unless maybe during debug, in which case it's
-# easy for a developer to commen out this code.
+# It is almost never desirable to have the boost-X_Y_Z directory from
+# previous builds as this script doesn't check in which state it's
+# been left (bootstrapped, patched, built, ...). Unless maybe during
+# a debug, in which case it's easy for a developer to comment out
+# this code.
 
 if [ -d "$PROGDIR/$BOOST_DIR" ]; then
 	echo "Cleaning: $BOOST_DIR"
@@ -145,50 +142,6 @@ if [ -z "$AndroidNDKRoot" ] ; then
 	echo "Using AndroidNDKRoot = $AndroidNDKRoot"
 fi
 
-# Set default NDK release number
-NDK_RN=4
-
-NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
-# TODO: Remove this mess with selecting compiler version
-# Most have now multiple compiler versions available
-if [ -n "`cat $NDK_RELEASE_FILE | grep 'r5'`" ]; then
-	NDK_RN=5
-
-	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
-		CRYSTAX_WCHAR=1
-	fi
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r7'`" ]; then
-	NDK_RN=7
-	EABI_VER=4.4.3
-	
-	if [ -n "`cat $NDK_RELEASE_FILE | grep 'crystax'`" ]; then
-		CRYSTAX_WCHAR=1
-		EABI_VER=4.6.3
-	fi
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8c'`" ]; then
-	NDK_RN=8c
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8b'`" ]; then
-	NDK_RN=8b
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8d'`" ]; then
-	NDK_RN=8d
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8e'`" ]; then
-	NDK_RN=8e
-elif [ -n "`cat $NDK_RELEASE_FILE | grep 'r8'`" ]; then
-	NDK_RN=8
-fi
-
-echo "Detected Android NDK version $NDK_RN"
-if [ "$CRYSTAX_WCHAR" = 1 ]; then
-	echo "Using Crystax NDK"
-fi
-
-# Check if android NDK path has been set 
-if [ ! -n "${AndroidNDKRoot:+x}" ]
-then
-	echo "Environment variable: AndroidNDKRoot not set! Please enter tell me where you got the NDK root:"
-	read AndroidNDKPatch
-fi
-
 # Check platform patch
 case "$HOST_OS" in
     linux)
@@ -204,13 +157,18 @@ case "$HOST_OS" in
         Platfrom=linux-x86
 esac
 
+NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
+NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
+
+echo "Detected Android NDK version $NDK_RN"
+
 case "$NDK_RN" in
-	4)
+	4*)
 		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
 		CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
 		TOOLSET=gcc-androidR4
 		;;
-	5)
+	5*)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-8/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
@@ -218,7 +176,8 @@ case "$NDK_RN" in
 				-I$AndroidNDKRoot/sources/wchar-support/include"
 		TOOLSET=gcc-androidR5
 		;;
-	7)
+	7*)
+		EABI_VER=4.6.3
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
 				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include/4.6.3 \
@@ -293,54 +252,54 @@ fi
 # ---------
 if [ ! -f ./$BOOST_DIR/bjam ]
 then
-	# Make the initial bootstrap
-	echo "Performing boost bootstrap"
+  # Make the initial bootstrap
+  echo "Performing boost bootstrap"
 
-	cd $BOOST_DIR 
-	./bootstrap.sh --prefix="./../$BUILD_DIR/" 			\
-								 $LIBRARIES 											\
-								 2>&1 | tee -a $PROGDIR/build.log
+  cd $BOOST_DIR 
+  ./bootstrap.sh --prefix="./../$BUILD_DIR/"      \
+                 $LIBRARIES                       \
+                 2>&1 | tee -a $PROGDIR/build.log
 
-	if [ $? != 0 ] ; then
-		dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
-		exit 1
-	fi
-	cd $PROGDIR
-	
-	# -------------------------------------------------------------
-	# Patching will be done only if we had a successfull bootstrap!
-	# -------------------------------------------------------------
+  if [ $? != 0 ] ; then
+  	dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
+  	exit 1
+  fi
+  cd $PROGDIR
+  
+  # -------------------------------------------------------------
+  # Patching will be done only if we had a successfull bootstrap!
+  # -------------------------------------------------------------
 
-	# Apply patches to boost
-	PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-	PATCH_NDK_DIR=$PATCH_BOOST_DIR/ndk-androidR${NDK_RN}
+  # Apply patches to boost
+  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
+  PATCH_NDK_DIR=$PATCH_BOOST_DIR/ndk-androidR${NDK_RN}
 
   for dir in $PATCH_BOOST_DIR $PATCH_NDK_DIR; do
-	  if [ ! -d "$dir" ]; then
+    if [ ! -d "$dir" ]; then
       echo "Could not find directory '$dir' while looking for patches"
       exit 1
     fi
 
-	  PATCHES=`(cd $dir && ls *.patch | sort) 2> /dev/null`
+    PATCHES=`(cd $dir && ls *.patch | sort) 2> /dev/null`
 
     if [ -z "$PATCHES" ]; then
-		  echo "No patches found in directory '$dir'"
+      echo "No patches found in directory '$dir'"
       exit 1
     fi
 
     for PATCH in $PATCHES; do
       PATCH=`echo $PATCH | sed -e s%^\./%%g`
       SRC_DIR=$PROGDIR/$BOOST_DIR
-		  PATCHDIR=`dirname $PATCH`
-		  PATCHNAME=`basename $PATCH`
-		  log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
-		  cd $SRC_DIR && patch -p1 < $dir/$PATCH && cd $PROGDIR
-		  if [ $? != 0 ] ; then
-		  	dump "ERROR: Patch failure !! Please check your patches directory!"
+      PATCHDIR=`dirname $PATCH`
+      PATCHNAME=`basename $PATCH`
+      log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
+      cd $SRC_DIR && patch -p1 < $dir/$PATCH && cd $PROGDIR
+      if [ $? != 0 ] ; then
+        dump "ERROR: Patch failure !! Please check your patches directory!"
         dump "       Try to perform a clean build using --clean ."
         dump "       Problem patch: $dir/$PATCHNAME"
-		  	exit 1
-		  fi
+        exit 1
+      fi
     done
   done
 fi
@@ -351,22 +310,29 @@ echo "# ---------------"
 
 # Build boost for android
 echo "Building boost for android"
-cd $BOOST_DIR
+(
+  cd $BOOST_DIR
+  export PATH=`dirname $CXXPATH`:$PATH
+  export AndroidNDKRoot=$AndroidNDKRoot
+  export NO_BZIP2=1
 
-bjam_params="-q"
-[ -n "$TOOLSET" ]  && bjam_params="$bjam_params toolset=$TOOLSET"
-[ -n "$CXXFLAGS" ] && bjam_params="$bjam_params cxxflags=$CXXFLAGS"
-bjam_params="$bjam_params link=static threading=multi"
-bjam_params="$bjam_params --layout=versioned"
-bjam_params="$bjam_params install"
+  cxxflags=""
+  for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
-env PATH=`dirname $CXXPATH`:$PATH \
- AndroidNDKRoot=$AndroidNDKRoot NO_BZIP2=1 \
- ./bjam $bjam_params 2>&1 | tee -a $PROGDIR/build.log
+  ./bjam -q                           \
+         toolset=$TOOLSET             \
+         $cxxflags                    \
+         link=static                  \
+         threading=multi              \
+         --layout=versioned           \
+         install 2>&1                 \
+         | tee -a $PROGDIR/build.log
 
-if [ $? != 0 ] ; then
-	dump "ERROR: Failed to build boost for android!"
-	exit 1
-fi
-cd $PROGDIR
+  if [ ${PEPESTATUS[0]} != 0 ] ; then
+    dump "ERROR: Failed to build boost for android!"
+    exit 1
+  fi
+)
+
 dump "Done!"
+
