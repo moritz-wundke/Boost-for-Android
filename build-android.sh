@@ -165,38 +165,23 @@ echo "Detected Android NDK version $NDK_RN"
 case "$NDK_RN" in
 	4*)
 		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
-		CXXFLAGS=-I$AndroidNDKRoot/build/platforms/android-8/arch-arm/usr/include
 		TOOLSET=gcc-androidR4
 		;;
 	5*)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
-		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-8/arch-arm/usr/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include \
-				-I$AndroidNDKRoot/sources/wchar-support/include"
 		TOOLSET=gcc-androidR5
 		;;
-	7*)
+	7-crystax-5.beta3)
 		EABI_VER=4.6.3
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
-		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include/4.6.3 \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/4.6.3/include \
-				-I$AndroidNDKRoot/sources/crystax/include"
-		TOOLSET=gcc-androidR7
+		TOOLSET=gcc-androidR7crystax5beta3
 		;;
 	8)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
-		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include"
 		TOOLSET=gcc-androidR8
 		;;
 	8b|8c|8d)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
-		CXXFLAGS="-I$AndroidNDKRoot/platforms/android-9/arch-arm/usr/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/include \
-				-I$AndroidNDKRoot/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include"
 		TOOLSET=gcc-androidR8b
 		;;
 	8e)
@@ -271,10 +256,12 @@ then
   # -------------------------------------------------------------
 
   # Apply patches to boost
-  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-  PATCH_NDK_DIR=$PATCH_BOOST_DIR/ndk-androidR${NDK_RN}
+  BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
+  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
-  for dir in $PATCH_BOOST_DIR $PATCH_NDK_DIR; do
+  cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam
+
+  for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
       echo "Could not find directory '$dir' while looking for patches"
       exit 1
