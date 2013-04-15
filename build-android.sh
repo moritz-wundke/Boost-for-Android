@@ -145,16 +145,16 @@ fi
 # Check platform patch
 case "$HOST_OS" in
     linux)
-        Platfrom=linux-x86
+        Platfrom=linux-$HOST_ARCH
         ;;
     darwin|freebsd)
-        Platfrom=darwin-x86
+        Platfrom=darwin-$HOST_ARCH
         ;;
     windows|cygwin)
-        Platfrom=windows-x86
+        Platfrom=windows-$HOST_ARCH
         ;;
     *)  # let's play safe here
-        Platfrom=linux-x86
+        Platfrom=linux-$HOST_ARCH
 esac
 
 NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
@@ -184,7 +184,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
-	8e)
+	8e|"8e (64-bit)")
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
