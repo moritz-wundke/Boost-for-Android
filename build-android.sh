@@ -320,7 +320,7 @@ echo "Building boost for android"
          || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
   } | tee -a $PROGDIR/build.log
 
-  # PIPESTATUS variable is defined only in Bash, and we're using /bin/sh, which is not Bash on newer Debian/Ubuntu
+  # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
 )
 
 dump "Done!"
