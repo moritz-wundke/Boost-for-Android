@@ -319,6 +319,11 @@ echo "Building boost for android"
 
   status=${PIPESTATUS[0]}
 
+  if [ -z "$status" ]; then
+    # PIPESTATUS not supported?
+    exit 0
+  fi
+
   if [ "$status" = "0" ] ; then
     dump "Done!"
     exit 0
