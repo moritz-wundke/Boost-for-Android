@@ -154,7 +154,7 @@ case "$HOST_OS" in
         Platfrom=darwin-$HOST_ARCH
         ;;
     windows|cygwin)
-        Platfrom=windows-$HOST_ARCH
+        Platfrom=windows
         ;;
     *)  # let's play safe here
         Platfrom=linux-$HOST_ARCH
