@@ -133,7 +133,7 @@ HOST_ARCH=`uname -m`
 case "$HOST_ARCH" in
     i?86) HOST_ARCH=x86
     ;;
-    amd64) HOST_ARCH=x86_64
+    amd64|x86_64) HOST_ARCH=x86_64
     ;;
     powerpc) HOST_ARCH=ppc
     ;;
