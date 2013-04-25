@@ -196,14 +196,32 @@ case "$NDK_RN" in
 		exit 1
 esac
 
-
+# --------------------
+# Perform some checks.
+# --------------------
 echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
-# Check if the ndk is valid or not
-if [ ! -f $CXXPATH ]
-then
+# Check if the path to the compiler is valid.
+if [ ! -f "$CXXPATH" ]; then
 	echo "Cannot find C++ compiler at: $CXXPATH"
 	exit 1
+fi
+
+# Check if the compiler is executable.
+if [ ! -x "$CXXPATH" ]; then
+	echo "The path to the compiler is not an executable."
+	exit 1
+fi
+
+export PATH="`dirname $CXXPATH`:$PATH"
+
+# One more test to see if we can use the compiler.
+compiler="`basename ${CXXPATH}`"
+$compiler --version
+which_status=$?
+if [ "$which_status" != "0" ]; then
+  echo "Can't find the compiler '$compiler' in '$PATH'"
+  exit 1
 fi
 
 # -----------------------
@@ -301,7 +319,6 @@ echo "# ---------------"
 echo "Building boost for android"
 (
   cd $BOOST_DIR
-  export PATH=`dirname $CXXPATH`:$PATH
   export AndroidNDKRoot
   export NO_BZIP2=1
 
