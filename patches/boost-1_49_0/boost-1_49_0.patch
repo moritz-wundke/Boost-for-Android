@@ -197,6 +197,36 @@ diff -ruN boost_1_49_0-boot/libs/filesystem/v3/src/operations.cpp boost_1_49_0-p
  
  #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
  #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
+--- boost_1_49_0_vanila/libs/filesystem/v3/src/path.cpp	2012-01-28 15:40:16.000000000 +0100
++++ boost_1_49_0/libs/filesystem/v3/src/path.cpp	2013-04-19 05:11:40.020270272 +0200
+@@ -35,7 +35,7 @@
+ #ifdef BOOST_WINDOWS_API
+ # include "windows_file_codecvt.hpp"
+ # include <windows.h>
+-#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
++#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__ANDROID__)
+ # include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+ #endif
+ 
+@@ -766,7 +766,7 @@
+     codecvt_facet(&std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t> >
+       (path_locale));
+ 
+-#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
++#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__ANDROID__)
+ 
+   // "All BSD system functions expect their string parameters to be in UTF-8 encoding
+   // and nothing else." See
+@@ -822,7 +822,8 @@
+   const path::codecvt_type*& path::wchar_t_codecvt_facet()
+   {
+ #   if defined(BOOST_POSIX_API) && \
+-      !(defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
++      !(defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)) && \
++      !(defined(__ANDROID__))
+       // A local static initialized by calling path::imbue ensures that std::locale(""),
+       // which may throw, is called only if path_locale and condecvt_facet will actually
+       // be used. Thus misconfigured environmental variables will only cause an
 diff -ruN boost_1_49_0-boot/tools/build/v2/tools/android.jam boost_1_49_0-patched/tools/build/v2/tools/android.jam
 --- boost_1_49_0-boot/tools/build/v2/tools/android.jam	1970-01-01 01:00:00.000000000 +0100
 +++ boost_1_49_0-patched/tools/build/v2/tools/android.jam	2012-06-27 19:19:24.829608011 +0200

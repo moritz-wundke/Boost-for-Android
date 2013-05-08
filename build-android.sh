@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright (C) 2010 Mystic Tree Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,15 +84,18 @@ PROGRAM_DESCRIPTION=\
 
 extract_parameters $@
 
-echo "Building boost version: $BOOST_VER1.$BOOST_VER2.$BOOST_VER3"
+BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
+BOOST_VER_DOTTED=${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3}
+
+echo "Building boost version: $BOOST_VER_DOTTED"
 
 # -----------------------
 # Build constants
 # -----------------------
 
-BOOST_DOWNLOAD_LINK="http://downloads.sourceforge.net/project/boost/boost/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3}%2F&ts=1291326673&use_mirror=garr"
-BOOST_TAR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
-BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
+BOOST_DOWNLOAD_LINK="http://downloads.sourceforge.net/project/boost/boost/$BOOST_VER_DOTTED/boost_$BOOST_VER.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F${BOOST_VER_DOTTED}%2F&ts=1291326673&use_mirror=garr"
+BOOST_TAR="boost_${BOOST_VER}.tar.bz2"
+BOOST_DIR="boost_${BOOST_VER}"
 BUILD_DIR="./build/"
 
 # -----------------------
@@ -145,16 +148,16 @@ fi
 # Check platform patch
 case "$HOST_OS" in
     linux)
-        Platfrom=linux-x86
+        Platfrom=linux-$HOST_ARCH
         ;;
     darwin|freebsd)
-        Platfrom=darwin-x86
+        Platfrom=darwin-$HOST_ARCH
         ;;
     windows|cygwin)
-        Platfrom=windows-x86
+        Platfrom=windows
         ;;
     *)  # let's play safe here
-        Platfrom=linux-x86
+        Platfrom=linux-$HOST_ARCH
 esac
 
 NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
@@ -184,7 +187,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
-	8e)
+	8e|"8e (64-bit)")
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
@@ -193,14 +196,32 @@ case "$NDK_RN" in
 		exit 1
 esac
 
-
+# --------------------
+# Perform some checks.
+# --------------------
 echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
-# Check if the ndk is valid or not
-if [ ! -f $CXXPATH ]
-then
+# Check if the path to the compiler is valid.
+if [ ! -f "$CXXPATH" ]; then
 	echo "Cannot find C++ compiler at: $CXXPATH"
 	exit 1
+fi
+
+# Check if the compiler is executable.
+if [ ! -x "$CXXPATH" ]; then
+	echo "The path to the compiler is not an executable."
+	exit 1
+fi
+
+export PATH="`dirname $CXXPATH`:$PATH"
+
+# One more test to see if we can use the compiler.
+compiler="`basename ${CXXPATH}`"
+$compiler --version
+which_status=$?
+if [ "$which_status" != "0" ]; then
+  echo "Can't find the compiler '$compiler' in '$PATH'"
+  exit 1
 fi
 
 # -----------------------
@@ -210,14 +231,14 @@ fi
 # Downalod and unzip boost in a temporal folder and
 if [ ! -f $BOOST_TAR ]
 then
-	echo "Downloading boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} please wait..."
+	echo "Downloading boost ${BOOST_VER_DOTTED} please wait..."
 	prepare_download
 	download_file $BOOST_DOWNLOAD_LINK $PROGDIR/$BOOST_TAR
 fi
 
 if [ ! -f $PROGDIR/$BOOST_TAR ]
 then
-	echo "Failed to download boost! Please download boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} manually\nand save it in this directory as $BOOST_TAR"
+	echo "Failed to download boost! Please download boost ${BOOST_VER_DOTTED} manually\nand save it in this directory as $BOOST_TAR"
 	exit 1
 fi
 
@@ -256,7 +277,6 @@ then
   # -------------------------------------------------------------
 
   # Apply patches to boost
-  BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
   PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
   cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam
@@ -299,8 +319,7 @@ echo "# ---------------"
 echo "Building boost for android"
 (
   cd $BOOST_DIR
-  export PATH=`dirname $CXXPATH`:$PATH
-  export AndroidNDKRoot=$AndroidNDKRoot
+  export AndroidNDKRoot
   export NO_BZIP2=1
 
   cxxflags=""
@@ -315,11 +334,20 @@ echo "Building boost for android"
          install 2>&1                 \
          | tee -a $PROGDIR/build.log
 
-  if [ ${PEPESTATUS[0]} != 0 ] ; then
+  status=${PIPESTATUS[0]}
+
+  if [ -z "$status" ]; then
+    # PIPESTATUS not supported?
+    exit 0
+  fi
+
+  if [ "$status" = "0" ] ; then
+    dump "Done!"
+    exit 0
+  else
     dump "ERROR: Failed to build boost for android!"
     exit 1
   fi
 )
 
-dump "Done!"
 
