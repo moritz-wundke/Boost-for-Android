@@ -39,6 +39,7 @@
 
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
+local AndroidPlatform = [ os.environ AndroidPlatform ] ;
 
 # --------------------------------------------------------------------
 # Is same for 8b, 8c and 8d
@@ -65,7 +66,7 @@ arm-linux-androideabi-g++
 <compileflags>-fomit-frame-pointer
 <compileflags>-fno-strict-aliasing
 <compileflags>-finline-limit=64
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
+<compileflags>-I$(AndroidNDKRoot)/platforms/$(AndroidPlatform)/arch-arm/usr/include
 <compileflags>-Wa,--noexecstack
 <compileflags>-DANDROID
 <compileflags>-D__ANDROID__
@@ -108,7 +109,7 @@ arm-linux-androideabi-g++
 <compileflags>-fomit-frame-pointer
 <compileflags>-fno-strict-aliasing
 <compileflags>-finline-limit=64
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
+<compileflags>-I$(AndroidNDKRoot)/platforms/$(AndroidPlatform)/arch-arm/usr/include
 <compileflags>-Wa,--noexecstack
 <compileflags>-DANDROID
 <compileflags>-D__ANDROID__

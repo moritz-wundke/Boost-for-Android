@@ -63,6 +63,18 @@ ABI=armeabi
 register_option "--abi=<abi>" do_abi      "One of {armeabi (default), armeabi-v7a, x86}."
 do_abi() { ABI=$1; }
 
+PLATFORM=android-9
+register_option "--platform=<android-version>" do_platform "One of {android-8, android-9 (default), android-14}."
+do_platform ()
+{
+	if [[ $1 =~ ^android-(8|9|14)$ ]]; then
+		PLATFORM=$1
+	else
+		echo "Unknown android platform '$1'."
+		exit 1
+	fi
+}
+
 CLEAN=no
 register_option "--clean"    do_clean     "Delete all previously downloaded and built files, then exit."
 do_clean () {	CLEAN=yes; }
@@ -210,7 +222,7 @@ case "$NDK_RN" in
 		exit 1
 esac
 
-echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
+echo Building with TOOLSET=$TOOLSET PLATFORM=$PLATFORM CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
 # Check if the ndk is valid or not
 if [ ! -f "$CXXPATH" ]
@@ -325,6 +337,7 @@ echo "Building boost for android"
   cd $BOOST_DIR
   export PATH=`dirname $CXXPATH`:$PATH
   export AndroidNDKRoot=$AndroidNDKRoot
+  export AndroidPlatform=$PLATFORM
   export NO_BZIP2=1
 
   cxxflags=""

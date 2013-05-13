@@ -39,6 +39,7 @@
 
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
+local AndroidPlatform = [ os.environ AndroidPlatform ] ;
 
 # --------------------------------------------------------------------
 using gcc : androidR8e
@@ -61,7 +62,7 @@ arm-linux-androideabi-g++
 <compileflags>-fomit-frame-pointer
 <compileflags>-fno-strict-aliasing
 <compileflags>-finline-limit=64
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
+<compileflags>-I$(AndroidNDKRoot)/platforms/$(AndroidPlatform)/arch-arm/usr/include
 <compileflags>-Wa,--noexecstack
 <compileflags>-DANDROID
 <compileflags>-D__ANDROID__

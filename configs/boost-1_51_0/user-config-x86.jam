@@ -39,6 +39,7 @@
 
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
+local AndroidPlatform = [ os.environ AndroidPlatform ] ;
 
 # --------------------------------------------------------------------
 using gcc : androidR8e
@@ -57,7 +58,7 @@ i686-linux-android-g++
 <compileflags>-fstrict-aliasing
 <compileflags>-funswitch-loops
 <compileflags>-finline-limit=300
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-14/arch-x86/usr/include
+<compileflags>-I$(AndroidNDKRoot)/platforms/$(AndroidPlatform)/arch-x86/usr/include
 <compileflags>-Wa,--noexecstack
 <compileflags>-DANDROID
 <compileflags>-D__ANDROID__
