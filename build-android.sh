@@ -30,12 +30,16 @@
 BOOST_VER1=1
 BOOST_VER2=53
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0,1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0, 1.51.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
   if [ "$1" = "1.53.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=53
+    BOOST_VER3=0
+  elif [ "$1" = "1.51.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=51
     BOOST_VER3=0
   elif [ "$1" = "1.49.0" ]; then
     BOOST_VER1=1
@@ -53,6 +57,22 @@ boost_version()
     echo "Unsupported boost version '$1'."
     exit 1
   fi
+}
+
+ABI=armeabi
+register_option "--abi=<abi>" do_abi      "One of {armeabi (default), armeabi-v7a, x86}."
+do_abi() { ABI=$1; }
+
+PLATFORM=android-9
+register_option "--platform=<android-version>" do_platform "One of {android-8, android-9 (default), android-14}."
+do_platform ()
+{
+	if [[ $1 =~ ^android-(8|9|14)$ ]]; then
+		PLATFORM=$1
+	else
+		echo "Unknown android platform '$1'."
+		exit 1
+	fi
 }
 
 CLEAN=no
@@ -162,30 +182,39 @@ NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
 
 echo "Detected Android NDK version $NDK_RN"
 
+check_abi () { if [[ "$1" != *\'$ABI\'* ]] ; then echo "Unsupported ABI for this NDK" ; exit 1 ; fi ; }
+
 case "$NDK_RN" in
 	4*)
-		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+		check_abi "'armeabi'"
+		[ "$ABI" == "armeabi" ] && CXX_PATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
 		TOOLSET=gcc-androidR4
 		;;
 	5*)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		check_abi "'armeabi'"
+		[ "$ABI" == "armeabi" ] && CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR5
 		;;
 	7-crystax-5.beta3)
+		check_abi "'armeabi'"
 		EABI_VER=4.6.3
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		[ "$ABI" == "armeabi" ] && CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR7crystax5beta3
 		;;
 	8)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		check_abi "'armeabi'"
+		[ "$ABI" == "armeabi" ] && CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8
 		;;
 	8b|8c|8d)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		check_abi "'armeabi'"
+		[ "$ABI" == "armeabi" ] && CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
 	8e)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		check_abi "'armeabi' 'armeabi-v7a' 'x86'"
+		[[ "$ABI" == armeabi* ]] && CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		[ "$ABI" == "x86" ] && CXXPATH=$AndroidNDKRoot/toolchains/x86-4.6/prebuilt/$Platfrom/bin/i686-linux-android-g++
 		TOOLSET=gcc-androidR8e
 		;;
 	*)
@@ -193,11 +222,10 @@ case "$NDK_RN" in
 		exit 1
 esac
 
-
-echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
+echo Building with TOOLSET=$TOOLSET PLATFORM=$PLATFORM CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
 # Check if the ndk is valid or not
-if [ ! -f $CXXPATH ]
+if [ ! -f "$CXXPATH" ]
 then
 	echo "Cannot find C++ compiler at: $CXXPATH"
 	exit 1
@@ -255,11 +283,19 @@ then
   # Patching will be done only if we had a successfull bootstrap!
   # -------------------------------------------------------------
 
-  # Apply patches to boost
   BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
-  cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam
+  # Copy user-config to boost
+  USER_CONFIG=$BOOST_DIR/tools/build/v2/user-config.jam
+  SIMPLE_CONFIG=configs/user-config-boost-${BOOST_VER}.jam
+  if [ -f $SIMPLE_CONFIG ]; then
+    cp $SIMPLE_CONFIG $USER_CONFIG
+  else
+    cp configs/boost-${BOOST_VER}/user-config-${ABI}.jam $USER_CONFIG
+  fi
+
+  # Apply patches to boost
+  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
@@ -301,12 +337,13 @@ echo "Building boost for android"
   cd $BOOST_DIR
   export PATH=`dirname $CXXPATH`:$PATH
   export AndroidNDKRoot=$AndroidNDKRoot
+  export AndroidPlatform=$PLATFORM
   export NO_BZIP2=1
 
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
-  ./bjam -q                           \
+  ./bjam -q -d2                          \
          toolset=$TOOLSET             \
          $cxxflags                    \
          link=static                  \
