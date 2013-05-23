@@ -315,7 +315,7 @@ echo "Building boost for android"
          install 2>&1                 \
          | tee -a $PROGDIR/build.log
 
-  if [ ${PEPESTATUS[0]} != 0 ] ; then
+  if [ ${PIPESTATUS[0]} != 0 ] ; then
     dump "ERROR: Failed to build boost for android!"
     exit 1
   fi
