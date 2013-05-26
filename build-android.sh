@@ -148,7 +148,7 @@ case "$HOST_OS" in
         Platfrom=linux-x86
         ;;
     darwin|freebsd)
-        Platfrom=darwin-x86
+        Platfrom=darwin-x86_64
         ;;
     windows|cygwin)
         Platfrom=windows-x86
@@ -184,7 +184,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
-	8e)
+	8e*)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
