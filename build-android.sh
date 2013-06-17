@@ -30,7 +30,7 @@
 BOOST_VER1=1
 BOOST_VER2=53
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0,1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
   if [ "$1" = "1.53.0" ]; then
@@ -151,7 +151,7 @@ case "$HOST_OS" in
         Platfrom=darwin-x86
         ;;
     windows|cygwin)
-        Platfrom=windows-x86
+        Platfrom=windows
         ;;
     *)  # let's play safe here
         Platfrom=linux-x86
