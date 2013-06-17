@@ -30,7 +30,7 @@
 BOOST_VER1=1
 BOOST_VER2=53
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0,1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
   if [ "$1" = "1.53.0" ]; then
@@ -69,8 +69,8 @@ do_download ()
 	CLEAN=yes
 }
 
-LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams
-
+#LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams
+LIBRARIES=
 register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
 do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
 
@@ -151,7 +151,7 @@ case "$HOST_OS" in
         Platfrom=darwin-x86
         ;;
     windows|cygwin)
-        Platfrom=windows-x86
+        Platfrom=windows
         ;;
     *)  # let's play safe here
         Platfrom=linux-x86
@@ -241,9 +241,14 @@ then
   echo "Performing boost bootstrap"
 
   cd $BOOST_DIR 
-  ./bootstrap.sh --prefix="./../$BUILD_DIR/"      \
-                 $LIBRARIES                       \
-                 2>&1 | tee -a $PROGDIR/build.log
+  case "$HOST_OS" in
+    windows)
+        cmd //c "bootstrap.bat" 2>&1 | tee -a $PROGDIR/build.log 
+        ;;
+    *)  # Linux and others
+        ./bootstrap.sh 2>&1 | tee -a $PROGDIR/build.log  
+    esac
+
 
   if [ $? != 0 ] ; then
   	dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
@@ -299,7 +304,9 @@ echo "# ---------------"
 echo "Building boost for android"
 (
   cd $BOOST_DIR
-  export PATH=`dirname $CXXPATH`:$PATH
+  echo "Adding pathname: `dirname $CXXPATH`"
+  export AndroidBinariesPath=`dirname $CXXPATH`
+  export PATH=$AndroidBinariesPath:$PATH
   export AndroidNDKRoot=$AndroidNDKRoot
   export NO_BZIP2=1
 
@@ -307,19 +314,16 @@ echo "Building boost for android"
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
   ./bjam -q                           \
+         target-os=linux              \
          toolset=$TOOLSET             \
          $cxxflags                    \
          link=static                  \
          threading=multi              \
          --layout=versioned           \
+         --prefix="./../$BUILD_DIR/"  \
+         $LIBRARIES                   \
          install 2>&1                 \
          | tee -a $PROGDIR/build.log
-
-  if [ ${PEPESTATUS[0]} != 0 ] ; then
-    dump "ERROR: Failed to build boost for android!"
-    exit 1
-  fi
 )
 
-dump "Done!"
 
