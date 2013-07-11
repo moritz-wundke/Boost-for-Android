@@ -188,6 +188,10 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
+	"8e (64-bit)")
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86_64/bin/arm-linux-androideabi-g++
+		TOOLSET=gcc-androidR8e
+		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
 		exit 1
