@@ -194,7 +194,7 @@ case "$NDK_RN" in
 esac
 
 
-echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
+echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS LINKFLAGS=$LDFLAGS | tee $PROGDIR/build.log
 
 # Check if the ndk is valid or not
 if [ ! -f $CXXPATH ]
@@ -306,9 +306,13 @@ echo "Building boost for android"
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
+  linkflags=""
+  for flag in $LDFLAGS; do linkflags="$linkflags linkflags=$flag"; done
+
   ./bjam -q                           \
          toolset=$TOOLSET             \
          $cxxflags                    \
+         $linkflags                   \
          link=static                  \
          threading=multi              \
          --layout=versioned           \
