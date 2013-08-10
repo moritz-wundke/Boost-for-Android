@@ -162,6 +162,11 @@ NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
 
 echo "Detected Android NDK version $NDK_RN"
 
+if echo $NDK_RN | grep '64.bit'; then
+	NDK_RN=`echo $NDK_RN | cut -d' ' -f1`
+	Platfrom=${Platfrom}_64
+fi
+
 case "$NDK_RN" in
 	4*)
 		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
@@ -184,7 +189,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
-	8e)
+	8e|9*)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
@@ -306,19 +311,17 @@ echo "Building boost for android"
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
-  ./bjam -q                           \
+  { ./bjam -q                         \
          toolset=$TOOLSET             \
          $cxxflags                    \
          link=static                  \
          threading=multi              \
          --layout=versioned           \
          install 2>&1                 \
-         | tee -a $PROGDIR/build.log
+         || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
+  } | tee -a $PROGDIR/build.log
 
-  if [ ${PEPESTATUS[0]} != 0 ] ; then
-    dump "ERROR: Failed to build boost for android!"
-    exit 1
-  fi
+  # PIPESTATUS variable is defined only in Bash, and we're using /bin/sh, which is not Bash on newer Debian/Ubuntu
 )
 
 dump "Done!"
