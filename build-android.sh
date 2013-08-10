@@ -162,11 +162,6 @@ NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
 
 echo "Detected Android NDK version $NDK_RN"
 
-if echo $NDK_RN | grep '64.bit'; then
-	NDK_RN=`echo $NDK_RN | cut -d' ' -f1`
-	Platfrom=${Platfrom}_64
-fi
-
 case "$NDK_RN" in
 	4*)
 		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
@@ -191,6 +186,10 @@ case "$NDK_RN" in
 		;;
 	8e)
 		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		TOOLSET=gcc-androidR8e
+		;;
+	"8e (64-bit)")
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/${Platform}_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
 	*)
