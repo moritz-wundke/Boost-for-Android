@@ -77,6 +77,13 @@ do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
 register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
 do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
 
+register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
+do_prefix () {
+    if [ -d $1 ]; then
+        PREFIX=$1;
+    fi
+}
+
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
@@ -325,3 +332,8 @@ echo "Building boost for android"
 
 dump "Done!"
 
+if [ $PREFIX ]; then
+    echo "Prefix set, copying files to $PREFIX"
+    cp -r $PROGDIR/$BUILD_DIR/lib $PREFIX
+    cp -r $PROGDIR/$BUILD_DIR/include $PREFIX
+fi
