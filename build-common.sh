@@ -41,7 +41,7 @@ setup_log_file ()
     if [ -n "$1" ] ; then
         TMPLOG="$1"
     else
-		    mkdir -p $PROGDIR/logs/
+		mkdir -p $PROGDIR/logs/
         TMPLOG=$PROGDIR/logs/myst-log-$$.log
     fi
     rm -f $TMPLOG && touch $TMPLOG
@@ -129,22 +129,17 @@ to_uppercase ()
 
 ## Normalize OS and CPU
 ##
+HOST_ARCH=`uname -m`
+case "$HOST_ARCH" in
+    i?86) HOST_ARCH=x86
+    ;;
+    amd64) HOST_ARCH=x86_64
+    ;;
+    powerpc) HOST_ARCH=ppc
+    ;;
+esac
 
-HOST_ARCH=""
-determine_host_arch()
-{
-  HOST_ARCH=`uname -m`
-  case "$HOST_ARCH" in
-      i?86) HOST_ARCH=x86
-      ;;
-      amd64|x86_64) HOST_ARCH=x86_64
-      ;;
-      powerpc) HOST_ARCH=ppc
-      ;;
-  esac
-  
-  log2 "HOST_ARCH=$HOST_ARCH"
-}
+log2 "HOST_ARCH=$HOST_ARCH"
 
 # at this point, the supported values for CPU are:
 #   x86
@@ -154,32 +149,29 @@ determine_host_arch()
 # other values may be possible but haven't been tested
 #
 HOST_EXE=""
-HOST_OS=""
-determine_host_os() {
-  HOST_OS=`uname -s`
-  case "$HOST_OS" in
-      Darwin)
-          HOST_OS=darwin
-          ;;
-      Linux)
-          # note that building  32-bit binaries on x86_64 is handled later
-          HOST_OS=linux
-          ;;
-      FreeBsd)  # note: this is not tested
-          HOST_OS=freebsd
-          ;;
-      CYGWIN*|*_NT-*)
-          HOST_OS=windows
-          HOST_EXE=.exe
-          if [ "x$OSTYPE" = xcygwin ] ; then
-              HOST_OS=cygwin
-          fi
-          ;;
-  esac
-  
-  log2 "HOST_OS=$HOST_OS"
-  log2 "HOST_EXE=$HOST_EXE"
-}
+HOST_OS=`uname -s`
+case "$HOST_OS" in
+    Darwin)
+        HOST_OS=darwin
+        ;;
+    Linux)
+        # note that building  32-bit binaries on x86_64 is handled later
+        HOST_OS=linux
+        ;;
+    FreeBsd)  # note: this is not tested
+        HOST_OS=freebsd
+        ;;
+    CYGWIN*|*_NT-*)
+        HOST_OS=windows
+        HOST_EXE=.exe
+        if [ "x$OSTYPE" = xcygwin ] ; then
+            HOST_OS=cygwin
+        fi
+        ;;
+esac
+
+log2 "HOST_OS=$HOST_OS"
+log2 "HOST_EXE=$HOST_EXE"
 
 # at this point, the value of HOST_OS should be one of the following:
 #   linux
@@ -213,39 +205,35 @@ compute_host_tag ()
     log2 "HOST_TAG=$HOST_TAG"
 }
 
+compute_host_tag
 
-HOST_NUM_CPUS=""
-BUILD_NUM_CPUS=""
-determine_num_cpus()
-{
-  # Compute the number of host CPU cores an HOST_NUM_CPUS
-  #
-  case "$HOST_OS" in
-      linux)
-          HOST_NUM_CPUS=`cat /proc/cpuinfo | grep processor | wc -l`
-          ;;
-      darwin|freebsd)
-          HOST_NUM_CPUS=`sysctl -n hw.ncpu`
-          ;;
-      windows|cygwin)
-          HOST_NUM_CPUS=$NUMBER_OF_PROCESSORS
-          ;;
-      *)  # let's play safe here
-          HOST_NUM_CPUS=1
-  esac
-  
-  log2 "HOST_NUM_CPUS=$HOST_NUM_CPUS"
-  
-  # If BUILD_NUM_CPUS is not already defined in your environment,
-  # define it as the double of HOST_NUM_CPUS. This is used to
-  # run Make commends in parralles, as in 'make -j$BUILD_NUM_CPUS'
-  #
-  if [ -z "$BUILD_NUM_CPUS" ] ; then
-      BUILD_NUM_CPUS=`expr $HOST_NUM_CPUS \* 2`
-  fi
-  
-  log2 "BUILD_NUM_CPUS=$BUILD_NUM_CPUS"
-}
+# Compute the number of host CPU cores an HOST_NUM_CPUS
+#
+case "$HOST_OS" in
+    linux)
+        HOST_NUM_CPUS=`cat /proc/cpuinfo | grep processor | wc -l`
+        ;;
+    darwin|freebsd)
+        HOST_NUM_CPUS=`sysctl -n hw.ncpu`
+        ;;
+    windows|cygwin)
+        HOST_NUM_CPUS=$NUMBER_OF_PROCESSORS
+        ;;
+    *)  # let's play safe here
+        HOST_NUM_CPUS=1
+esac
+
+log2 "HOST_NUM_CPUS=$HOST_NUM_CPUS"
+
+# If BUILD_NUM_CPUS is not already defined in your environment,
+# define it as the double of HOST_NUM_CPUS. This is used to
+# run Make commends in parralles, as in 'make -j$BUILD_NUM_CPUS'
+#
+if [ -z "$BUILD_NUM_CPUS" ] ; then
+    BUILD_NUM_CPUS=`expr $HOST_NUM_CPUS \* 2`
+fi
+
+log2 "BUILD_NUM_CPUS=$BUILD_NUM_CPUS"
 
 # Various probes are going to need to run a small C program
 TMPC=/tmp/myst-$$-test.c
@@ -650,10 +638,6 @@ extract_parameters ()
 	else
 		setup_log_file
 	fi
-  determine_host_arch
-  determine_host_os
-  compute_host_tag
-  determine_num_cpus
 }
 
 do_option_help ()
