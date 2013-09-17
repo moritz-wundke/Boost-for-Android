@@ -68,7 +68,7 @@ diff -ruN boost_1_53_0-boot/boost/detail/endian.hpp boost_1_53_0-patched/boost/d
  // __BYTE_ORDER
  
 -#if defined (__GLIBC__)
-+#if defined (__GLIBC__) || defined(ANDROID)
++#if defined (__GLIBC__) || defined(ANDROID) || defined(__ANDROID__)
  # include <endian.h>
  # if (__BYTE_ORDER == __LITTLE_ENDIAN)
  #  define BOOST_LITTLE_ENDIAN
@@ -80,7 +80,7 @@ diff -ruN boost_1_53_0-boot/boost/interprocess/detail/workaround.hpp boost_1_53_
  
     //Check for XSI shared memory objects. They are available in nearly all UNIX platforms
 -   #if !defined(__QNXNTO__)
-+   #if !defined(__QNXNTO__) && !defined(ANDROID)
++   #if !defined(__QNXNTO__) && !defined(ANDROID) && !defined(__ANDROID__)
        #define BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
     #endif
  

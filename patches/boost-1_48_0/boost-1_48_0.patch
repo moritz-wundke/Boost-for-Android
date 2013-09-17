@@ -125,27 +125,6 @@ diff -ruN boost_1_48_0-boot/boost/interprocess/detail/workaround.hpp boost_1_48_
     # define BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
     #endif
  
-diff -ruN boost_1_48_0-boot/bootstrap.log boost_1_48_0-patched/bootstrap.log
---- boost_1_48_0-boot/bootstrap.log	2012-06-17 00:11:38.000000000 +0200
-+++ boost_1_48_0-patched/bootstrap.log	1970-01-01 01:00:00.000000000 +0100
-@@ -1,17 +0,0 @@
--###
--### Using 'gcc' toolset.
--###
--rm -rf bootstrap
--mkdir bootstrap
--gcc -o bootstrap/jam0 command.c compile.c debug.c expand.c glob.c hash.c hdrmacro.c headers.c jam.c jambase.c jamgram.c lists.c make.c make1.c newstr.c option.c output.c parse.c pathunix.c pathvms.c regexp.c rules.c scan.c search.c subst.c timestamp.c variable.c modules.c strings.c filesys.c builtins.c pwd.c class.c native.c md5.c w32_getreg.c modules/set.c modules/path.c modules/regex.c modules/property-set.c modules/sequence.c modules/order.c execunix.c fileunix.c
--./bootstrap/jam0 -f build.jam --toolset=gcc --toolset-root= clean
--...found 1 target...
--...updating 1 target...
--...updated 1 target...
--./bootstrap/jam0 -f build.jam --toolset=gcc --toolset-root=
--...found 49 targets...
--...updating 3 targets...
--[MKDIR] bin.linuxx86
--[COMPILE] bin.linuxx86/b2
--[COPY] bin.linuxx86/bjam
--...updated 3 targets...
 diff -ruN boost_1_48_0-boot/libs/filesystem/v2/src/v2_operations.cpp boost_1_48_0-patched/libs/filesystem/v2/src/v2_operations.cpp
 --- boost_1_48_0-boot/libs/filesystem/v2/src/v2_operations.cpp	2011-07-29 21:51:24.000000000 +0200
 +++ boost_1_48_0-patched/libs/filesystem/v2/src/v2_operations.cpp	2012-06-17 00:02:25.000000000 +0200

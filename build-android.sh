@@ -77,6 +77,13 @@ do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
 register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
 do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
 
+register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
+do_prefix () {
+    if [ -d $1 ]; then
+        PREFIX=$1;
+    fi
+}
+
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
@@ -145,16 +152,16 @@ fi
 # Check platform patch
 case "$HOST_OS" in
     linux)
-        Platfrom=linux-x86
+        PlatformOS=linux
         ;;
     darwin|freebsd)
-        Platfrom=darwin-x86
+        PlatformOS=darwin
         ;;
     windows|cygwin)
-        Platfrom=windows-x86
+        PlatformOS=windows
         ;;
     *)  # let's play safe here
-        Platfrom=linux-x86
+        PlatformOS=linux
 esac
 
 NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
@@ -164,28 +171,32 @@ echo "Detected Android NDK version $NDK_RN"
 
 case "$NDK_RN" in
 	4*)
-		CXXPATH=$AndroidNDKRoot/build/prebuilt/$Platfrom/arm-eabi-4.4.0/bin/arm-eabi-g++
+		CXXPATH=$AndroidNDKRoot/build/prebuilt/$PlatformOS-x86/arm-eabi-4.4.0/bin/arm-eabi-g++
 		TOOLSET=gcc-androidR4
 		;;
 	5*)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR5
 		;;
 	7-crystax-5.beta3)
 		EABI_VER=4.6.3
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR7crystax5beta3
 		;;
 	8)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8
 		;;
 	8b|8c|8d)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
-	8e)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$Platfrom/bin/arm-linux-androideabi-g++
+	8e|9*)
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
+		TOOLSET=gcc-androidR8e
+		;;
+	"8e (64-bit)")
+		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
 	*)
@@ -300,26 +311,29 @@ echo "Building boost for android"
 (
   cd $BOOST_DIR
   export PATH=`dirname $CXXPATH`:$PATH
-  export AndroidNDKRoot=$AndroidNDKRoot
+  export AndroidNDKRoot
   export NO_BZIP2=1
 
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
-  ./bjam -q                           \
+  { ./bjam -q                         \
          toolset=$TOOLSET             \
          $cxxflags                    \
          link=static                  \
          threading=multi              \
          --layout=versioned           \
          install 2>&1                 \
-         | tee -a $PROGDIR/build.log
+         || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
+  } | tee -a $PROGDIR/build.log
 
-  if [ ${PEPESTATUS[0]} != 0 ] ; then
-    dump "ERROR: Failed to build boost for android!"
-    exit 1
-  fi
+  # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
 )
 
 dump "Done!"
 
+if [ $PREFIX ]; then
+    echo "Prefix set, copying files to $PREFIX"
+    cp -r $PROGDIR/$BUILD_DIR/lib $PREFIX
+    cp -r $PROGDIR/$BUILD_DIR/include $PREFIX
+fi
