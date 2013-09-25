@@ -55,6 +55,11 @@ boost_version()
   fi
 }
 
+register_option "--toolchain=<toolchain>" select_toolchain "Select a toolchain. To see available execute ls -l ANDROID_NDK/toolchains."
+select_toolchain () {
+    TOOLCHAIN=$1
+}
+
 CLEAN=no
 register_option "--clean"    do_clean     "Delete all previously downloaded and built files, then exit."
 do_clean () {	CLEAN=yes; }
@@ -171,36 +176,43 @@ echo "Detected Android NDK version $NDK_RN"
 
 case "$NDK_RN" in
 	4*)
-		CXXPATH=$AndroidNDKRoot/build/prebuilt/$PlatformOS-x86/arm-eabi-4.4.0/bin/arm-eabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-eabi-4.4.0}
+		CXXPATH=$AndroidNDKRoot/build/prebuilt/$PlatformOS-x86/${TOOLCHAIN}/bin/arm-eabi-g++
 		TOOLSET=gcc-androidR4
 		;;
 	5*)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.4.3}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR5
 		;;
 	7-crystax-5.beta3)
-		EABI_VER=4.6.3
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-$EABI_VER/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6.3}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR7crystax5beta3
 		;;
 	8)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.4.3}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8
 		;;
 	8b|8c|8d)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
 	8e|9)
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
 	"8e (64-bit)")
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
 	"9 (64-bit)")
-		CXXPATH=$AndroidNDKRoot/toolchains/arm-linux-androideabi-4.6/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
 	*)
