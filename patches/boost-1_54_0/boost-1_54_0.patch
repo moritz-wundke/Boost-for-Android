@@ -1,3 +1,15 @@
+diff -ruN boost_1_54_0/libs/filesystem/src/path.cpp boost_1_54_0_patched/libs/filesystem/src/path.cpp
+--- boost_1_54_0/libs/filesystem/src/path.cpp	2012-04-16 15:36:28.000000000 +0200
++++ boost_1_54_0_patched/libs/filesystem/src/path.cpp	2013-10-28 02:55:32.773380890 +0100
+@@ -902,7 +902,7 @@
+ 
+   const path::codecvt_type& path::codecvt()
+   {
+-#   if defined(BOOST_POSIX_API) && \
++#   if defined(BOOST_POSIX_API) && !defined(__ANDROID__) && \
+       !(defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
+       // A local static initialized by calling path::imbue ensures that std::locale(""),
+       // which may throw, is called only if path_locale and condecvt_facet will actually
 diff -ruN boost_1_54_0-boot/boost/asio/detail/socket_types.hpp boost_1_54_0-patched/boost/asio/detail/socket_types.hpp
 --- boost_1_54_0-boot/boost/asio/detail/socket_types.hpp
 +++ boost_1_54_0-patched/boost/asio/detail/socket_types.hpp
