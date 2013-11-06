@@ -127,6 +127,47 @@ arm-linux-androideabi-g++
 <cxxflags>-D_GLIBCXX__PTHREADS
 ;
 
+# --------------------------------------------------------------------
+using gcc : androidR9
+:
+arm-linux-androideabi-g++
+:
+<archiver>arm-linux-androideabi-ar
+<compileflags>-fexceptions
+<compileflags>-frtti
+<compileflags>-fpic
+<compileflags>-ffunction-sections
+<compileflags>-funwind-tables
+<compileflags>-D__ARM_ARCH_5__
+<compileflags>-D__ARM_ARCH_5T__
+<compileflags>-D__ARM_ARCH_5E__
+<compileflags>-D__ARM_ARCH_5TE__
+<compileflags>-Wno-psabi
+<compileflags>-march=armv5te
+<compileflags>-mtune=xscale
+<compileflags>-msoft-float
+<compileflags>-mthumb
+<compileflags>-Os
+<compileflags>-fomit-frame-pointer
+<compileflags>-fno-strict-aliasing
+<compileflags>-finline-limit=64
+<compileflags>-I$(AndroidNDKRoot)/platforms/android-14/arch-arm/usr/include
+<compileflags>-Wa,--noexecstack
+<compileflags>-DANDROID
+<compileflags>-D__ANDROID__
+<compileflags>-DNDEBUG
+<compileflags>-O2
+<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/include
+<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi/include
+# @Moss - Above are the 'oficial' android flags
+<architecture>arm
+<compileflags>-fvisibility=hidden
+<compileflags>-fvisibility-inlines-hidden
+<compileflags>-fdata-sections
+<cxxflags>-D__arm__
+<cxxflags>-D_REENTRANT
+<cxxflags>-D_GLIBCXX__PTHREADS
+;
 
 # ------------------
 # GCC configuration.
