@@ -69,7 +69,7 @@ do_download ()
 	CLEAN=yes
 }
 
-LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams
+LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams,locale
 
 register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
 do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
@@ -303,6 +303,14 @@ echo "# ---------------"
 # Build boost for android
 echo "Building boost for android"
 (
+
+  [ -e libiconv-libicu-android ] || {
+    git clone git@github.com:pelya/libiconv-libicu-android.git
+    cd libiconv-libicu-android
+    ./build.sh || exit 1
+    cd ..
+  } || exit 1
+
   cd $BOOST_DIR
   export PATH=`dirname $CXXPATH`:$PATH
   export AndroidNDKRoot=$AndroidNDKRoot
@@ -317,6 +325,10 @@ echo "Building boost for android"
          link=static                  \
          threading=multi              \
          --layout=versioned           \
+         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
+         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
+         cxxflags=-I$AndroidNDKRoot/sources/android/support/include \
+         -j4 \
          install 2>&1                 \
          || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
   } | tee -a $PROGDIR/build.log
