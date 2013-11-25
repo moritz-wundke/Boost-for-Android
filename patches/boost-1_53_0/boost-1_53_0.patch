@@ -1,15 +1,15 @@
-diff -ruN boost_1_53_0-boot/boost/asio/detail/socket_types.hpp boost_1_53_0-patched/boost/asio/detail/socket_types.hpp
 --- boost_1_53_0-boot/libs/locale/build/Jamfile.v2	2013-11-25 01:16:41.401893635 +0200
 +++ boost_1_53_0/libs/locale/build/Jamfile.v2	2013-11-25 01:16:55.810101872 +0200
-@@ -213,7 +213,7 @@
-         }
-         else 
-         {
--            if [ configure.builds has_external_iconv : $(properties) : "iconv (separate)" ]
-+            #if [ configure.builds has_external_iconv : $(properties) : "iconv (separate)" ]
-             {
-                 found-iconv = true ;
-                 result += <library>iconv ;
+@@ -185,7 +185,7 @@
+ obj has_icu_obj     : ../build/has_icu_test.cpp : $(ICU_OPTS)   ;
+ obj has_icu64_obj   : ../build/has_icu_test.cpp : $(ICU64_OPTS) ;
+ 
+-exe has_icu   : has_icu_obj   : $(ICU_OPTS)   ;
++lib has_icu   : ../build/option.cpp : <link>static ;
+ exe has_icu64 : has_icu64_obj : $(ICU64_OPTS) ;
+ 
+ explicit has_icu has_icu64 ;
+diff -ruN boost_1_53_0-boot/boost/asio/detail/socket_types.hpp boost_1_53_0-patched/boost/asio/detail/socket_types.hpp
 --- boost_1_53_0-boot/boost/asio/detail/socket_types.hpp	2012-01-15 14:46:25.000000000 +0100
 +++ boost_1_53_0-patched/boost/asio/detail/socket_types.hpp	2012-06-27 19:19:01.279562338 +0200
 @@ -123,7 +123,12 @@

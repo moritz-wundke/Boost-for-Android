@@ -305,7 +305,7 @@ echo "Building boost for android"
 (
 
   [ -e libiconv-libicu-android ] || {
-    git clone git@github.com:pelya/libiconv-libicu-android.git
+    git clone https://github.com/pelya/libiconv-libicu-android.git
     cd libiconv-libicu-android
     ./build.sh || exit 1
     cd ..
@@ -319,6 +319,8 @@ echo "Building boost for android"
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
+#         cxxflags=-include/home/pelya/src/endless_space/android-ndk-r9b/sources/android/support/include/wchar.h \
+
   { ./bjam -q                         \
          toolset=$TOOLSET             \
          $cxxflags                    \
@@ -327,7 +329,6 @@ echo "Building boost for android"
          --layout=versioned           \
          -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
-         cxxflags=-I$AndroidNDKRoot/sources/android/support/include \
          -j4 \
          install 2>&1                 \
          || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
