@@ -30,10 +30,14 @@
 BOOST_VER1=1
 BOOST_VER2=53
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.54.0,1.53.0,1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.55.0,1.54.0,1.53.0,1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
-  if [ "$1" = "1.54.0" ]; then
+  if [ "$1" = "1.55.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=55
+    BOOST_VER3=0
+  elif [ "$1" = "1.54.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=54
     BOOST_VER3=0
@@ -204,7 +208,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8b
 		;;
-	8e|9)
+	8e|9|9b)
 		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/$PlatformOS-x86/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
@@ -214,7 +218,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
-	"9 (64-bit)")
+	"9 (64-bit)"|"9b (64-bit)")
 		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
