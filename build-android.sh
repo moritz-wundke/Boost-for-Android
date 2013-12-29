@@ -151,16 +151,29 @@ if [ -d "$PROGDIR/$BUILD_DIR" ]; then
 fi
 
 
-export AndroidNDKRoot=$PARAMETERS
+AndroidNDKRoot=$PARAMETERS
 if [ -z "$AndroidNDKRoot" ] ; then
-	if [ -z "`which ndk-build`" ]; then
-		dump "ERROR: You need to provide a <ndk-root>!"
-		exit 1
-	fi
-	AndroidNDKRoot=`which ndk-build`
-	AndroidNDKRoot=`dirname $AndroidNDKRoot`
-	echo "Using AndroidNDKRoot = $AndroidNDKRoot"
+  if [ -n "${ANDROID_BUILD_TOP}" ]; then # building from Android sources
+    AndroidNDKRoot="${ANDROID_BUILD_TOP}/prebuilts/ndk/current"
+    export AndroidSourcesDetected=1
+  elif [ -z "`which ndk-build`" ]; then
+    dump "ERROR: You need to provide a <ndk-root>!"
+    exit 1
+  else
+    AndroidNDKRoot=`which ndk-build`
+    AndroidNDKRoot=`dirname $AndroidNDKRoot`
+  fi
+  echo "Using AndroidNDKRoot = $AndroidNDKRoot"
+else
+  # User passed the NDK root as a parameter. Make sure the directory
+  # exists and make it an absolute path.
+  if [ ! -f "$AndroidNDKRoot/ndk-build" ]; then
+    dump "ERROR: $AndroidNDKRoot is not a valid NDK root"
+    exit 1
+  fi
+  AndroidNDKRoot=$(cd $AndroidNDKRoot; pwd -P)
 fi
+export AndroidNDKRoot
 
 # Check platform patch
 case "$HOST_OS" in
@@ -178,7 +191,20 @@ case "$HOST_OS" in
 esac
 
 NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
-NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
+if [ -f "${NDK_RELEASE_FILE}" ]; then
+    NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
+elif [ -n "${AndroidSourcesDetected}" ]; then
+    NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html"
+    if [ -f "${NDK_RELEASE_FILE}" ]; then
+        NDK_RN=`grep "android-ndk-" "${NDK_RELEASE_FILE}" | head -1 | sed 's/^.*r\(.*\)$/\1/'`
+    else
+        dump "ERROR: can not find ndk version"
+        exit 1
+    fi
+else
+    dump "ERROR: can not find ndk version"
+    exit 1
+fi
 
 echo "Detected Android NDK version $NDK_RN"
 
@@ -228,6 +254,9 @@ case "$NDK_RN" in
 		exit 1
 esac
 
+if [ -n "${AndroidSourcesDetected}" ]; then # Overwrite CXXPATH if we are building from Android sources
+    CXXPATH="${ANDROID_TOOLCHAIN}/arm-linux-androideabi-g++"
+fi
 
 echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
