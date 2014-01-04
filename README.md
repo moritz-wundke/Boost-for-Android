@@ -26,15 +26,19 @@ To compile Boost for Android you may use one of the following NDKs:
 
 ## Usage
 
+### Compiling
+
     $ ./build-android.sh $(NDK_ROOT)
 
-This command will download and build boost against the NDK specified and output the final headers and libs and in the build folder.
+This command will download and build boost against the NDK specified and output the final headers and libs in the `build` folder. Make sure to provide an absolute path the the NDK folder!
 
-For more info about usage and available commands use --help
+For more info about usage and available commands use `--help`.
 
-Now that you got boost compiled you must add it to your Android.mk file. First copy the inlcude and lib filder over to your jni folder. I copied it just into: /jni/boost/.
+### Including
 
-Add the following to your Android.mk (example for boost 1.48):
+Now that you got Boost compiled you must add it to your `Android.mk` file. Locate the `build` folder and copy the `include` and `lib` folders over to your project's `jni` folder. A recommended path inside your project is `/jni/boost/`.
+
+Add the following to your `Android.mk` (note that here we're using Boost 1.48 and have assumed that Boost resides inside `/jni/boost`):
 
     LOCAL_CFLAGS += -I$(LOCAL_PATH)/boost/include/boost-1_48
     LOCAL_LDLIBS += -L$(LOCAL_PATH)/boost/lib/ -lboost_system -lboost_...
@@ -42,9 +46,9 @@ Add the following to your Android.mk (example for boost 1.48):
     LOCAL_CPPFLAGS += -fexceptions
     LOCAL_CPPFLAGS += -frtti
 
-Now use ndk-build and have fun with it!
-Also note that you should build your project and Boost with one version of NDK -
-STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
+Now use `ndk-build` to build and have fun with it!
+
+Note that you should build your project and Boost with the same version of NDK as the C++ STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
 
 
 ## Troubleshooting
@@ -52,7 +56,7 @@ STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
 In case you encounter bunch of linker errors when building your app with boost, 
 this might help:
 
-### Building from a 64 bit machine (linux)
+### Building from a 64 bit machine (Linux)
 
 Make sure you have installed the 32 bit libraries. Those are required to be able
 to use the NDK.
