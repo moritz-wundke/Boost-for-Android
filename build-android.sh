@@ -185,8 +185,11 @@ NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
 if [ -f "${NDK_RELEASE_FILE}" ]; then
     NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
 elif [ -n "${AndroidSourcesDetected}" ]; then
-    NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html"
-    if [ -f "${NDK_RELEASE_FILE}" ]; then
+    if [ -f "${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html" ]; then
+        NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html"
+        NDK_RN=`grep "android-ndk-" "${NDK_RELEASE_FILE}" | head -1 | sed 's/^.*r\(.*\)$/\1/'`
+    elif [ -f "${ANDROID_BUILD_TOP}/ndk/docs/text/CHANGES.text" ]; then
+        NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/text/CHANGES.text"
         NDK_RN=`grep "android-ndk-" "${NDK_RELEASE_FILE}" | head -1 | sed 's/^.*r\(.*\)$/\1/'`
     else
         dump "ERROR: can not find ndk version"
