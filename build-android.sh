@@ -249,6 +249,11 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
+	"10 (64-bit)")
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+                CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+                TOOLSET=gcc-androidR8e
+                ;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
 		exit 1
@@ -288,7 +293,11 @@ fi
 if [ ! -d $PROGDIR/$BOOST_DIR ]
 then
 	echo "Unpacking boost"
-	tar xjf $PROGDIR/$BOOST_TAR
+	if [ $OPTION_PROGRESS = "yes" ] ; then
+		pv $PROGDIR/$BOOST_TAR | tar xjf - -C $PROGDIR
+	else
+		tar xjf $PROGDIR/$BOOST_TAR
+	fi
 fi
 
 if [ $DOWNLOAD = yes ] ; then

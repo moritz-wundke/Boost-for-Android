@@ -660,7 +660,12 @@ do_option_verbose ()
 OPTION_OUTPUT=
 do_logpath () { OPTION_OUTPUT=$1; }
 
+do_progress_bar() 
+{ 
+	OPTION_PROGRESS="yes"
+}
+
 register_option "--help"          do_option_help     "Print this help."
 register_option "--verbose"       do_option_verbose  "Enable verbose mode."
 register_option "--output=<path>" do_logpath "Specify specific log output path (only terminal output by default)"
-
+register_option "--progress"	  do_progress_bar "Enable extraction progress bar"
