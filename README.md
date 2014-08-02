@@ -16,6 +16,7 @@ To compile Boost for Android you may use one of the following NDKs:
 | r8c from the [official android repository](http://developer.android.com).                 |   |   | x |   |
 | r8d from the [official android repository](http://developer.android.com).                 |   |   | x | x |
 | r8e from the [official android repository](http://developer.android.com).                 |   |   | x | x |
+| r10 from the [official android repository](http://developer.android.com).                 |   |   | x | x |
 
 # Quick Start
 
@@ -50,6 +51,9 @@ Now use `ndk-build` to build and have fun with it!
 
 Note that you should build your project and Boost with the same version of NDK as the C++ STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
 
+## Contribute
+
+The projects is split into two main branches, the master and devel. The master branch is where the current stable version lies and which should be used in most of the cases, the devel branch in turn is where development occurs. To contribute to the project make sure to use the devel branch which will make it easier to test changes and to merge incoming pull requests (PR).
 
 ## Troubleshooting
 
