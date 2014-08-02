@@ -39,14 +39,15 @@
 
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
+local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
 
 # --------------------------------------------------------------------
 # Is same for 8b, 8c and 8d
 using gcc : androidR8b
 :
-arm-linux-androideabi-g++
+$(AndroidBinariesPath)/arm-linux-androideabi-g++
 :
-<archiver>arm-linux-androideabi-ar
+<archiver>$(AndroidBinariesPath)/arm-linux-androideabi-ar
 <compileflags>-fexceptions
 <compileflags>-frtti
 <compileflags>-fpic
@@ -87,9 +88,9 @@ arm-linux-androideabi-g++
 # --------------------------------------------------------------------
 using gcc : androidR8e
 :
-arm-linux-androideabi-g++
+$(AndroidBinariesPath)/arm-linux-androideabi-g++
 :
-<archiver>arm-linux-androideabi-ar
+<archiver>$(AndroidBinariesPath)/arm-linux-androideabi-ar
 <compileflags>-fexceptions
 <compileflags>-frtti
 <compileflags>-fpic
@@ -127,60 +128,3 @@ arm-linux-androideabi-g++
 <cxxflags>-D_GLIBCXX__PTHREADS
 ;
 
-
-# ------------------
-# GCC configuration.
-# ------------------
-
-# Configure gcc (default version).
-# using gcc ;
-
-# Configure specific gcc version, giving alternative name to use.
-# using gcc : 3.2 : g++-3.2 ;
-
-
-# -------------------
-# MSVC configuration.
-# -------------------
-
-# Configure msvc (default version, searched for in standard locations and PATH).
-# using msvc ;
-
-# Configure specific msvc version (searched for in standard locations and PATH).
-# using msvc : 8.0 ;
-
-
-# ----------------------
-# Borland configuration.
-# ----------------------
-# using borland ;
-
-
-# ----------------------
-# STLPort configuration.
-# ----------------------
-
-#   Configure specifying location of STLPort headers. Libraries must be either
-# not needed or available to the compiler by default.
-# using stlport : : /usr/include/stlport ;
-
-# Configure specifying location of both headers and libraries explicitly.
-# using stlport : : /usr/include/stlport /usr/lib ;
-
-
-# -----------------
-# QT configuration.
-# -----------------
-
-# Configure assuming QTDIR gives the installation prefix.
-# using qt ;
-
-# Configure with an explicit installation prefix.
-# using qt : /usr/opt/qt ;
-
-# ---------------------
-# Python configuration.
-# ---------------------
-
-# Configure specific Python version.
-# using python : 3.1 : /usr/bin/python3 : /usr/include/python3.1 : /usr/lib ;
