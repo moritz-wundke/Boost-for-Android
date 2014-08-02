@@ -194,8 +194,11 @@ NDK_RELEASE_FILE=$AndroidNDKRoot"/RELEASE.TXT"
 if [ -f "${NDK_RELEASE_FILE}" ]; then
     NDK_RN=`cat $NDK_RELEASE_FILE | sed 's/^r\(.*\)$/\1/g'`
 elif [ -n "${AndroidSourcesDetected}" ]; then
-    NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html"
-    if [ -f "${NDK_RELEASE_FILE}" ]; then
+    if [ -f "${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html" ]; then
+        NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/CHANGES.html"
+        NDK_RN=`grep "android-ndk-" "${NDK_RELEASE_FILE}" | head -1 | sed 's/^.*r\(.*\)$/\1/'`
+    elif [ -f "${ANDROID_BUILD_TOP}/ndk/docs/text/CHANGES.text" ]; then
+        NDK_RELEASE_FILE="${ANDROID_BUILD_TOP}/ndk/docs/text/CHANGES.text"
         NDK_RN=`grep "android-ndk-" "${NDK_RELEASE_FILE}" | head -1 | sed 's/^.*r\(.*\)$/\1/'`
     else
         dump "ERROR: can not find ndk version"
@@ -249,6 +252,11 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
+	"10 (64-bit)")
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+                CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+                TOOLSET=gcc-androidR8e
+                ;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
 		exit 1
@@ -288,7 +296,11 @@ fi
 if [ ! -d $PROGDIR/$BOOST_DIR ]
 then
 	echo "Unpacking boost"
-	tar xjf $PROGDIR/$BOOST_TAR
+	if [ $OPTION_PROGRESS = "yes" ] ; then
+		pv $PROGDIR/$BOOST_TAR | tar xjf - -C $PROGDIR
+	else
+		tar xjf $PROGDIR/$BOOST_TAR
+	fi
 fi
 
 if [ $DOWNLOAD = yes ] ; then
