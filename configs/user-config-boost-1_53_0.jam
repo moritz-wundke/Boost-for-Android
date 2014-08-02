@@ -88,7 +88,7 @@ $(AndroidBinariesPath)/arm-linux-androideabi-g++
 # --------------------------------------------------------------------
 using gcc : androidR8e
 :
-$(AndroidBinariesPath)/arm-linux-androideabi-g++.exe
+$(AndroidBinariesPath)/arm-linux-androideabi-g++
 :
 <archiver>$(AndroidBinariesPath)/arm-linux-androideabi-ar
 <compileflags>-fexceptions
