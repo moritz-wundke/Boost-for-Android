@@ -44,7 +44,7 @@ diff -u -r boost_1_55_0/boost/asio/ip/impl/address_v6.ipp boost_1_55_0.patched/b
 diff -u -r boost_1_55_0/boost/config/user.hpp boost_1_55_0.patched/boost/config/user.hpp
 --- boost_1_55_0/boost/config/user.hpp
 +++ boost_1_55_0.patched/boost/config/user.hpp
-@@ -13,6 +13,15 @@
+@@ -13,6 +13,14 @@
  //  configuration policy:
  //
  

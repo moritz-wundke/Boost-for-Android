@@ -85,10 +85,15 @@ do_download ()
 #LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams
 LIBRARIES=
 register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
-do_with_libraries () { LIBRARIES="--with-libraries=$1"; }
+do_with_libraries () { 
+  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--with-$lib ${LIBRARIES}"; done 
+}
 
 register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
 do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
+do_without_libraries () { 
+  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--without-$lib ${LIBRARIES}"; done 
+}
 
 register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
 do_prefix () {
