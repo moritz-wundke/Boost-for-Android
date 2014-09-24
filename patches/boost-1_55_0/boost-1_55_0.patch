@@ -123,3 +123,16 @@ diff -u -r boost_1_55_0/libs/filesystem/src/operations.cpp boost_1_55_0.patched/
  
  #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
  #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
+diff -u -r boost_1_55_0/libs/filesystem/src/path.cpp boost_1_55_0.patched/libs/filesystem/src/path.cpp
+--- boost_1_55_0/libs/filesystem/src/path.cpp	2012-04-16 15:36:28.000000000 +0200
++++ boost_1_55_0.patched/libs/filesystem/src/path.cpp	2014-09-24 11:43:13.206476815 +0200
+@@ -903,7 +903,8 @@
+   const path::codecvt_type& path::codecvt()
+   {
+ #   if defined(BOOST_POSIX_API) && \
+-      !(defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
++      !(defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
++        || defined(__ANDROID__) )
+       // A local static initialized by calling path::imbue ensures that std::locale(""),
+       // which may throw, is called only if path_locale and condecvt_facet will actually
+       // be used. Thus misconfigured environmental variables will only cause an
