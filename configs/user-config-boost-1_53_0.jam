@@ -109,6 +109,9 @@ $(AndroidBinariesPath)/arm-linux-androideabi-g++
 <compileflags>-fomit-frame-pointer
 <compileflags>-fno-strict-aliasing
 <compileflags>-finline-limit=64
+<compileflags>-I$(AndroidNDKRoot)/sources/android/support/include
+<compileflags>-DTHOUSEP=MON_THOUSANDS_SEP
+<compileflags>-DRADIXCHAR=MON_DECIMAL_POINT
 <compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
 <compileflags>-Wa,--noexecstack
 <compileflags>-DANDROID
