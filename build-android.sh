@@ -82,7 +82,7 @@ do_download ()
 	CLEAN=yes
 }
 
-#LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams,locale
+#LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams
 LIBRARIES=
 register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
 do_with_libraries () { 
@@ -257,11 +257,11 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
-	"10 (64-bit)"|"10b (64-bit)")
+	"10 (64-bit)")
 		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
-		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
-		TOOLSET=gcc-androidR8e
-		;;
+                CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+                TOOLSET=gcc-androidR8e
+                ;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
 		exit 1
@@ -301,7 +301,7 @@ fi
 if [ ! -d $PROGDIR/$BOOST_DIR ]
 then
 	echo "Unpacking boost"
-	if [ "$OPTION_PROGRESS" = "yes" ] ; then
+	if [ $OPTION_PROGRESS = "yes" ] ; then
 		pv $PROGDIR/$BOOST_TAR | tar xjf - -C $PROGDIR
 	else
 		tar xjf $PROGDIR/$BOOST_TAR
@@ -384,19 +384,6 @@ echo "# ---------------"
 # Build boost for android
 echo "Building boost for android"
 (
-
-  if echo $LIBRARIES | grep locale; then
-    if [ -e libiconv-libicu-android ]; then
-      echo "ICONV and ICU already compiled"
-    else
-      echo "boost_locale selected - compiling ICONV and ICU"
-      git clone https://github.com/pelya/libiconv-libicu-android.git
-      cd libiconv-libicu-android
-      ./build.sh || exit 1
-      cd ..
-    fi
-  fi
-
   cd $BOOST_DIR
 
   echo "Adding pathname: `dirname $CXXPATH`"
@@ -416,8 +403,6 @@ echo "Building boost for android"
          link=static                  \
          threading=multi              \
          --layout=versioned           \
-         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
-         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          --prefix="./../$BUILD_DIR/"  \
          $LIBRARIES                   \
          install 2>&1                 \

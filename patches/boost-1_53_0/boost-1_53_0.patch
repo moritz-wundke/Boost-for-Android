@@ -1,14 +1,3 @@
---- boost_1_53_0-boot/libs/locale/build/Jamfile.v2	2013-11-25 01:16:41.401893635 +0200
-+++ boost_1_53_0/libs/locale/build/Jamfile.v2	2013-11-25 01:16:55.810101872 +0200
-@@ -185,7 +185,7 @@
- obj has_icu_obj     : ../build/has_icu_test.cpp : $(ICU_OPTS)   ;
- obj has_icu64_obj   : ../build/has_icu_test.cpp : $(ICU64_OPTS) ;
- 
--exe has_icu   : has_icu_obj   : $(ICU_OPTS)   ;
-+lib has_icu   : ../build/option.cpp : <link>static ;
- exe has_icu64 : has_icu64_obj : $(ICU64_OPTS) ;
- 
- explicit has_icu has_icu64 ;
 diff -ruN boost_1_54_0/libs/filesystem/src/path.cpp boost_1_54_0_patched/libs/filesystem/src/path.cpp
 --- boost_1_54_0/libs/filesystem/src/path.cpp	2012-04-16 15:36:28.000000000 +0200
 +++ boost_1_54_0_patched/libs/filesystem/src/path.cpp	2013-10-28 02:55:32.773380890 +0100
