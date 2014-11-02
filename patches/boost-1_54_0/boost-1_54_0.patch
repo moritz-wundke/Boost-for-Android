@@ -136,6 +136,18 @@ diff -ruN boost_1_54_0-boot/libs/filesystem/src/operations.cpp boost_1_54_0-patc
  
  #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
  #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
+diff -ruN boost_1_54_0-boot/libs/log/src/threadsafe_queue.cpp boost_1_54_0-patched/libs/log/src/threadsafe_queue.cpp
+--- boost_1_54_0-boot/libs/log/src/threadsafe_queue.cpp	2013-06-17 16:20:22.000000000 -0500
++++ boost_1_54_0-patched/libs/log/src/threadsafe_queue.cpp	2014-10-29 12:45:40.416270265 -0500
+@@ -54,7 +54,7 @@
+ #endif
+ #elif (defined(_POSIX_VERSION) && (_POSIX_VERSION >= 200112L)) || (defined(_XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))
+ // Solaris 10 does not have posix_memalign. Solaris 11 and later seem to have it.
+-#if !(defined(sun) || defined(__sun)) || defined(__SunOS_5_11) || defined(__SunOS_5_12)
++#if !(defined(__ANDROID) || defined(ANDROID)) && (!(defined(sun) || defined(__sun)) || defined(__SunOS_5_11) || defined(__SunOS_5_12))
+ #define BOOST_LOG_HAS_POSIX_MEMALIGN 1
+ #endif
+ #endif
 diff -ruN boost_1_54_0-boot/tools/build/v2/tools/android.jam boost_1_54_0-patched/tools/build/v2/tools/android.jam
 --- boost_1_54_0-boot/tools/build/v2/tools/android.jam
 +++ boost_1_54_0-patched/tools/build/v2/tools/android.jam
