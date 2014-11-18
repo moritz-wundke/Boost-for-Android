@@ -415,6 +415,10 @@ echo "Building boost for android"
          $cxxflags                    \
          link=static                  \
          threading=multi              \
+	 abi=aapcs 		      \
+	 binary-format=elf 	      \
+	 address-model=32 	      \
+	 architecture=arm	      \
          --layout=versioned           \
          -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
