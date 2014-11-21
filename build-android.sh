@@ -85,14 +85,14 @@ do_download ()
 #LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams,locale
 LIBRARIES=
 register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
-do_with_libraries () { 
-  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--with-$lib ${LIBRARIES}"; done 
+do_with_libraries () {
+  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--with-$lib ${LIBRARIES}"; done
 }
 
 register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
 do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
-do_without_libraries () { 
-  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--without-$lib ${LIBRARIES}"; done 
+do_without_libraries () {
+  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--without-$lib ${LIBRARIES}"; done
 }
 
 register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
@@ -125,10 +125,10 @@ BUILD_DIR="./build/"
 if [ $CLEAN = yes ] ; then
 	echo "Cleaning: $BUILD_DIR"
 	rm -f -r $PROGDIR/$BUILD_DIR
-	
+
 	echo "Cleaning: $BOOST_DIR"
 	rm -f -r $PROGDIR/$BOOST_DIR
-	
+
 	echo "Cleaning: $BOOST_TAR"
 	rm -f $PROGDIR/$BOOST_TAR
 
@@ -257,7 +257,7 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
-	"10 (64-bit)"|"10b (64-bit)")
+	"10 (64-bit)"|"10b (64-bit)"|"10c (64-bit)")
 		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
@@ -321,7 +321,7 @@ then
   # Make the initial bootstrap
   echo "Performing boost bootstrap"
 
-  cd $BOOST_DIR 
+  cd $BOOST_DIR
   case "$HOST_OS" in
     windows)
         cmd //c "bootstrap.bat" 2>&1 | tee -a $PROGDIR/build.log
@@ -336,7 +336,7 @@ then
   	exit 1
   fi
   cd $PROGDIR
-  
+
   # -------------------------------------------------------------
   # Patching will be done only if we had a successfull bootstrap!
   # -------------------------------------------------------------
@@ -385,17 +385,17 @@ echo "# ---------------"
 echo "Building boost for android"
 (
 
-  if echo $LIBRARIES | grep locale; then
+  #if echo $LIBRARIES | grep locale; then
     if [ -e libiconv-libicu-android ]; then
       echo "ICONV and ICU already compiled"
     else
       echo "boost_locale selected - compiling ICONV and ICU"
-      git clone https://github.com/pelya/libiconv-libicu-android.git
+      git clone https://github.com/wuqian/libiconv-libicu-android.git
       cd libiconv-libicu-android
       ./build.sh || exit 1
       cd ..
     fi
-  fi
+  #fi
 
   cd $BOOST_DIR
 
@@ -416,6 +416,7 @@ echo "Building boost for android"
          link=static                  \
          threading=multi              \
          --layout=versioned           \
+         --without-python             \
          -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          --prefix="./../$BUILD_DIR/"  \
