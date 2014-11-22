@@ -1,6 +1,26 @@
-diff -u -r boost_1_55_0/boost/asio/detail/socket_types.hpp boost_1_55_0.patched/boost/asio/detail/socket_types.hpp
---- boost_1_55_0/boost/asio/detail/socket_types.hpp
-+++ boost_1_55_0.patched/boost/asio/detail/socket_types.hpp
+--- boost_1_56_0-boot/libs/locale/build/Jamfile.v2	2013-11-25 01:16:41.401893635 +0200
++++ boost_1_56_0/libs/locale/build/Jamfile.v2	2013-11-25 01:16:55.810101872 +0200
+@@ -27,7 +27,7 @@
+ ## iconv
+
+ obj has_iconv_libc_obj : ../build/has_iconv.cpp ;
+-exe has_iconv : has_iconv_libc_obj ;
++lib has_iconv  : ../build/option.cpp : <link>static ;
+ explicit has_iconv ;
+
+ ICONV_PATH = [ modules.peek : ICONV_PATH ] ;
+@@ -185,7 +185,7 @@
+ obj has_icu_obj     : ../build/has_icu_test.cpp : $(ICU_OPTS)   ;
+ obj has_icu64_obj   : ../build/has_icu_test.cpp : $(ICU64_OPTS) ;
+ 
+-exe has_icu   : has_icu_obj   : $(ICU_OPTS)   ;
++lib has_icu   : ../build/option.cpp : <link>static ;
+ exe has_icu64 : has_icu64_obj : $(ICU64_OPTS) ;
+ 
+ explicit has_icu has_icu64 ;
+diff -u -r boost_1_56_0/boost/asio/detail/socket_types.hpp boost_1_56_0.patched/boost/asio/detail/socket_types.hpp
+--- boost_1_56_0/boost/asio/detail/socket_types.hpp
++++ boost_1_56_0.patched/boost/asio/detail/socket_types.hpp
 @@ -278,7 +278,12 @@
  typedef int socket_type;
  const int invalid_socket = -1;
@@ -14,9 +34,9 @@ diff -u -r boost_1_55_0/boost/asio/detail/socket_types.hpp boost_1_55_0.patched/
  #if defined(INET6_ADDRSTRLEN)
  const int max_addr_v6_str_len = INET6_ADDRSTRLEN + 1 + IF_NAMESIZE;
  #else // defined(INET6_ADDRSTRLEN)
-diff -u -r boost_1_55_0/boost/asio/ip/impl/address_v6.ipp boost_1_55_0.patched/boost/asio/ip/impl/address_v6.ipp
---- boost_1_55_0/boost/asio/ip/impl/address_v6.ipp
-+++ boost_1_55_0.patched/boost/asio/ip/impl/address_v6.ipp
+diff -u -r boost_1_56_0/boost/asio/ip/impl/address_v6.ipp boost_1_56_0.patched/boost/asio/ip/impl/address_v6.ipp
+--- boost_1_56_0/boost/asio/ip/impl/address_v6.ipp
++++ boost_1_56_0.patched/boost/asio/ip/impl/address_v6.ipp
 @@ -11,6 +11,23 @@
  #ifndef BOOST_ASIO_IP_IMPL_ADDRESS_V6_IPP
  #define BOOST_ASIO_IP_IMPL_ADDRESS_V6_IPP
@@ -41,9 +61,9 @@ diff -u -r boost_1_55_0/boost/asio/ip/impl/address_v6.ipp boost_1_55_0.patched/b
  #if defined(_MSC_VER) && (_MSC_VER >= 1200)
  # pragma once
  #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
-diff -u -r boost_1_55_0/boost/config/user.hpp boost_1_55_0.patched/boost/config/user.hpp
---- boost_1_55_0/boost/config/user.hpp
-+++ boost_1_55_0.patched/boost/config/user.hpp
+diff -u -r boost_1_56_0/boost/config/user.hpp boost_1_56_0.patched/boost/config/user.hpp
+--- boost_1_56_0/boost/config/user.hpp
++++ boost_1_56_0.patched/boost/config/user.hpp
 @@ -13,6 +13,14 @@
  //  configuration policy:
  //
@@ -59,9 +79,9 @@ diff -u -r boost_1_55_0/boost/config/user.hpp boost_1_55_0.patched/boost/config/
  // define this to locate a compiler config file:
  // #define BOOST_COMPILER_CONFIG <myheader>
  
-diff -u -r boost_1_55_0/boost/interprocess/detail/workaround.hpp boost_1_55_0.patched/boost/interprocess/detail/workaround.hpp
---- boost_1_55_0/boost/interprocess/detail/workaround.hpp	2013-09-16 19:01:45.000000000 +0200
-+++ boost_1_55_0.patched/boost/interprocess/detail/workaround.hpp	2013-11-29 17:51:33.111025389 +0100
+diff -u -r boost_1_56_0/boost/interprocess/detail/workaround.hpp boost_1_56_0.patched/boost/interprocess/detail/workaround.hpp
+--- boost_1_56_0/boost/interprocess/detail/workaround.hpp	2013-09-16 19:01:45.000000000 +0200
++++ boost_1_56_0.patched/boost/interprocess/detail/workaround.hpp	2013-11-29 17:51:33.111025389 +0100
 @@ -73,7 +73,7 @@
     #endif
  
@@ -71,9 +91,9 @@ diff -u -r boost_1_55_0/boost/interprocess/detail/workaround.hpp boost_1_55_0.pa
        #define BOOST_INTERPROCESS_XSI_SHARED_MEMORY_OBJECTS
     #endif
  
-diff -u -r boost_1_55_0/boost/predef/other/endian.h boost_1_55_0.patched/boost/predef/other/endian.h
---- boost_1_55_0/boost/predef/other/endian.h
-+++ boost_1_55_0.patched/boost/predef/other/endian.h
+diff -u -r boost_1_56_0/boost/predef/other/endian.h boost_1_56_0.patched/boost/predef/other/endian.h
+--- boost_1_56_0/boost/predef/other/endian.h
++++ boost_1_56_0.patched/boost/predef/other/endian.h
 @@ -53,7 +53,7 @@
   */
  #if !BOOST_ENDIAN_BIG_BYTE && !BOOST_ENDIAN_BIG_WORD && \
@@ -83,9 +103,9 @@ diff -u -r boost_1_55_0/boost/predef/other/endian.h boost_1_55_0.patched/boost/p
  #       include <endian.h>
  #   else
  #       if BOOST_OS_MACOS
-diff -u -r boost_1_55_0/libs/filesystem/src/operations.cpp boost_1_55_0.patched/libs/filesystem/src/operations.cpp
---- boost_1_55_0/libs/filesystem/src/operations.cpp
-+++ boost_1_55_0.patched/libs/filesystem/src/operations.cpp
+diff -u -r boost_1_56_0/libs/filesystem/src/operations.cpp boost_1_56_0.patched/libs/filesystem/src/operations.cpp
+--- boost_1_56_0/libs/filesystem/src/operations.cpp
++++ boost_1_56_0.patched/libs/filesystem/src/operations.cpp
 @@ -73,14 +73,14 @@
      const fs::path dot_dot_path("..");
  #   include <sys/types.h>

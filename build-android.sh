@@ -262,9 +262,12 @@ case "$NDK_RN" in
 		TOOLSET=gcc-androidR8e
 		;;
 	"10 (64-bit)"|"10b (64-bit)")
-		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
-		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
-		TOOLSET=gcc-androidR8e
+#		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.8}
+#		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+#		TOOLSET=gcc-androidR8e
+		TOOLCHAIN=llvm-3.4
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
+		TOOLSET=clang-androidR8e
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
@@ -413,6 +416,7 @@ echo "Building boost for android"
   export PATH=$AndroidBinariesPath:$PATH
   export AndroidNDKRoot
   export NO_BZIP2=1
+  export ICONV_PATH="`pwd`/../../libiconv/armeabi-v7a"
 
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
@@ -427,12 +431,16 @@ echo "Building boost for android"
 	 binary-format=elf 	      \
 	 address-model=32 	      \
 	 architecture=arm	      \
+         boost.locale.posix=off       \
+         boost.locale.std=on          \
+         boost.locale.iconv=on        \
+         boost.locale.icu=off         \
          --layout=versioned           \
-         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
-         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
+#         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
+#         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          --prefix="./../$BUILD_DIR/"  \
          $LIBRARIES                   \
-         install 2>&1                 \
+         release debug install 2>&1   \
          || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
   } | tee -a $PROGDIR/build.log
 
