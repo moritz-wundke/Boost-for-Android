@@ -30,10 +30,14 @@
 BOOST_VER1=1
 BOOST_VER2=53
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.56.0, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
-  if [ "$1" = "1.55.0" ]; then
+  if [ "$1" = "1.56.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=56
+    BOOST_VER3=0
+  elif [ "$1" = "1.55.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=55
     BOOST_VER3=0
@@ -258,9 +262,12 @@ case "$NDK_RN" in
 		TOOLSET=gcc-androidR8e
 		;;
 	"10 (64-bit)"|"10b (64-bit)")
-		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
-		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
-		TOOLSET=gcc-androidR8e
+#		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.8}
+#		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+#		TOOLSET=gcc-androidR8e
+		TOOLCHAIN=llvm-3.4
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
+		TOOLSET=clang-androidR8e
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version!"
@@ -345,7 +352,11 @@ then
   BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
   PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
-  cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam
+  if [ "$BOOST_VER1" -eq 1 ] && [ "$BOOST_VER2" -ge 56 ] && [ "$BOOST_VER3" -ge 0 ]; then
+	cp -f configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/project-config.jam
+  else
+	cp -f configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam
+  fi
 
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
@@ -405,6 +416,8 @@ echo "Building boost for android"
   export PATH=$AndroidBinariesPath:$PATH
   export AndroidNDKRoot
   export NO_BZIP2=1
+  export ICONV_PATH="`pwd`/../../libiconv/armeabi-v7a"
+  export PROGDIR
 
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
@@ -415,12 +428,20 @@ echo "Building boost for android"
          $cxxflags                    \
          link=static                  \
          threading=multi              \
+	 abi=aapcs 		      \
+	 binary-format=elf 	      \
+	 address-model=32 	      \
+	 architecture=arm	      \
+         boost.locale.posix=off       \
+         boost.locale.std=on          \
+         boost.locale.iconv=on        \
+         boost.locale.icu=off         \
          --layout=versioned           \
-         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
-         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
+#         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
+#         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          --prefix="./../$BUILD_DIR/"  \
          $LIBRARIES                   \
-         install 2>&1                 \
+         release debug install 2>&1   \
          || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
   } | tee -a $PROGDIR/build.log
 
