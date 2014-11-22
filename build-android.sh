@@ -417,6 +417,7 @@ echo "Building boost for android"
   export AndroidNDKRoot
   export NO_BZIP2=1
   export ICONV_PATH="`pwd`/../../libiconv/armeabi-v7a"
+  export PROGDIR
 
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done

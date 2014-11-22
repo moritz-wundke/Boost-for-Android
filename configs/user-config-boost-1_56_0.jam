@@ -39,6 +39,7 @@
 
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
+local PROGDIR = [ os.environ PROGDIR ] ;
 
 # --------------------------------------------------------------------
 # Is same for 8b, 8c and 8d
@@ -74,9 +75,11 @@ $(AndroidNDKRoot)/toolchains/llvm-3.4/prebuilt/linux-x86_64/bin/clang++
 <compileflags>-g
 <compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/include
 <compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi/include
+<compileflags>-I$(PROGDIR)/../libiconv/armeabi-v7a/include
 <linkflags>--target=armv7-none-linux-androideabi
 <linkflags>--gcc-toolchain="$(AndroidNDKRoot)/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64"
 <linkflags>--sysroot=$(AndroidNDKRoot)/platforms/android-9/arch-arm
+<linkflags>-L$(PROGDIR)/../libiconv/armeabi-v7a/lib
  # @Moss - Above are the 'official' android flags
 <architecture>arm
 <compileflags>-fvisibility=hidden
@@ -85,58 +88,6 @@ $(AndroidNDKRoot)/toolchains/llvm-3.4/prebuilt/linux-x86_64/bin/clang++
 <cxxflags>-D_GLIBCXX__PTHREADS
 <cxxflags>-std=c++11
 ;
-
-
-# --------------------------------------------------------------------
-using gcc : androidR8e
-:
-arm-linux-androideabi-g++
-:
-<archiver>arm-linux-androideabi-ar
-<compileflags>-fexceptions
-<compileflags>-frtti
-<compileflags>-fpic
-<compileflags>-ffunction-sections
-<compileflags>-funwind-tables
-<compileflags>-Wno-pedantic
-<compileflags>-march=armv7-a
-<compileflags>-mtune=xscale
-<compileflags>-msoft-float
-<compileflags>-mthumb
-<compileflags>-O2
-<compileflags>-g
-<compileflags>-DNDEBUG
-<compileflags>-fomit-frame-pointer
-<compileflags>-fno-strict-aliasing
-<compileflags>-finline-limit=64
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
-<compileflags>-Wa,--noexecstack
-<compileflags>-DANDROID
-<compileflags>-D__ANDROID__
-<compileflags>-DNDEBUG
-<compileflags>-O2
-<compileflags>-g
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/include
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.8/include/backward
-<compileflags>-I/home/adnan/Boost-for-Android/libiconv-libicu-android/armeabi/include
-<compileflags>--sysroot=$(AndroidNDKRoot)/platforms/android-9/arch-arm
-<compileflags>-Wa,--noexecstack
-<cxxflags>-std=c++11
-<linkflags>--sysroot=$(AndroidNDKRoot)/platforms/android-9/arch-arm
-<linkflags>-L/home/adnan/Boost-for-Android/libiconv-libicu-android/armeabi/lib
-# @Moss - Above are the 'oficial' android flags
-<architecture>arm
-<compileflags>-fvisibility=hidden
-<compileflags>-fvisibility-inlines-hidden
-<compileflags>-fdata-sections
-<cxxflags>-D__arm__
-<cxxflags>-D_REENTRANT
-<cxxflags>-D_GLIBCXX__PTHREADS
-<cxxflags>-D_BOOST_SYSTEM_NO_DEPRECATED
-<cxxflags>-D_NO_BZIP2
-;
-
 
 # ------------------
 # GCC configuration.
