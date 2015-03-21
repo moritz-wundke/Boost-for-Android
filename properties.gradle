@@ -1,0 +1,33 @@
+
+def CheckProperty(String property, String error) {
+    if (!hasProperty(property)) {
+        throw new GradleException(error)
+    }    
+}
+
+def PropertyWithDefault(String property, String defaultValue) {
+    if (!hasProperty(property)) {
+        ext.setProperty(property, defaultValue)
+    }    
+}
+
+CheckProperty("androidNDK", "NDK is not configured. Make sure there is a local.properties " +
+                "file with an ndk.dir entry, or set path " +
+                "via -Pndk=<path>")
+
+PropertyWithDefault("version", "1.53.0")
+PropertyWithDefault("libs", "")
+PropertyWithDefault("toolchain", "")
+
+ext {
+    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
+    dotVersion = version
+    underscoreVersion = dotVersion.replace(".", "_")
+    boostName = "boost_" + underscoreVersion
+    zipFile = boostName + ".tar.bz2"
+    boostUrl = "http://downloads.sourceforge.net/project/boost/boost/$version/$zipFile"
+    unpackedDir = "unpacked"
+    pathToBjamDir = "tools/build/v2"
+    boostDir = new File(unpackedDir, boostName)
+    bjamExtensionDir = new File(boostDir.getPath(), pathToBjamDir)
+}

@@ -1,0 +1,33 @@
+import org.gradle.internal.os.OperatingSystem
+
+def getOSName()
+{
+    if (OperatingSystem.current().windows) {
+        return 'windows'
+    }
+    else if (OperatingSystem.current().linux) {
+        return 'linux'
+    }
+    else if (OperatingSystem.current().macosx) {
+        return 'darwin'
+    }
+
+    throw GradleException("Unsupported OS: $OperatingSystem.name")
+}
+
+def IsWindows()
+{
+    return OperatingSystem.current().windows
+}
+
+def AddToSystemPath(String path)
+{
+    String sep = OperatingSystem.current().windows ? ";" : ":"
+    return "$System.env.PATH$sep$path"
+}
+
+ext {
+    getOSName = this.&getOSName
+    AddToSystemPath = this.&AddToSystemPath
+    IsWindows = this.&IsWindows
+}

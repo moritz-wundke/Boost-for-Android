@@ -1,0 +1,75 @@
+plugins {
+    id "de.undercouch.download" version "1.2"
+    id 'com.github.jlouns.cpe' version '0.1.0'
+}
+
+import de.undercouch.gradle.tasks.download.Download
+
+apply from: 'common.gradle'
+apply from: 'properties.gradle'
+
+ext {
+    bjamExtensionToolset = "gcc-androidR8e"
+    ndkToolChains = ['arm-linux-androideabi-4.9', 'mips64el-linux-android-4.9']
+}
+
+task downloadBoost(type: Download) {
+    src boostUrl
+    dest './'
+}
+
+task unzipBoost(type: Copy) {
+    from tarTree(resources.bzip2(zipFile))
+    into unpackedDir
+}
+
+task copyJamExtension(type: Copy) {
+    from "configs/user-config-boost-${underscoreVersion}.jam"
+    into bjamExtensionDir
+    rename { "user-config.jam" }
+}
+
+task bootstrapBoost(type: CrossPlatformExec) {
+    outputs.file new File(boostDir.getPath(), IsWindows() ? "b2.exe" : "b2") 
+    workingDir boostDir
+    executable = "bootstrap"
+
+    doFirst {
+        delete new File(bjamExtensionDir.getPath(), "user-config.jam")
+    }
+}
+
+task patchForAndroid << {
+    ant.patch(patchfile: "patches/boost-${underscoreVersion}/boost-${underscoreVersion}.patch", dir: boostDir, strip: 1)
+}
+
+// Generate tasks for each toolchain
+logger.info("Generating tasks for this list of toolchains: $ndkToolChains")
+ndkToolChains.each { toolchain ->
+    task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: [bootstrapBoost, copyJamExtension, patchForAndroid]) {
+        // TODO: with this code still only one toolchain is supported: armeabi 
+        String ndkToolsetRoot = new File(androidNDK, "toolchains/$toolchain/prebuilt/$getOSName-x86_64/bin/")
+
+        environment "AndroidBinariesPath", ndkToolsetRoot
+        environment "PATH", AddToSystemPath(ndkToolsetRoot)
+        environment "AndroidNDKRoot", androidNDK
+        environment "NO_BZIP2", "1"
+
+        def libsToBuild = libs.tokenize().collect { x -> "--with-$x" }
+        workingDir boostDir
+        executable = "bjam"
+        args = ["target-os=linux",
+             "toolset=gcc-androidR8e",
+             "link=static",
+             "threading=multi",
+             "--layout=versioned",
+             // TODO: fix that
+             // "-sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi",
+             // "-sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi",
+             "--prefix=./../BUILD_$underscoreVersion/$toolchain",
+             ] + libsToBuild
+    }
+}
+
+task getBoost(dependsOn: [downloadBoost, unzipBoost])
+task buildBoost(dependsOn: ndkToolChains.collect { toolchain -> "$toolchain-Build" } )
