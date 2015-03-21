@@ -11,16 +11,14 @@ def PropertyWithDefault(String property, String defaultValue) {
     }    
 }
 
-CheckProperty("androidNDK", "NDK is not configured. Make sure there is a local.properties " +
-                "file with an ndk.dir entry, or set path " +
-                "via -Pndk=<path>")
+CheckProperty("androidNDK", "NDK is not configured. Make sure there is a gradle.properties " +
+                "file with an androidNDK entry, or set path via -PandroidNDK=<path>")
 
 PropertyWithDefault("version", "1.53.0")
 PropertyWithDefault("libs", "")
 PropertyWithDefault("toolchain", "")
 
 ext {
-    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
     dotVersion = version
     underscoreVersion = dotVersion.replace(".", "_")
     boostName = "boost_" + underscoreVersion

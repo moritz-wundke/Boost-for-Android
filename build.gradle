@@ -8,7 +8,12 @@ import de.undercouch.gradle.tasks.download.Download
 apply from: 'common.gradle'
 apply from: 'properties.gradle'
 
+if (androidNDK == "") {
+    androidNDK = TryFindNDK()
+}
+
 ext {
+    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
     bjamExtensionToolset = "gcc-androidR8e"
     ndkToolChains = ['arm-linux-androideabi-4.9', 'mips64el-linux-android-4.9']
 }
