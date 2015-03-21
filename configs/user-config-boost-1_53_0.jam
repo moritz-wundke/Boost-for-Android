@@ -40,14 +40,15 @@
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
 local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
+local AndroidToolchainPrefix = [ os.environ AndroidToolchainPrefix ] ;
 
 # --------------------------------------------------------------------
 # Is same for 8b, 8c and 8d
 using gcc : androidR8b
 :
-$(AndroidBinariesPath)/arm-linux-androideabi-g++
+$(AndroidBinariesPath)/$(AndroidToolchainPrefix)-g++
 :
-<archiver>$(AndroidBinariesPath)/arm-linux-androideabi-ar
+<archiver>$(AndroidBinariesPath)/$(AndroidToolchainPrefix)-ar
 <compileflags>-fexceptions
 <compileflags>-frtti
 <compileflags>-fpic
@@ -88,9 +89,9 @@ $(AndroidBinariesPath)/arm-linux-androideabi-g++
 # --------------------------------------------------------------------
 using gcc : androidR8e
 :
-$(AndroidBinariesPath)/arm-linux-androideabi-g++
+$(AndroidBinariesPath)/$(AndroidToolchainPrefix)-g++
 :
-<archiver>$(AndroidBinariesPath)/arm-linux-androideabi-ar
+<archiver>$(AndroidBinariesPath)/$(AndroidToolchainPrefix)-ar
 <compileflags>-fexceptions
 <compileflags>-frtti
 <compileflags>-fpic
