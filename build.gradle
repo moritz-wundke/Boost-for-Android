@@ -39,10 +39,6 @@ task bootstrapBoost(type: CrossPlatformExec) {
     outputs.file new File(boostDir.getPath(), IsWindows() ? "b2.exe" : "b2") 
     workingDir boostDir
     executable = "bootstrap"
-
-    doFirst {
-        delete new File(bjamExtensionDir.getPath(), "user-config.jam")
-    }
 }
 
 task patchForAndroid << {
@@ -81,3 +77,21 @@ ndk_toolchains.each { toolchain ->
 
 task getBoost(dependsOn: [downloadBoost, unzipBoost])
 task buildBoost(dependsOn: ndk_toolchains.collect { toolchain -> "$toolchain-Build" } )
+
+task buildBoostNative(type: CrossPlatformExec, dependsOn: [bootstrapBoost, patchForAndroid]) {
+    def toolset = IsWindows() ? 'msvc' : 'gcc'
+
+    workingDir boostDir
+    executable = "bjam"
+    args = ["toolset=$toolset",
+         "link=static",
+         "threading=multi",
+         "--layout=versioned",
+         "--stagedir=./../BUILD_$underscoreVersion/$toolset",
+         "--build-dir=./../BUILD_$underscoreVersion/$toolset/obj",
+         ] + libsToBuild
+}
+
+// Following tasks requires to be clean of user-config.jam
+bootstrapBoost.doFirst { delete new File(bjamExtensionDir.getPath(), "user-config.jam") }
+buildBoostNative.doFirst { delete new File(bjamExtensionDir.getPath(), "user-config.jam") }
