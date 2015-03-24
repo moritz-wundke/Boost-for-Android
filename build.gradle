@@ -38,7 +38,7 @@ task copyJamExtension(type: Copy) {
 task bootstrapBoost(type: CrossPlatformExec) {
     outputs.file new File(boostDir.getPath(), IsWindows() ? "b2.exe" : "b2") 
     workingDir boostDir
-    executable = "bootstrap"
+    executable = IsWindows() ? "bootstrap.bat" : "./bootstrap.sh"
 }
 
 task patchForAndroid << {
@@ -59,7 +59,7 @@ ndk_toolchains.each { toolchain ->
         environment "NO_BZIP2", "1"
 
         workingDir boostDir
-        executable = "bjam"
+        executable = IsWindows() ? "bjam.exe" : "./bjam"
         args = ["target-os=linux",
              "toolset=gcc-androidR8e",
              "link=static",
@@ -82,7 +82,7 @@ task buildBoostNative(type: CrossPlatformExec, dependsOn: [bootstrapBoost, patch
     def toolset = IsWindows() ? 'msvc' : 'gcc'
 
     workingDir boostDir
-    executable = "bjam"
+    executable = IsWindows() ? "bjam.exe" : "./bjam"
     args = ["toolset=$toolset",
          "link=static",
          "threading=multi",
