@@ -5,10 +5,10 @@ def CheckProperty(String property, String error) {
     }    
 }
 
-def PropertyWithDefault(String property, String defaultValue) {
+def PropertyWithDefault(String property, Object defaultValue) {
     if (!hasProperty(property)) {
         ext.setProperty(property, defaultValue)
-    }    
+    }
 }
 
 CheckProperty("androidNDK", "NDK is not configured. Make sure there is a gradle.properties " +
@@ -17,6 +17,11 @@ CheckProperty("androidNDK", "NDK is not configured. Make sure there is a gradle.
 PropertyWithDefault("version", "1.53.0")
 PropertyWithDefault("libs", "")
 
+PropertyWithDefault("bintray_user", "")
+PropertyWithDefault("bintray_key", "")
+PropertyWithDefault("bintray_dryRun", true)
+PropertyWithDefault("bintray_publish", false)
+
 ext {
     dotVersion = version
     underscoreVersion = dotVersion.replace(".", "_")
@@ -24,7 +29,21 @@ ext {
     zipFile = boostName + ".tar.bz2"
     boostUrl = "http://downloads.sourceforge.net/project/boost/boost/$version/$zipFile"
     unpackedDir = "unpacked"
+    boostBuildDir = new File(unpackedDir, "BUILD_$underscoreVersion/")
     pathToBjamDir = "tools/build/v2"
     boostDir = new File(unpackedDir, boostName)
     bjamExtensionDir = new File(boostDir.getPath(), pathToBjamDir)
+}
+
+if (androidNDK == "") {
+    androidNDK = TryFindNDK()
+}
+
+ext {
+    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
+    bjamExtensionToolset = "gcc-androidR8e"
+    libsToBuild = libs.tokenize().collect { x -> "--with-$x" }
+    ndk_toolchains = ndk_toolchains.tokenize()
+
+    nativeToochain = IsWindows() ? 'msvc' : 'gcc'
 }

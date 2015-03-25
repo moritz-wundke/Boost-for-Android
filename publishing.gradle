@@ -1,0 +1,58 @@
+apply plugin: "maven-publish"
+
+task zipBuild
+
+ext {
+    publicationsData = [:]
+}
+
+def CreateZipTask(toolchain, publication) {
+    task "zip-$publication-Build"(type: Zip) {
+        from boostBuildDir
+        baseName = "Boost-$publication"
+        version = dotVersion
+        include "$toolchain/**"
+        excludes = ['**/obj*']
+
+        publicationsData[publication] = archiveName
+    }
+    zipBuild.dependsOn.add("zip-$publication-Build")
+}
+
+ndk_toolchains.each { toolchain ->
+    CreateZipTask(toolchain, "$toolchain-$ndk_toolchain_compiler_version")
+}
+
+CreateZipTask(nativeToochain, nativeToochain)
+
+// publications can't have dots in names
+publicationsData = publicationsData.collectEntries { publication, archiveName -> [(publication.replace('.', '_')): archiveName] }
+
+publicationsData.each { publication, archiveName ->
+    publishing.publications.create(publication, MavenPublication) {
+        groupId 'org.boost'
+        artifactId "Boost-custom-$publication"
+        version dotVersion
+        artifact archiveName
+    }
+}
+
+bintray {
+    user = bintray_user
+    key = bintray_key
+
+    publications = publicationsData.collect { publication, archiveName -> publication }
+    dryRun = bintray_dryRun.toBoolean()
+    publish = bintray_publish.toBoolean()
+
+    pkg {
+        repo = 'maven'
+        name = 'org.boost'
+        desc = 'Boost precompiled libraries'
+        licenses = ['BSD']
+        publicDownloadNumbers = true
+        version {
+           name = '0.0.2-experimental'
+        }
+    }
+}
