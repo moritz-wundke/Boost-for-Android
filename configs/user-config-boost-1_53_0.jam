@@ -41,53 +41,9 @@ import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
 local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
 local AndroidToolchainPrefix = [ os.environ AndroidToolchainPrefix ] ;
+local AndroidNDKCompilerVersion = [ os.environ AndroidNDKCompilerVersion ] ;
 
-# --------------------------------------------------------------------
-# Is same for 8b, 8c and 8d
-using gcc : androidR8b
-:
-$(AndroidBinariesPath)/$(AndroidToolchainPrefix)-g++
-:
-<archiver>$(AndroidBinariesPath)/$(AndroidToolchainPrefix)-ar
-<compileflags>-fexceptions
-<compileflags>-frtti
-<compileflags>-fpic
-<compileflags>-ffunction-sections
-<compileflags>-funwind-tables
-<compileflags>-D__ARM_ARCH_5__
-<compileflags>-D__ARM_ARCH_5T__
-<compileflags>-D__ARM_ARCH_5E__
-<compileflags>-D__ARM_ARCH_5TE__
-<compileflags>-Wno-psabi
-<compileflags>-march=armv5te
-<compileflags>-mtune=xscale
-<compileflags>-msoft-float
-<compileflags>-mthumb
-<compileflags>-Os
-<compileflags>-fomit-frame-pointer
-<compileflags>-fno-strict-aliasing
-<compileflags>-finline-limit=64
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
-<compileflags>-Wa,--noexecstack
-<compileflags>-DANDROID
-<compileflags>-D__ANDROID__
-<compileflags>-DNDEBUG
-<compileflags>-O2
-<compileflags>-g
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.6/include
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include
-# @Moss - Above are the 'oficial' android flags
-<architecture>arm
-<compileflags>-fvisibility=hidden
-<compileflags>-fvisibility-inlines-hidden
-<compileflags>-fdata-sections
-<cxxflags>-D__arm__
-<cxxflags>-D_REENTRANT
-<cxxflags>-D_GLIBCXX__PTHREADS
-;
-
-# --------------------------------------------------------------------
-using gcc : androidR8e
+using gcc : $(AndroidNDKCompilerVersion)
 :
 $(AndroidBinariesPath)/$(AndroidToolchainPrefix)-g++
 :
@@ -120,8 +76,8 @@ $(AndroidBinariesPath)/$(AndroidToolchainPrefix)-g++
 <compileflags>-DNDEBUG
 <compileflags>-O2
 <compileflags>-g
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.6/include
-<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include
+<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/$(AndroidNDKCompilerVersion)/include
+<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/gnu-libstdc++/$(AndroidNDKCompilerVersion)/libs/armeabi/include
 # @Moss - Above are the 'oficial' android flags
 <architecture>arm
 <compileflags>-fvisibility=hidden
