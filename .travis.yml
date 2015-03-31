@@ -10,7 +10,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install llvm && brew link --force llvm; fi
 
 script:
-  - [ $TRAVIS_OS_NAME == linux ] && ./gradlew getBoost buildBoostNative zipBuild
+  - ./gradlew getBoost buildBoostNative zipBuild
 
 os:
   - linux
