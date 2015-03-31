@@ -6,12 +6,18 @@ compiler:
 before_install:
   - echo $LANG
   - echo $LC_ALL
+  - sudo apt-get update
+  - sudo apt-get install -yqq libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1
+  - wget http://dl.google.com/android/ndk/android-ndk-r10d-linux-x86_64.bin
+  - chmod a+x ./android-ndk-r10d-linux-x86_64.bin 
+  - ./android-ndk-r10d-linux-x86_64.bin > /dev/null
+
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install -y llvm-3.4 llvm-3.4-dev; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install llvm && brew link --force llvm; fi
 
 script:
   - export TERM=dumb
-  - ./gradlew getBoost buildBoostNative zipBuild
+  - ./gradlew -PandroidNDK=android-ndk-r10d getBoost buildBoostNative buildBoost zipBuild
 
 os:
   - linux
