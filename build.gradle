@@ -20,12 +20,6 @@ task unzipBoost(type: Copy) {
     into unpackedDir
 }
 
-task copyJamExtension(type: Copy) {
-    from "configs/user-config-boost-${underscoreVersion}.jam"
-    into bjamExtensionDir
-    rename { "user-config.jam" }
-}
-
 task bootstrapBoost(type: CrossPlatformExec) {
     outputs.file new File(boostDir.getPath(), IsWindows() ? "b2.exe" : "b2") 
     workingDir boostDir
@@ -39,11 +33,18 @@ task patchForAndroid << {
 // Generate tasks for each toolchain
 logger.info("Generating tasks for this list of toolchains: $ndk_toolchains")
 ndk_toolchains.each { toolchain ->
-    task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: [bootstrapBoost, copyJamExtension, patchForAndroid]) {
-        // TODO: with this code still only one toolchain is supported: armeabi 
+    def toolchainFullName = toolchainPrefixMap[toolchain]
+
+    task "copyJamExtension-$toolchain"(type: Copy) {
+        from "configs/" + toolchainBjamExtensionMap[toolchain]
+        into bjamExtensionDir
+        rename { "user-config.jam" }
+    }
+
+    task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: [bootstrapBoost, "copyJamExtension-$toolchain", patchForAndroid]) {
         String ndkToolsetRoot = new File(androidNDK, "toolchains/$toolchain-$ndk_toolchain_compiler_version/prebuilt/$getOSName-x86_64/bin/")
 
-        environment "AndroidToolchainPrefix", toolchain
+        environment "AndroidToolchainPrefix", toolchainFullName
         environment "AndroidBinariesPath", ndkToolsetRoot
         environment "AndroidNDKCompilerVersion", ndk_toolchain_compiler_version
         environment "PATH", AddToSystemPath(ndkToolsetRoot)
@@ -57,8 +58,8 @@ ndk_toolchains.each { toolchain ->
              "link=static",
              "threading=multi",
              "--layout=versioned",
-             "--stagedir=./../BUILD_$underscoreVersion/$toolchain", //TODO: use boostBuildDir
-             "--build-dir=./../BUILD_$underscoreVersion/$toolchain/obj",
+             "--stagedir=./../BUILD_$underscoreVersion/$toolchainFullName", //TODO: use boostBuildDir
+             "--build-dir=./../BUILD_$underscoreVersion/$toolchainFullName/obj",
              // TODO: fix that
              // "-sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi",
              // "-sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi",

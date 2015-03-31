@@ -24,7 +24,8 @@ def CreateZipTaskLibs(toolchain, publication) {
 }
 
 ndk_toolchains.each { toolchain ->
-    CreateZipTaskLibs(toolchain, "$toolchain-$ndk_toolchain_compiler_version")
+    def toolchainFullName = toolchainPrefixMap[toolchain]
+    CreateZipTaskLibs(toolchainFullName, "$toolchainFullName-$ndk_toolchain_compiler_version")
 }
 
 CreateZipTaskLibs(nativeToochain, nativeToochain)
