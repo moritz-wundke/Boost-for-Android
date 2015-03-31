@@ -1,23 +1,14 @@
 plugins {
     id "de.undercouch.download" version "1.2"
     id 'com.github.jlouns.cpe' version '0.1.0'
+    id 'com.jfrog.bintray' version '1.1'
 }
 
 import de.undercouch.gradle.tasks.download.Download
 
 apply from: 'common.gradle'
 apply from: 'properties.gradle'
-
-if (androidNDK == "") {
-    androidNDK = TryFindNDK()
-}
-
-ext {
-    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
-    bjamExtensionToolset = "gcc-androidR8e"
-    libsToBuild = libs.tokenize().collect { x -> "--with-$x" }
-    ndk_toolchains = ndk_toolchains.tokenize()
-}
+apply from: 'publishing.gradle'
 
 task downloadBoost(type: Download) {
     src boostUrl
@@ -27,12 +18,6 @@ task downloadBoost(type: Download) {
 task unzipBoost(type: Copy) {
     from tarTree(resources.bzip2(zipFile))
     into unpackedDir
-}
-
-task copyJamExtension(type: Copy) {
-    from "configs/user-config-boost-${underscoreVersion}.jam"
-    into bjamExtensionDir
-    rename { "user-config.jam" }
 }
 
 task bootstrapBoost(type: CrossPlatformExec) {
@@ -48,25 +33,33 @@ task patchForAndroid << {
 // Generate tasks for each toolchain
 logger.info("Generating tasks for this list of toolchains: $ndk_toolchains")
 ndk_toolchains.each { toolchain ->
-    task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: [bootstrapBoost, copyJamExtension, patchForAndroid]) {
-        // TODO: with this code still only one toolchain is supported: armeabi 
+    def toolchainFullName = toolchainPrefixMap[toolchain]
+
+    task "copyJamExtension-$toolchain"(type: Copy) {
+        from "configs/" + toolchainBjamExtensionMap[toolchain]
+        into bjamExtensionDir
+        rename { "user-config.jam" }
+    }
+
+    task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: [bootstrapBoost, "copyJamExtension-$toolchain", patchForAndroid]) {
         String ndkToolsetRoot = new File(androidNDK, "toolchains/$toolchain-$ndk_toolchain_compiler_version/prebuilt/$getOSName-x86_64/bin/")
 
-        environment "AndroidToolchainPrefix", toolchain
+        environment "AndroidToolchainPrefix", toolchainFullName
         environment "AndroidBinariesPath", ndkToolsetRoot
+        environment "AndroidNDKCompilerVersion", ndk_toolchain_compiler_version
         environment "PATH", AddToSystemPath(ndkToolsetRoot)
         environment "AndroidNDKRoot", androidNDK
+        environment "AndroidNDKApiLevel", ndkApiLevel
         environment "NO_BZIP2", "1"
 
         workingDir boostDir
         executable = IsWindows() ? "bjam.exe" : "./bjam"
         args = ["target-os=linux",
-             "toolset=gcc-androidR8e",
              "link=static",
              "threading=multi",
              "--layout=versioned",
-             "--stagedir=./../BUILD_$underscoreVersion/$toolchain",
-             "--build-dir=./../BUILD_$underscoreVersion/$toolchain/obj",
+             "--stagedir=./../BUILD_$underscoreVersion/$toolchainFullName", //TODO: use boostBuildDir
+             "--build-dir=./../BUILD_$underscoreVersion/$toolchainFullName/obj",
              // TODO: fix that
              // "-sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi",
              // "-sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi",
@@ -79,16 +72,14 @@ task getBoost(dependsOn: [downloadBoost, unzipBoost])
 task buildBoost(dependsOn: ndk_toolchains.collect { toolchain -> "$toolchain-Build" } )
 
 task buildBoostNative(type: CrossPlatformExec, dependsOn: [bootstrapBoost, patchForAndroid]) {
-    def toolset = IsWindows() ? 'msvc' : 'gcc'
-
     workingDir boostDir
     executable = IsWindows() ? "bjam.exe" : "./bjam"
-    args = ["toolset=$toolset",
+    args = ["toolset=$nativeToochain",
          "link=static",
          "threading=multi",
          "--layout=versioned",
-         "--stagedir=./../BUILD_$underscoreVersion/$toolset",
-         "--build-dir=./../BUILD_$underscoreVersion/$toolset/obj",
+         "--stagedir=./../BUILD_$underscoreVersion/$nativeToochain",
+         "--build-dir=./../BUILD_$underscoreVersion/$nativeToochain/obj",
          ] + libsToBuild
 }
 

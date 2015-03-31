@@ -5,10 +5,10 @@ def CheckProperty(String property, String error) {
     }    
 }
 
-def PropertyWithDefault(String property, String defaultValue) {
+def PropertyWithDefault(String property, Object defaultValue) {
     if (!hasProperty(property)) {
         ext.setProperty(property, defaultValue)
-    }    
+    }
 }
 
 CheckProperty("androidNDK", "NDK is not configured. Make sure there is a gradle.properties " +
@@ -16,6 +16,15 @@ CheckProperty("androidNDK", "NDK is not configured. Make sure there is a gradle.
 
 PropertyWithDefault("version", "1.53.0")
 PropertyWithDefault("libs", "")
+PropertyWithDefault("ndkApiLevel", "14")
+
+PropertyWithDefault("bintray_user", "")
+PropertyWithDefault("bintray_key", "")
+PropertyWithDefault("bintray_dryRun", true)
+PropertyWithDefault("bintray_publish", false)
+
+PropertyWithDefault("msvc_version", "12.0")
+PropertyWithDefault("gcc_version", "4.9")
 
 ext {
     dotVersion = version
@@ -24,7 +33,41 @@ ext {
     zipFile = boostName + ".tar.bz2"
     boostUrl = "http://downloads.sourceforge.net/project/boost/boost/$version/$zipFile"
     unpackedDir = "unpacked"
+    boostBuildDir = new File(unpackedDir, "BUILD_$underscoreVersion/")
     pathToBjamDir = "tools/build/v2"
     boostDir = new File(unpackedDir, boostName)
     bjamExtensionDir = new File(boostDir.getPath(), pathToBjamDir)
+}
+
+if (androidNDK == "") {
+    androidNDK = TryFindNDK()
+}
+
+ext {
+    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
+    bjamExtensionToolset = "gcc-androidR8e"
+    libsToBuild = libs.tokenize().collect { x -> "--with-$x" }
+    ndk_toolchains = ndk_toolchains.tokenize()
+
+    nativeToochain = IsWindows() ? "msvc-$msvc_version" : "gcc-$gcc_version"
+}
+
+ext {
+    toolchainPrefixMap = [
+        'aarch64-linux-android':  'aarch64-linux-android',
+        'arm-linux-androideabi':  'arm-linux-androideabi',
+        'mips64el-linux-android': 'mips64el-linux-android',
+        'mipsel-linux-android':   'mipsel-linux-android',
+        'x86':                    'i686-linux-android',
+        'x86_64':                 'x86_64-linux-android'
+    ]
+
+    toolchainBjamExtensionMap = [
+        'aarch64-linux-android':  "user-config-arm-boost-${underscoreVersion}.jam",
+        'arm-linux-androideabi':  "user-config-arm-boost-${underscoreVersion}.jam",
+        'mips64el-linux-android': "user-config-mips-boost-${underscoreVersion}.jam",
+        'mipsel-linux-android':   "user-config-mips-boost-${underscoreVersion}.jam",
+        'x86':                    "user-config-i686-boost-${underscoreVersion}.jam",
+        'x86_64':                 "user-config-x86_64-boost-${underscoreVersion}.jam",
+    ]
 }
