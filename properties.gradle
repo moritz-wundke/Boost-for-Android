@@ -16,6 +16,7 @@ CheckProperty("androidNDK", "NDK is not configured. Make sure there is a gradle.
 
 PropertyWithDefault("version", "1.53.0")
 PropertyWithDefault("libs", "")
+PropertyWithDefault("ndkApiLevel", "14")
 
 PropertyWithDefault("bintray_user", "")
 PropertyWithDefault("bintray_key", "")

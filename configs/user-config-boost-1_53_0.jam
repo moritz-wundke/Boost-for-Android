@@ -42,6 +42,7 @@ local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
 local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
 local AndroidToolchainPrefix = [ os.environ AndroidToolchainPrefix ] ;
 local AndroidNDKCompilerVersion = [ os.environ AndroidNDKCompilerVersion ] ;
+local AndroidNDKApiLevel = [ os.environ AndroidNDKApiLevel ] ;
 
 using gcc : $(AndroidNDKCompilerVersion)
 :
@@ -69,7 +70,7 @@ $(AndroidBinariesPath)/$(AndroidToolchainPrefix)-g++
 <compileflags>-I$(AndroidNDKRoot)/sources/android/support/include
 <compileflags>-DTHOUSEP=MON_THOUSANDS_SEP
 <compileflags>-DRADIXCHAR=MON_DECIMAL_POINT
-<compileflags>-I$(AndroidNDKRoot)/platforms/android-9/arch-arm/usr/include
+<compileflags>-I$(AndroidNDKRoot)/platforms/android-$(AndroidNDKApiLevel)/arch-arm/usr/include
 <compileflags>-Wa,--noexecstack
 <compileflags>-DANDROID
 <compileflags>-D__ANDROID__

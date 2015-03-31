@@ -48,6 +48,7 @@ ndk_toolchains.each { toolchain ->
         environment "AndroidNDKCompilerVersion", ndk_toolchain_compiler_version
         environment "PATH", AddToSystemPath(ndkToolsetRoot)
         environment "AndroidNDKRoot", androidNDK
+        environment "AndroidNDKApiLevel", ndkApiLevel
         environment "NO_BZIP2", "1"
 
         workingDir boostDir
