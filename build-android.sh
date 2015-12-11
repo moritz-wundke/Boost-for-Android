@@ -416,6 +416,7 @@ echo "Building boost for android"
          link=static                  \
          threading=multi              \
          --layout=versioned           \
+         --without-python             \
          -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
          --prefix="./../$BUILD_DIR/"  \
