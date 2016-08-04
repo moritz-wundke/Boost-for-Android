@@ -1,0 +1,50 @@
+import org.gradle.internal.os.OperatingSystem
+
+def getOSName()
+{
+    if (OperatingSystem.current().windows) {
+        return 'windows'
+    }
+    else if (OperatingSystem.current().linux) {
+        return 'linux'
+    }
+    else if (OperatingSystem.current().macosx) {
+        return 'darwin'
+    }
+
+    throw GradleException("Unsupported OS: $OperatingSystem.name")
+}
+
+def IsWindows()
+{
+    return OperatingSystem.current().windows
+}
+
+def AddToSystemPath(String path)
+{
+    String sep = OperatingSystem.current().windows ? ";" : ":"
+    return "$System.env.PATH$sep$path"
+}
+
+def TryFindNDK() {
+    def homeDir = file(System.getProperty("user.home"))
+    def possibleValues = homeDir.listFiles().findAll {it.name.startsWith('android-ndk-')}
+
+    if (possibleValues.size() > 1) {
+        throw GradleException("Found several anroid NDKs. Please specify full" +
+            "path to NDK in gradle.properties file. Found: $possibleValues")
+    }
+    else if (possibleValues.size() == 0) {
+        throw GradleException("Faild to find anroid NDK. Please specify full" +
+            "path to NDK in gradle.properties file.")   
+    }
+
+    return possibleValues.get(0)
+}
+
+ext {
+    getOSName = this.&getOSName
+    AddToSystemPath = this.&AddToSystemPath
+    IsWindows = this.&IsWindows
+    TryFindNDK = this.&TryFindNDK
+}
