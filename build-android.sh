@@ -28,12 +28,16 @@
 # -----------------------
 
 BOOST_VER1=1
-BOOST_VER2=53
-BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
+BOOST_VER2=65
+BOOST_VER3=1
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.53.0."
 boost_version()
 {
-  if [ "$1" = "1.55.0" ]; then
+  if [ "$1" = "1.65.1" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=65
+    BOOST_VER3=1
+  elif [ "$1" = "1.55.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=55
     BOOST_VER3=0
@@ -100,6 +104,12 @@ do_prefix () {
     if [ -d $1 ]; then
         PREFIX=$1;
     fi
+}
+
+ARCHLIST=
+register_option "--arch=<list>" do_arch "Comma separated list of architectures to build: arm64-v8a,armeabi,armeabi-v7a,mips,mips64,x86,x86_64"
+do_arch () {
+  for ARCH in $(echo $1 | tr ',' '\n') ; do ARCHLIST="$ARCH ${ARCHLIST}"; done
 }
 
 PROGRAM_PARAMETERS="<ndk-root>"
@@ -210,8 +220,13 @@ elif [ -n "${AndroidSourcesDetected}" ]; then
         exit 1
     fi
 else
-    dump "ERROR: can not find ndk version"
-    exit 1
+    NDK_RELEASE_FILE=$AndroidNDKRoot"/source.properties"
+    if [ -f "${NDK_RELEASE_FILE}" ]; then
+        NDK_RN=`cat $NDK_RELEASE_FILE | grep 'Pkg.Revision' | sed -E 's/^.*[=] *([0-9]+[.][0-9]+)[.].*/\1/g'`
+    else
+        dump "ERROR: can not find ndk version"
+        exit 1
+    fi
 fi
 
 echo "Detected Android NDK version $NDK_RN"
@@ -262,16 +277,38 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
 		TOOLSET=gcc-androidR8e
 		;;
+	"10 (64-bit)"|"10b (64-bit)"|"10c (64-bit)"|"10d (64-bit)")
+		TOOLCHAIN=${TOOLCHAIN:-arm-linux-androideabi-4.6}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
+		TOOLSET=gcc-androidR8e
+		;;
+	"16.0")
+		TOOLCHAIN=${TOOLCHAIN:-llvm}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
+		TOOLSET=clang
+		;;
 	*)
-		echo "Undefined or not supported Android NDK version!"
+		echo "Undefined or not supported Android NDK version: $NDK_RN"
 		exit 1
 esac
 
-if [ -n "${AndroidSourcesDetected}" ]; then # Overwrite CXXPATH if we are building from Android sources
+if [ -n "${AndroidSourcesDetected}" -a "${TOOLSET}" '!=' "clang" ]; then # Overwrite CXXPATH if we are building from Android sources
     CXXPATH="${ANDROID_TOOLCHAIN}/arm-linux-androideabi-g++"
 fi
 
-echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
+if [ -z "${ARCHLIST}" ]; then
+  ARCHLIST=armeabi
+  if [ "$TOOLSET" = "clang" ]; then
+    ARCHLIST="arm64-v8a armeabi armeabi-v7a mips mips64 x86 x86_64"
+  fi
+fi
+
+if [ "${ARCHLIST}" '!=' "armeabi" ] && [ "${TOOLSET}" '!=' "clang" ]; then
+    echo "Old NDK versions only support ARM architecture"
+    exit 1
+fi
+
+echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CFLAGS=$CFLAGS CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
 # Check if the ndk is valid or not
 if [ ! -f $CXXPATH ]
@@ -345,7 +382,21 @@ then
   BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
   PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
-  cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam
+  if [ "$TOOLSET" = "clang" ]; then
+      cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+      for FILE in configs/user-config-boost-${BOOST_VER}-*.jam; do
+          ARCH="`echo $FILE | sed s%configs/user-config-boost-${BOOST_VER}-%% | sed s/[.]jam//`"
+          if [ "$ARCH" = "common" ]; then
+              continue
+          fi
+          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
+          sed "s/%ARCH%/${JAMARCH}/g" configs/user-config-boost-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          cat configs/user-config-boost-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+      done
+  else
+      cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
+  fi
 
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
@@ -381,8 +432,16 @@ echo "# ---------------"
 echo "# Build using NDK"
 echo "# ---------------"
 
-# Build boost for android
-echo "Building boost for android"
+if [ -z "$NCPU" ]; then
+	NCPU=4
+	if uname -s | grep -i "linux" > /dev/null ; then
+		NCPU=`cat /proc/cpuinfo | grep -c -i processor`
+	fi
+fi
+
+for ARCH in $ARCHLIST; do
+
+echo "Building boost for android for $ARCH"
 (
 
   if echo $LIBRARIES | grep locale; then
@@ -406,23 +465,43 @@ echo "Building boost for android"
   export AndroidNDKRoot
   export NO_BZIP2=1
 
+  cflags=""
+  for flag in $CFLAGS; do cflags="$cflags cflags=$flag"; done
   cxxflags=""
   for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
 
+  LIBRARIES_BROKEN=""
+  if [ "$TOOLSET" = "clang" ]; then
+      JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
+      TOOLSET_ARCH=${TOOLSET}-${JAMARCH}
+      TARGET_OS=android
+      if [ "$ARCH" = "armeabi" ]; then
+          echo "Disabling boost_math library on armeabi architecture, because of broken toolchain" | tee -a $PROGDIR/build.log
+          LIBRARIES_BROKEN="--without-math"
+      fi
+  else
+      TOOLSET_ARCH=${TOOLSET}
+      TARGET_OS=linux
+  fi
+
   { ./bjam -q                         \
-         target-os=linux              \
-         toolset=$TOOLSET             \
+         -j$NCPU                      \
+         target-os=${TARGET_OS}       \
+         toolset=${TOOLSET_ARCH}      \
+         $cflags                      \
          $cxxflags                    \
          link=static                  \
          threading=multi              \
          --layout=versioned           \
          --without-python             \
-         -sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi \
-         -sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi \
-         --prefix="./../$BUILD_DIR/"  \
+         -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
+         -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
+         --build-dir="./../$BUILD_DIR/build/$ARCH" \
+         --prefix="./../$BUILD_DIR/out/$ARCH" \
          $LIBRARIES                   \
+         $LIBRARIES_BROKEN            \
          install 2>&1                 \
-         || { dump "ERROR: Failed to build boost for android!" ; exit 1 ; }
+         || { dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf ./../$BUILD_DIR/out/$ARCH ; exit 1 ; }
   } | tee -a $PROGDIR/build.log
 
   # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
@@ -432,6 +511,9 @@ dump "Done!"
 
 if [ $PREFIX ]; then
     echo "Prefix set, copying files to $PREFIX"
-    cp -r $PROGDIR/$BUILD_DIR/lib $PREFIX
-    cp -r $PROGDIR/$BUILD_DIR/include $PREFIX
+    mkdir -p $PREFIX/$ARCH
+    cp -r $PROGDIR/$BUILD_DIR/out/$ARCH/lib $PREFIX/$ARCH/
+    cp -r $PROGDIR/$BUILD_DIR/out/$ARCH/include $PREFIX/$ARCH/
 fi
+
+done # for ARCH in $ARCHLIST

@@ -1,0 +1,52 @@
+diff -u -r boost_1_65_1.orig/boost/config/user.hpp boost_1_65_1/boost/config/user.hpp
+--- boost_1_65_1.orig/boost/config/user.hpp	2017-09-02 12:56:10.000000000 +0300
++++ boost_1_65_1/boost/config/user.hpp	2017-11-14 16:55:28.479905698 +0200
+@@ -13,6 +13,12 @@
+ //  configuration policy:
+ //
+ 
++// Android defines
++// There is problem with std::atomic on android (and some other platforms).
++// See this link for more info:
++// https://code.google.com/p/android/issues/detail?id=42735#makechanges
++#define BOOST_ASIO_DISABLE_STD_ATOMIC 1
++
+ // define this to locate a compiler config file:
+ // #define BOOST_COMPILER_CONFIG <myheader>
+ 
+diff -u -r boost_1_65_1.orig/boost/system/error_code.hpp boost_1_65_1/boost/system/error_code.hpp
+--- boost_1_65_1.orig/boost/system/error_code.hpp	2017-09-02 12:56:17.000000000 +0300
++++ boost_1_65_1/boost/system/error_code.hpp	2017-11-14 16:27:50.967979548 +0200
+@@ -16,6 +16,7 @@
+ #include <boost/assert.hpp>
+ #include <boost/noncopyable.hpp>
+ #include <boost/utility/enable_if.hpp>
++#include <stdio.h>
+ #include <ostream>
+ #include <string>
+ #include <stdexcept>
+diff -u -r boost_1_65_1.orig/libs/filesystem/src/operations.cpp boost_1_65_1/libs/filesystem/src/operations.cpp
+--- boost_1_65_1.orig/libs/filesystem/src/operations.cpp	2017-09-02 12:56:12.000000000 +0300
++++ boost_1_65_1/libs/filesystem/src/operations.cpp	2017-11-14 18:04:46.099720456 +0200
+@@ -207,6 +207,21 @@
+ 
+ # if defined(BOOST_POSIX_API)
+ 
++#  if defined(__ANDROID__)
++#  define truncate libboost_truncate_wrapper
++// truncate() is present in Android libc only starting from ABI 21, so here's a simple wrapper
++static int libboost_truncate_wrapper(const char *path, off_t length)
++{
++  int fd = open(path, O_WRONLY);
++  if (fd == -1) {
++    return -1;
++  }
++  int status = ftruncate(fd, length);
++  close(fd);
++  return status;
++}
++#  endif
++
+ typedef int err_t;
+ 
+ //  POSIX uses a 0 return to indicate success
