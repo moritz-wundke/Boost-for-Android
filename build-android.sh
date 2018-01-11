@@ -444,7 +444,7 @@ for ARCH in $ARCHLIST; do
 echo "Building boost for android for $ARCH"
 (
 
-  #if echo $LIBRARIES | grep locale; then
+  if echo $LIBRARIES | grep locale; then
     if [ -e libiconv-libicu-android ]; then
       echo "ICONV and ICU already compiled"
     else
@@ -454,7 +454,7 @@ echo "Building boost for android for $ARCH"
       ./build.sh || exit 1
       cd ..
     fi
-  #fi
+  fi
 
   cd $BOOST_DIR
 
