@@ -1,0 +1,26 @@
+
+# --------------------------------------------------------------------
+
+using clang : %ARCH%
+:
+$(AndroidBinariesPath)/clang++
+:
+<archiver>$(AndroidBinariesPath)/llvm-ar
+<compileflags>-fexceptions
+<compileflags>-frtti
+<compileflags>-ffunction-sections
+<compileflags>-funwind-tables
+<compileflags>-fstack-protector-strong
+<compileflags>-Wno-invalid-command-line-argument
+<compileflags>-Wno-unused-command-line-argument
+<compileflags>-no-canonical-prefixes
+<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/llvm-libc++/include
+<compileflags>-I$(AndroidNDKRoot)/sources/cxx-stl/llvm-libc++abi/include
+<compileflags>-I$(AndroidNDKRoot)/sources/android/support/include
+<compileflags>-DANDROID
+<compileflags>-Wa,--noexecstack
+<compileflags>-Wformat
+<compileflags>-Werror=format-security
+<compileflags>-DNDEBUG
+<compileflags>-O2
+<compileflags>-g
