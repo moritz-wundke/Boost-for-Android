@@ -480,8 +480,14 @@ echo "Building boost for android for $ARCH"
       TOOLSET_ARCH=${TOOLSET}-${JAMARCH}
       TARGET_OS=android
       if [ "$ARCH" = "armeabi" ]; then
-          echo "Disabling boost_math library on armeabi architecture, because of broken toolchain" | tee -a $PROGDIR/build.log
-          LIBRARIES_BROKEN="--without-math"
+          if [ -z "$LIBRARIES" ]; then
+              echo "Disabling boost_math library on armeabi architecture, because of broken toolchain" | tee -a $PROGDIR/build.log
+              LIBRARIES_BROKEN="--without-math"
+          elif echo $LIBRARIES | grep math; then
+            dump "ERROR: Cannot build boost_math library for armeabi architecture because of broken toolchain"
+            dump "       However, it is explicitly included"
+            exit 1
+          fi
       fi
   else
       TOOLSET_ARCH=${TOOLSET}
