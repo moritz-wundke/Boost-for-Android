@@ -468,6 +468,7 @@ echo "Building boost for android for $ARCH"
   export PATH=$AndroidBinariesPath:$PATH
   export AndroidNDKRoot
   export NO_BZIP2=1
+  export PlatformOS
 
   cflags=""
   for flag in $CFLAGS; do cflags="$cflags cflags=$flag"; done
