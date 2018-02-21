@@ -488,6 +488,11 @@ echo "Building boost for android for $ARCH"
       TARGET_OS=linux
   fi
 
+  WITHOUT_LIBRARIES=--without-python
+  if [ -n "$LIBRARIES" ]; then
+      unset WITHOUT_LIBRARIES
+  fi
+
   { ./bjam -q                         \
          -j$NCPU                      \
          target-os=${TARGET_OS}       \
@@ -497,7 +502,7 @@ echo "Building boost for android for $ARCH"
          link=static                  \
          threading=multi              \
          --layout=versioned           \
-         --without-python             \
+         $WITHOUT_LIBRARIES           \
          -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
          -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
          --build-dir="./../$BUILD_DIR/build/$ARCH" \
