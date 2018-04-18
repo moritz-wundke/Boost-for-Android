@@ -1,0 +1,11 @@
+<compileflags>-gcc-toolchain
+<compileflags>$(AndroidNDKRoot)/toolchains/mips64el-linux-android-4.9/prebuilt/${PlatformOS}-x86_64
+<compileflags>-target
+<compileflags>mips64el-none-linux-android
+<compileflags>-fpic
+<compileflags>-fintegrated-as
+<compileflags>--sysroot
+<compileflags>$(AndroidNDKRoot)/sysroot
+<compileflags>-isystem
+<compileflags>$(AndroidNDKRoot)/sysroot/usr/include/mips64el-linux-android
+<compileflags>-D__ANDROID_API__=21
