@@ -1,5 +1,6 @@
+<ranlib>$(AndroidNDKRoot)/toolchains/aarch64-linux-android-4.9/prebuilt/$(PlatformOS)-x86_64/bin/aarch64-linux-android-ranlib
 <compileflags>-gcc-toolchain
-<compileflags>$(AndroidNDKRoot)/toolchains/aarch64-linux-android-4.9/prebuilt/${PlatformOS}-x86_64
+<compileflags>$(AndroidNDKRoot)/toolchains/aarch64-linux-android-4.9/prebuilt/$(PlatformOS)-x86_64
 <compileflags>-target
 <compileflags>aarch64-none-linux-android
 <compileflags>-fpic

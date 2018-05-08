@@ -1,7 +1,8 @@
+<ranlib>$(AndroidNDKRoot)/toolchains/arm-linux-androideabi-4.9/prebuilt/$(PlatformOS)-x86_64/bin/arm-linux-androideabi-ranlib
 <compileflags>-gcc-toolchain
-<compileflags>$(AndroidNDKRoot)/toolchains/arm-linux-androideabi-4.9/prebuilt/${PlatformOS}-x86_64
+<compileflags>$(AndroidNDKRoot)/toolchains/arm-linux-androideabi-4.9/prebuilt/$(PlatformOS)-x86_64
 <compileflags>-target
-<compileflags>armv7-none-linux-androideabi15
+<compileflags>armv7-none-linux-androideabi
 <compileflags>-march=armv7-a
 <compileflags>-mfloat-abi=softfp
 <compileflags>-mfpu=vfpv3-d16

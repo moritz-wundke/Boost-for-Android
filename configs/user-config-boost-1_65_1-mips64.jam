@@ -1,5 +1,6 @@
+<ranlib>$(AndroidNDKRoot)/toolchains/mips64el-linux-android-4.9/prebuilt/$(PlatformOS)-x86_64/bin/mips64el-linux-android-ranlib
 <compileflags>-gcc-toolchain
-<compileflags>$(AndroidNDKRoot)/toolchains/mips64el-linux-android-4.9/prebuilt/${PlatformOS}-x86_64
+<compileflags>$(AndroidNDKRoot)/toolchains/mips64el-linux-android-4.9/prebuilt/$(PlatformOS)-x86_64
 <compileflags>-target
 <compileflags>mips64el-none-linux-android
 <compileflags>-fpic
