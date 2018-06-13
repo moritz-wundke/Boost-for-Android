@@ -22,6 +22,7 @@ To compile Boost for Android you may use one of the following NDKs:
 | r8e from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |
 | r10 from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |
 | r16 from the [official android repository](http://developer.android.com).                 |   |   |   |   | x | x | x |
+| r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x |
 
 # Quick Start
 
@@ -99,3 +100,9 @@ add full path to the gnustl_static library to the link paths. Example:
     LOCAL_LDLIBS += lboost_system-gcc-md lboost_thread-gcc-md \
                  -L$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi \
                  -lgnustl_static
+
+### NDK 17 (official)
+
+Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed. Attempting to build any of these ABIs will result in an error.
+This project will exclude these architectures for compiling with NDK 17.
+
