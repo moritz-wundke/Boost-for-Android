@@ -40,3 +40,4 @@
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
 local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
+local PlatformOS = [ os.environ PlatformOS ] ;
