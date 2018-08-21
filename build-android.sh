@@ -482,7 +482,7 @@ echo "Building boost for android for $ARCH"
   echo "Adding pathname: `dirname $CXXPATH`"
   # `AndroidBinariesPath` could be used by user-config-boost-*.jam
   export AndroidBinariesPath=`dirname $CXXPATH`
-  export PATH=$AndroidBinariesPath:$PATH
+  export PATH="$AndroidBinariesPath:$PATH"
   export AndroidNDKRoot
   export NO_BZIP2=1
   export PlatformOS
