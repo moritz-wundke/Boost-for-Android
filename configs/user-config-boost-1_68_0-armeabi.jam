@@ -1,0 +1,15 @@
+<compileflags>-gcc-toolchain
+<compileflags>$(AndroidNDKRoot)/toolchains/arm-linux-androideabi-4.9/prebuilt/${PlatformOS}-x86_64
+<compileflags>-target
+<compileflags>armv5te-none-linux-androideabi15
+<compileflags>-march=armv5te
+<compileflags>-mtune=xscale
+<compileflags>-msoft-float
+<compileflags>-mthumb
+<compileflags>-fpic
+<compileflags>-fno-integrated-as
+<compileflags>--sysroot
+<compileflags>$(AndroidNDKRoot)/sysroot
+<compileflags>-isystem
+<compileflags>$(AndroidNDKRoot)/sysroot/usr/include/arm-linux-androideabi
+<compileflags>-D__ANDROID_API__=15
