@@ -14,6 +14,22 @@ diff -u -r boost_1_68_0.orig/boost/config/user.hpp boost_1_68_0/boost/config/use
  // define this to locate a compiler config file:
  // #define BOOST_COMPILER_CONFIG <myheader>
  
+diff -u -r boost_1_68_0.orig/boost/asio/detail/config.hpp boost_1_68_0/boost/asio/detail/config.hpp
+--- boost_1_68_0.orig/boost/asio/detail/config.hpp  2018-08-01 22:50:46.000000000 +0200
++++ boost_1_68_0/boost/asio/detail/config.hpp   2018-09-19 12:39:56.000000000 +0200
+@@ -804,7 +804,11 @@
+ #  if defined(__clang__)
+ #   if (__cplusplus >= 201402)
+ #    if __has_include(<experimental/string_view>)
+-#     define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
++#     if __clang_major__ >= 7
++#      undef BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW
++#     else
++#      define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
++#     endif // __clang_major__ >= 7
+ #    endif // __has_include(<experimental/string_view>)
+ #   endif // (__cplusplus >= 201402)
+ #  endif // defined(__clang__)
 diff -u -r boost_1_68_0.orig/boost/system/error_code.hpp boost_1_68_0/boost/system/error_code.hpp
 --- boost_1_68_0.orig/boost/system/error_code.hpp	2018-08-01 22:50:53.000000000 +0200
 +++ boost_1_68_0/boost/system/error_code.hpp	2018-08-27 15:44:29.000000000 +0200
