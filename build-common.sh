@@ -311,7 +311,7 @@ download_file ()
         if [ -n "$CMD_WGET" ] ; then
             run $CMD_WGET -O $2 $1 
         elif [ -n "$CMD_CURL" ] ; then
-            run $CMD_CURL -o -L $2 $1
+            run $CMD_CURL -L -o $2 $1
         else
             echo "Please install wget or curl on this machine"
             exit 1
