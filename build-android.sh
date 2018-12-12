@@ -314,7 +314,7 @@ if [ -z "${ARCHLIST}" ]; then
 
     case "$NDK_RN" in
       # NDK 17+: Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed.
-      "17.1"|"17.2"|"18.0")
+      "17.1"|"17.2"|"18.0"|"18.1")
         ARCHLIST="arm64-v8a armeabi-v7a x86 x86_64"
         ;;
       *)
