@@ -1,0 +1,11 @@
+<compileflags>-gcc-toolchain
+<compileflags>$(AndroidNDKRoot)/toolchains/x86-4.9/prebuilt/${PlatformOS}-x86_64
+<compileflags>-target
+<compileflags>i686-none-linux-android
+<compileflags>-fPIC
+<compileflags>-mstackrealign
+<compileflags>--sysroot
+<compileflags>$(AndroidNDKRoot)/sysroot
+<compileflags>-isystem
+<compileflags>$(AndroidNDKRoot)/sysroot/usr/include/i686-linux-android
+<compileflags>-D__ANDROID_API__=15
