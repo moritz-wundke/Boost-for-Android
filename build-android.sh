@@ -521,6 +521,7 @@ echo "Building boost for android for $ARCH"
   fi
 
   { ./bjam -q                         \
+         --ignore-site-config         \
          -j$NCPU                      \
          target-os=${TARGET_OS}       \
          toolset=${TOOLSET_ARCH}      \
