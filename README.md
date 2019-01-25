@@ -25,6 +25,7 @@ To compile Boost for Android you may use one of the following NDKs:
 | r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x | x |   |
 | r18 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   | x |   |
 | r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x |
+| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x |
 
 # Quick Start
 

@@ -247,6 +247,8 @@ fi
 
 echo "Detected Android NDK version $NDK_RN"
 
+CONFIG_VARIANT=boost
+
 case "$NDK_RN" in
 	4*)
 		TOOLCHAIN=${TOOLCHAIN:-arm-eabi-4.4.0}
@@ -303,6 +305,12 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
 		TOOLSET=clang
 		;;
+	"19.0")
+		TOOLCHAIN=${TOOLCHAIN:-llvm}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
+		TOOLSET=clang
+		CONFIG_VARIANT=ndk19
+		;;
 	*)
 		echo "Undefined or not supported Android NDK version: $NDK_RN"
 		exit 1
@@ -318,7 +326,7 @@ if [ -z "${ARCHLIST}" ]; then
 
     case "$NDK_RN" in
       # NDK 17+: Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed.
-      "17.1"|"17.2"|"18.0"|"18.1")
+      "17.1"|"17.2"|"18.0"|"18.1"|"19.0")
         ARCHLIST="arm64-v8a armeabi-v7a x86 x86_64"
         ;;
       *)
@@ -332,7 +340,7 @@ if [ "${ARCHLIST}" '!=' "armeabi" ] && [ "${TOOLSET}" '!=' "clang" ]; then
     exit 1
 fi
 
-echo Building with TOOLSET=$TOOLSET CXXPATH=$CXXPATH CFLAGS=$CFLAGS CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
+echo Building with TOOLSET=$TOOLSET CONFIG_VARIANT=${CONFIG_VARIANT} CXXPATH=$CXXPATH CFLAGS=$CFLAGS CXXFLAGS=$CXXFLAGS | tee $PROGDIR/build.log
 
 # Check if the ndk is valid or not
 if [ ! -f $CXXPATH ]
@@ -407,19 +415,19 @@ then
   PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
   if [ "$TOOLSET" = "clang" ]; then
-      cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      for FILE in configs/user-config-boost-${BOOST_VER}-*.jam; do
-          ARCH="`echo $FILE | sed s%configs/user-config-boost-${BOOST_VER}-%% | sed s/[.]jam//`"
+      cp configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+      for FILE in configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
+          ARCH="`echo $FILE | sed s%configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
           if [ "$ARCH" = "common" ]; then
               continue
           fi
           JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
-          sed "s/%ARCH%/${JAMARCH}/g" configs/user-config-boost-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          cat configs/user-config-boost-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          sed "s/%ARCH%/${JAMARCH}/g" configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          cat configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
           echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
       done
   else
-      cp configs/user-config-boost-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
+      cp configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
   fi
 
   for dir in $PATCH_BOOST_DIR; do
@@ -473,7 +481,7 @@ echo "Building boost for android for $ARCH"
       echo "ICONV and ICU already compiled"
     else
       echo "boost_locale selected - compiling ICONV and ICU"
-      git clone https://github.com/pelya/libiconv-libicu-android.git
+      git clone --depth=1 https://github.com/pelya/libiconv-libicu-android.git
       cd libiconv-libicu-android
       ./build.sh || exit 1
       cd ..
@@ -483,12 +491,12 @@ echo "Building boost for android for $ARCH"
   cd $BOOST_DIR
 
   echo "Adding pathname: `dirname $CXXPATH`"
-  # `AndroidBinariesPath` could be used by user-config-boost-*.jam
+  # `AndroidBinariesPath` could be used by user-config-*.jam
   export AndroidBinariesPath=`dirname $CXXPATH`
   export PATH=$AndroidBinariesPath:$PATH
-  export AndroidNDKRoot
+  export AndroidNDKRoot=$AndroidNDKRoot
   export NO_BZIP2=1
-  export PlatformOS
+  export PlatformOS=$PlatformOS
 
   cflags=""
   for flag in $CFLAGS; do cflags="$cflags cflags=$flag"; done

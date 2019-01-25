@@ -66,3 +66,21 @@ diff -u -r boost_1_69_0.orig/libs/filesystem/src/operations.cpp boost_1_69_0/lib
  typedef int err_t;
 
  //  POSIX uses a 0 return to indicate success
+diff -u -r boost_1_69_0.orig/tools/build/src/tools/common.jam boost_1_69_0/tools/build/src/tools/common.jam
+--- boost_1_69_0.orig/tools/build/src/tools/common.jam	2019-01-25 23:18:34.544755629 +0200
++++ boost_1_69_0/tools/build/src/tools/common.jam	2019-01-25 23:20:42.309047754 +0200
+@@ -976,10 +976,10 @@
+     }
+ 
+     # Ditto, from Clang 4
+-    if $(tag) in clang clangw && [ numbers.less 3 $(version[1]) ]
+-    {
+-        version = $(version[1]) ;
+-    }
++    #if $(tag) in clang clangw && [ numbers.less 3 $(version[1]) ]
++    #{
++    #    version = $(version[1]) ;
++    #}
+ 
+     # On intel, version is not added, because it does not matter and it is the
+     # version of vc used as backend that matters. Ideally, we should encode the
