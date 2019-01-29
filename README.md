@@ -27,12 +27,19 @@ To compile Boost for Android you may use one of the following NDKs:
 | r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x |
 | r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x |
 
+For NDK from r4 to r10, GCC with gnustl_static runtime library is used, only ARM architecture is supported.
+
+For NDK from r16 to r18b, clang with c++_static runtime library is used, all architectures are supported.
+
+For NDK from r19 and up, clang with c++_shared runtime library is used, all architectures are supported.
+
 # Quick Start
 
 ## Dependencies
 
  * NDK ([official](http://developer.android.com) or [customized by CrystaX](http://www.crystax.net/android/ndk.php))
  * GNU Make
+ * autoconf, automake, libtool, pkg-config
 
 ## Usage
 
