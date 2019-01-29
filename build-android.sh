@@ -128,6 +128,12 @@ do_arch () {
   for ARCH in $(echo $1 | tr ',' '\n') ; do ARCHLIST="$ARCH ${ARCHLIST}"; done
 }
 
+WITH_ICONV=
+register_option "--with-iconv" do_with_iconv "Build iconv and icu libaries, for boost-locale"
+do_with_iconv () {
+  WITH_ICONV=1
+}
+
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
@@ -476,7 +482,7 @@ for ARCH in $ARCHLIST; do
 echo "Building boost for android for $ARCH"
 (
 
-  if echo $LIBRARIES | grep locale; then
+  if [ -n "$WITH_ICONV" ] || echo $LIBRARIES | grep locale; then
     if [ -e libiconv-libicu-android ]; then
       echo "ICONV and ICU already compiled"
     else
