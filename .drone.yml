@@ -1,0 +1,8 @@
+kind: pipeline
+name: default
+
+steps:
+- name: build
+  image: jhasse/android-ndk:r19b
+  commands:
+  - ./build-android.sh $ANDROID_HOME/ndk-bundle | grep -v '^common.copy'
