@@ -20,8 +20,10 @@
 # Build boost for android completly. It will download boost 1.45.0
 # prepare the build system and finally build it for android
 
+SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)"
+
 # Add common build methods
-. `dirname $0`/build-common.sh
+. "$SCRIPTDIR"/build-common.sh
 
 # -----------------------
 # Command line arguments
@@ -425,19 +427,19 @@ then
   PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
 
   if [ "$TOOLSET" = "clang" ]; then
-      cp configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      for FILE in configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
-          ARCH="`echo $FILE | sed s%configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+      for FILE in "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
+          ARCH="`echo $FILE | sed s%$SCRIPTDIR/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
           if [ "$ARCH" = "common" ]; then
               continue
           fi
           JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
-          sed "s/%ARCH%/${JAMARCH}/g" configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          cat configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
           echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
       done
   else
-      cp configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
   fi
 
   for dir in $PATCH_BOOST_DIR; do
