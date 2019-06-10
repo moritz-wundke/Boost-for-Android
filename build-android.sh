@@ -424,7 +424,7 @@ then
 
   # Apply patches to boost
   BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
+  PATCH_BOOST_DIR="$SCRIPTDIR/patches/boost-${BOOST_VER}"
 
   if [ "$TOOLSET" = "clang" ]; then
       cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
