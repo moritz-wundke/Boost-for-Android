@@ -3,9 +3,10 @@
 
 using clang : %ARCH%
 :
-$(AndroidCompiler_%ARCH%)
+$(AndroidCompiler)
 :
 <archiver>$(AndroidBinariesPath)/llvm-ar
+<compileflags>--target=$(AndroidTarget_%ARCH%)
 <compileflags>-fPIC
 <compileflags>-ffunction-sections
 <compileflags>-fdata-sections

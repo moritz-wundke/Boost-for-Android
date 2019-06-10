@@ -134,6 +134,13 @@ do_arch () {
   for ARCH in $(echo $1 | tr ',' '\n') ; do ARCHLIST="$ARCH ${ARCHLIST}"; done
 }
 
+ANDROID_TARGET=21
+register_option "--target-version=<version>" select_target_version \
+                "Select Android's target version" "$ANDROID_TARGET"
+select_target_version () {
+    ANDROID_TARGET="$1"
+}
+
 WITH_ICONV=
 register_option "--with-iconv" do_with_iconv "Build iconv and icu libaries, for boost-locale"
 do_with_iconv () {
@@ -507,6 +514,7 @@ echo "Building boost for android for $ARCH"
   export AndroidBinariesPath=`dirname $CXXPATH`
   export PATH=$AndroidBinariesPath:$PATH
   export AndroidNDKRoot=$AndroidNDKRoot
+  export AndroidTargetVersion="$ANDROID_TARGET"
   export NO_BZIP2=1
   export PlatformOS=$PlatformOS
 

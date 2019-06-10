@@ -40,8 +40,11 @@
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
 local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
+local AndroidTargetVersion = [ os.environ AndroidTargetVersion ] ;
 
-local AndroidCompiler_arm64v8a = $(AndroidBinariesPath)/aarch64-linux-android21-clang++ ;
-local AndroidCompiler_armeabiv7a = $(AndroidBinariesPath)/armv7a-linux-androideabi16-clang++ ;
-local AndroidCompiler_x86 = $(AndroidBinariesPath)/i686-linux-android16-clang++ ;
-local AndroidCompiler_x8664 = $(AndroidBinariesPath)/x86_64-linux-android21-clang++ ;
+local AndroidCompiler = $(AndroidBinariesPath)/clang++ ;
+
+local AndroidTarget_arm64v8a = aarch64-linux-android$(AndroidTargetVersion) ;
+local AndroidTarget_armeabiv7a = armv7a-linux-android$(AndroidTargetVersion) ;
+local AndroidTarget_x86 = i686-linux-android$(AndroidTargetVersion) ;
+local AndroidTarget_x8664 = x86_64-linux-android$(AndroidTargetVersion) ;
