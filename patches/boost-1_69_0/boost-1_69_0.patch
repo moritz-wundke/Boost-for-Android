@@ -66,6 +66,29 @@ diff -u -r boost_1_69_0.orig/libs/filesystem/src/operations.cpp boost_1_69_0/lib
  typedef int err_t;
 
  //  POSIX uses a 0 return to indicate success
+diff -u -r boost_1_69_0.orig/libs/filesystem/src/path.cpp boost_1_69_0/libs/filesystem/src/path.cpp
+--- boost_1_69_0.orig/libs/filesystem/src/path.cpp	2019-06-11 08:43:27.922127113 +0200
++++ boost_1_69_0/libs/filesystem/src/path.cpp	2019-06-11 08:47:45.972182953 +0200
+@@ -37,7 +37,8 @@
+ # include "windows_file_codecvt.hpp"
+ # include <windows.h>
+ #elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
+- || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
++ || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) \
++ || defined(__ANDROID__)
+ # include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+ #endif
+ 
+@@ -869,7 +870,8 @@
+     std::locale global_loc = std::locale();
+     return std::locale(global_loc, new windows_file_codecvt);
+ # elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
+-  || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
++  || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) \
++  || defined(__ANDROID__)
+     // "All BSD system functions expect their string parameters to be in UTF-8 encoding
+     // and nothing else." See
+     // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
 diff -u -r boost_1_69_0.orig/tools/build/src/tools/common.jam boost_1_69_0/tools/build/src/tools/common.jam
 --- boost_1_69_0.orig/tools/build/src/tools/common.jam	2019-01-25 23:18:34.544755629 +0200
 +++ boost_1_69_0/tools/build/src/tools/common.jam	2019-01-25 23:20:42.309047754 +0200
