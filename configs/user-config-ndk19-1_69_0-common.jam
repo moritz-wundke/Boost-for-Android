@@ -5,7 +5,8 @@ using clang : %ARCH%
 :
 $(AndroidCompiler_%ARCH%)
 :
-<archiver>$(AndroidBinariesPath)/llvm-ar
+<archiver>$(AndroidBinaryPrefix_%ARCH%)-ar
+<ranlib>$(AndroidBinaryPrefix_%ARCH%)-ranlib
 <compileflags>-fPIC
 <compileflags>-ffunction-sections
 <compileflags>-fdata-sections
