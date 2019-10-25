@@ -20,7 +20,7 @@
 # Build boost for android completly. It will download boost 1.45.0
 # prepare the build system and finally build it for android
 
-SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)"
+SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)" # " # This extra quote fixes syntax highlighting in mcedit
 
 # Add common build methods
 . "$SCRIPTDIR"/build-common.sh
