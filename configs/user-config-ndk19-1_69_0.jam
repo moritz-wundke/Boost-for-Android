@@ -40,8 +40,15 @@
 import os ;
 local AndroidNDKRoot = [ os.environ AndroidNDKRoot ] ;
 local AndroidBinariesPath = [ os.environ AndroidBinariesPath ] ;
+local AndroidTargetVersion32 = [ os.environ AndroidTargetVersion32 ] ;
+local AndroidTargetVersion64 = [ os.environ AndroidTargetVersion64 ] ;
 
-local AndroidCompiler_arm64v8a = $(AndroidBinariesPath)/aarch64-linux-android21-clang++ ;
-local AndroidCompiler_armeabiv7a = $(AndroidBinariesPath)/armv7a-linux-androideabi16-clang++ ;
-local AndroidCompiler_x86 = $(AndroidBinariesPath)/i686-linux-android16-clang++ ;
-local AndroidCompiler_x8664 = $(AndroidBinariesPath)/x86_64-linux-android21-clang++ ;
+local AndroidCompiler_arm64v8a = $(AndroidBinariesPath)/aarch64-linux-android$(AndroidTargetVersion64)-clang++ ;
+local AndroidCompiler_armeabiv7a = $(AndroidBinariesPath)/armv7a-linux-androideabi$(AndroidTargetVersion32)-clang++ ;
+local AndroidCompiler_x86 = $(AndroidBinariesPath)/i686-linux-android$(AndroidTargetVersion32)-clang++ ;
+local AndroidCompiler_x8664 = $(AndroidBinariesPath)/x86_64-linux-android$(AndroidTargetVersion64)-clang++ ;
+
+local AndroidBinaryPrefix_arm64v8a = $(AndroidBinariesPath)/aarch64-linux-android ;
+local AndroidBinaryPrefix_armeabiv7a = $(AndroidBinariesPath)/arm-linux-androideabi ;
+local AndroidBinaryPrefix_x86 = $(AndroidBinariesPath)/i686-linux-android ;
+local AndroidBinaryPrefix_x8664 = $(AndroidBinariesPath)/x86_64-linux-android ;

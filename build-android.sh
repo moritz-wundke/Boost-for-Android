@@ -20,8 +20,10 @@
 # Build boost for android completly. It will download boost 1.45.0
 # prepare the build system and finally build it for android
 
+SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)"
+
 # Add common build methods
-. `dirname $0`/build-common.sh
+. "$SCRIPTDIR"/build-common.sh
 
 # -----------------------
 # Command line arguments
@@ -130,6 +132,30 @@ ARCHLIST=
 register_option "--arch=<list>" do_arch "Comma separated list of architectures to build: arm64-v8a,armeabi,armeabi-v7a,mips,mips64,x86,x86_64"
 do_arch () {
   for ARCH in $(echo $1 | tr ',' '\n') ; do ARCHLIST="$ARCH ${ARCHLIST}"; done
+}
+
+ANDROID_TARGET_32=21
+ANDROID_TARGET_64=21
+register_option "--target-version=<version>" select_target_version \
+                "Select Android's target version" "$ANDROID_TARGET_32"
+select_target_version () {
+
+    if [ "$1" -lt 16 ]; then
+        ANDROID_TARGET_32="16"
+        ANDROID_TARGET_64="21"
+    elif [ "$1" = 20 ]; then
+        ANDROID_TARGET_32="19"
+        ANDROID_TARGET_64="21"
+    elif [ "$1" -lt 21 ]; then
+        ANDROID_TARGET_32="$1"
+        ANDROID_TARGET_64="21"
+    elif [ "$1" = 25 ]; then
+        ANDROID_TARGET_32="24"
+        ANDROID_TARGET_64="24"
+    else
+        ANDROID_TARGET_32="$1"
+        ANDROID_TARGET_64="$1"
+    fi
 }
 
 WITH_ICONV=
@@ -422,22 +448,22 @@ then
 
   # Apply patches to boost
   BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
-  PATCH_BOOST_DIR=$PROGDIR/patches/boost-${BOOST_VER}
+  PATCH_BOOST_DIR="$SCRIPTDIR/patches/boost-${BOOST_VER}"
 
   if [ "$TOOLSET" = "clang" ]; then
-      cp configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      for FILE in configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
-          ARCH="`echo $FILE | sed s%configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+      for FILE in "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
+          ARCH="`echo $FILE | sed s%$SCRIPTDIR/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
           if [ "$ARCH" = "common" ]; then
               continue
           fi
           JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
-          sed "s/%ARCH%/${JAMARCH}/g" configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          cat configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
+          cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
           echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
       done
   else
-      cp configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
   fi
 
   for dir in $PATCH_BOOST_DIR; do
@@ -505,6 +531,8 @@ echo "Building boost for android for $ARCH"
   export AndroidBinariesPath=`dirname $CXXPATH`
   export PATH=$AndroidBinariesPath:$PATH
   export AndroidNDKRoot=$AndroidNDKRoot
+  export AndroidTargetVersion32=$ANDROID_TARGET_32
+  export AndroidTargetVersion64=$ANDROID_TARGET_64
   export NO_BZIP2=1
   export PlatformOS=$PlatformOS
 
@@ -539,6 +567,7 @@ echo "Building boost for android for $ARCH"
   fi
 
   { ./bjam -q                         \
+         -d+2                         \
          --ignore-site-config         \
          -j$NCPU                      \
          target-os=${TARGET_OS}       \
