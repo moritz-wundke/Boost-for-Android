@@ -42,15 +42,15 @@ boost_version()
   elif [ "$1" = "1.69.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=69
-    BOOST_VER3=0    
+    BOOST_VER3=0
   elif [ "$1" = "1.68.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=68
-    BOOST_VER3=0    
+    BOOST_VER3=0
   elif [ "$1" = "1.67.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=67
-    BOOST_VER3=0    
+    BOOST_VER3=0
   elif [ "$1" = "1.66.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=66
@@ -111,14 +111,14 @@ do_download ()
 #LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams,locale
 LIBRARIES=
 register_option "--with-libraries=<list>" do_with_libraries "Comma separated list of libraries to build."
-do_with_libraries () { 
-  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--with-$lib ${LIBRARIES}"; done 
+do_with_libraries () {
+  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--with-$lib ${LIBRARIES}"; done
 }
 
 register_option "--without-libraries=<list>" do_without_libraries "Comma separated list of libraries to exclude from the build."
 do_without_libraries () {	LIBRARIES="--without-libraries=$1"; }
-do_without_libraries () { 
-  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--without-$lib ${LIBRARIES}"; done 
+do_without_libraries () {
+  for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--without-$lib ${LIBRARIES}"; done
 }
 
 register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
@@ -187,10 +187,10 @@ BUILD_DIR="./build/"
 if [ $CLEAN = yes ] ; then
 	echo "Cleaning: $BUILD_DIR"
 	rm -f -r $PROGDIR/$BUILD_DIR
-	
+
 	echo "Cleaning: $BOOST_DIR"
 	rm -f -r $PROGDIR/$BOOST_DIR
-	
+
 	echo "Cleaning: $BOOST_TAR"
 	rm -f $PROGDIR/$BOOST_TAR
 
@@ -367,7 +367,7 @@ if [ -z "${ARCHLIST}" ]; then
         ;;
       *)
         ARCHLIST="arm64-v8a armeabi armeabi-v7a mips mips64 x86 x86_64"
-    esac    
+    esac
   fi
 fi
 
@@ -426,7 +426,7 @@ then
   # Make the initial bootstrap
   echo "Performing boost bootstrap"
 
-  cd $BOOST_DIR 
+  cd $BOOST_DIR
   case "$HOST_OS" in
     windows)
         cmd //c "bootstrap.bat" 2>&1 | tee -a $PROGDIR/build.log
@@ -441,7 +441,7 @@ then
   	exit 1
   fi
   cd $PROGDIR
-  
+
   # -------------------------------------------------------------
   # Patching will be done only if we had a successfull bootstrap!
   # -------------------------------------------------------------
