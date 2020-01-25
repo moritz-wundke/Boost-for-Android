@@ -164,6 +164,16 @@ do_with_iconv () {
   WITH_ICONV=1
 }
 
+WITH_PYTHON=
+register_option "--with-python=</path/to/python>" do_with_python "Build boost-python"
+do_with_python () {
+  WITH_PYTHON=$1
+  for pylib in ${WITH_PYTHON}/lib/python*; do
+    pyvers_=$(basename $pylib)
+    PYTHON_VERSION=${pyvers_#python}
+  done
+}
+
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
@@ -466,6 +476,12 @@ then
       cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
   fi
 
+  if [ -n "$WITH_PYTHON" ]; then
+    echo "Sed: $WITH_PYTHON"
+    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
+    cat $BOOST_DIR/tools/build/src/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config.jam
+  fi
+
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
       echo "Could not find directory '$dir' while looking for patches"
@@ -560,8 +576,14 @@ echo "Building boost for android for $ARCH"
       TOOLSET_ARCH=${TOOLSET}
       TARGET_OS=linux
   fi
+  if [ -n "$WITH_PYTHON" ]; then
+    WITHOUT_LIBRARIES=
+    PYTHON_BUILD=python=${PYTHON_VERSION}
+  else
+    WITHOUT_LIBRARIES=--without-python
+    PYTHON_BUILD=
+  fi
 
-  WITHOUT_LIBRARIES=--without-python
   if [ -n "$LIBRARIES" ]; then
       unset WITHOUT_LIBRARIES
   fi
@@ -578,6 +600,7 @@ echo "Building boost for android for $ARCH"
          threading=multi              \
          --layout=versioned           \
          $WITHOUT_LIBRARIES           \
+         $PYTHON_BUILD                \
          -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
          -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
          --build-dir="./../$BUILD_DIR/build/$ARCH" \
