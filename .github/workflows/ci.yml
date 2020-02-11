@@ -31,19 +31,15 @@ jobs:
         echo "::set-env name=NDK_ROOT::$NDK_ROOT"
         export NUM_CPU=`python -c 'import multiprocessing as mp; print(mp.cpu_count())'`
         echo "::set-env name=NUM_CPU::$NUM_CPU"
-
-        ls -alF $NDK_ROOT/platforms/
-        if [ -f "$NDK_ROOT/RELEASE.TXT" ]; then
-            echo $NDK_ROOT/RELEASE.TXT
-            cat  $NDK_ROOT/RELEASE.TXT
-        elif [ -f "$NDK_ROOT/source.properties" ]; then
-            echo $NDK_ROOT/source.properties
-            cat  $NDK_ROOT/source.properties
-        fi
-
         set
         mkdir -p bins/${{ matrix.variation }}
         mkdir -p logs/${{ matrix.variation }}
+    - name: Install dependencies (MacOS))
+      run: |
+        brew install android-ndk
+        export NDK_ROOT="$(brew --prefix)/share/android-ndk"
+        echo "::set-env name=NDK_ROOT::$NDK_ROOT"
+      if: matrix.os != 'windows-latest'
     - name: Build Boost for Android on ${{ matrix.variation }}
       run: ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
       if: matrix.os != 'windows-latest'
@@ -53,7 +49,7 @@ jobs:
     - name: Prepare Binaries
       run: |
         set -x
-        if [ -d build/out ]; then mv build/out/* ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }}/; fi
+        mv build/out/* ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }}/ || true
         # Get rid of boost include directory cause it takes a long time to pack and upload (~20 min)
         find ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }} -type d -name "include" -exec rm -rf {} +
         ls -alFR ${GITHUB_WORKSPACE}/bins
