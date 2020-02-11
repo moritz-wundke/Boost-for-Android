@@ -51,7 +51,7 @@ jobs:
     - name: Build Boost for Android on ${{ matrix.variation }}
       run: |
         set -x
-        ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_DIR}"
+        ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
       if: matrix.variation == 'linux'
     - name: Prepare Binaries
       run: |
