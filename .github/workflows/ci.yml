@@ -6,13 +6,11 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest,windows-latest,macos-latest]
+        os: [ubuntu-latest,macos-latest]
         include:
           # includes a new variable of 'variation' for each host os
           - os: ubuntu-latest
             variation: linux
-          - os: windows-latest
-            variation: windows
           - os: macos-latest
             variation: mac
       fail-fast: false
@@ -36,16 +34,13 @@ jobs:
         mkdir -p logs/${{ matrix.variation }}
     - name: Install dependencies (MacOS))
       run: |
+        brew update
         brew install android-ndk
         export NDK_ROOT="$(brew --prefix)/share/android-ndk"
         echo "::set-env name=NDK_ROOT::$NDK_ROOT"
-      if: matrix.os != 'windows-latest'
+      if: matrix.os == 'macos-latest'
     - name: Build Boost for Android on ${{ matrix.variation }}
       run: ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
-      if: matrix.os != 'windows-latest'
-    - name: Build Boost for Android on ${{ matrix.variation }}
-      run: build-android.bat  --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
-      if: matrix.os == 'windows-latest'
     - name: Prepare Binaries
       run: |
         set -x
