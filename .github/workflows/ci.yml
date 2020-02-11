@@ -48,12 +48,6 @@ jobs:
         set
         mkdir -p bins/${{ matrix.variation }}
         mkdir -p logs/${{ matrix.variation }}
-    - name: Install Dependencies (Linux)
-      run: |
-        set -x
-        sudo apt-get update
-        sudo apt-get install ia32-libs
-      if: matrix.os == 'ubuntu-latest'
     - name: Build Boost for Android on ${{ matrix.variation }}
       run: |
         set -x
@@ -74,7 +68,7 @@ jobs:
     - name: Prepare Logs
       run: |
         set -x
-        mv logs/*.log ${GITHUB_WORKSPACE}/logs/${{ matrix.variation }}/;
+        mv logs/*.log ${GITHUB_WORKSPACE}/logs/${{ matrix.variation }}/ || true
         ls -alFR ${GITHUB_WORKSPACE}/logs
       if: always()
     - name: Upload Logs
