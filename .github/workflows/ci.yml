@@ -15,10 +15,6 @@ jobs:
             variation: windows
           - os: macos-latest
             variation: mac
-        exclude:
-          # disable some matrix combinations if needed
-          - os: windows-latest
-          - os: macos-latest
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -49,14 +45,17 @@ jobs:
         mkdir -p bins/${{ matrix.variation }}
         mkdir -p logs/${{ matrix.variation }}
     - name: Build Boost for Android on ${{ matrix.variation }}
-      run: |
-        set -x
-        ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
-      if: matrix.variation == 'linux'
+      run: ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
+      if: matrix.os != 'windows-latest'
+    - name: Build Boost for Android on ${{ matrix.variation }}
+      run: build-android.bat  --boost=1.70.0 --arch=armeabi-v7a,x86 --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
+      if: matrix.os == 'windows-latest'
     - name: Prepare Binaries
       run: |
         set -x
         if [ -d build/out ]; then mv build/out/* ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }}/; fi
+        # Get rid of boost include directory cause it takes a long time to pack and upload (~20 min)
+        find ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }} -type d -name "include" -exec rm -rf {} +
         ls -alFR ${GITHUB_WORKSPACE}/bins
       if: always()
     - name: Upload Binaries
