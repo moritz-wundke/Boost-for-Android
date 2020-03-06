@@ -40,7 +40,7 @@ jobs:
         echo "::set-env name=NDK_ROOT::$NDK_ROOT"
       if: matrix.os == 'macos-latest'
     - name: Build Boost for Android on ${{ matrix.variation }}
-      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a --with-libraries=atomic,system "${NDK_ROOT}"
+      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
     - name: Prepare Binaries
       run: |
         set -x
