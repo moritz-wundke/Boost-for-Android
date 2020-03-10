@@ -1,4 +1,4 @@
-# Boost for Android
+# Boost for Android [![Build Status: GitHub Actions](https://github.com/moritz-wundke/Boost-for-Android/workflows/CI/badge.svg)](https://github.com/moritz-wundke/Boost-for-Android/actions)
 Boost for android is a set of tools to compile the main part of the [Boost C++ Libraries](http://www.boost.org/) for the Android platform.
 
 Currently supported boost versions are 1.45.0, 1.48.0, 1.49.0, 1.53.0, 1.54.0, 1.55.0, 1.65.1, 1.66.0, 1.67.0, 1.68.0, 1.69.0 and 1.70.0.

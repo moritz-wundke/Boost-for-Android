@@ -1,0 +1,69 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest,macos-latest]
+        include:
+          # includes a new variable of 'variation' for each host os
+          - os: ubuntu-latest
+            variation: linux
+          - os: macos-latest
+            variation: mac
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout Sources
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Setup Environment Variables
+      run: |
+        set -x
+        export NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+        echo "::set-env name=NDK_ROOT::$NDK_ROOT"
+        export NUM_CPU=`python -c 'import multiprocessing as mp; print(mp.cpu_count())'`
+        echo "::set-env name=NUM_CPU::$NUM_CPU"
+        set
+        mkdir -p bins/${{ matrix.variation }}
+        mkdir -p logs/${{ matrix.variation }}
+    - name: Install dependencies (MacOS))
+      run: |
+        brew update
+        brew cask install android-ndk
+        export NDK_ROOT="$(brew --prefix)/share/android-ndk"
+        echo "::set-env name=NDK_ROOT::$NDK_ROOT"
+      if: matrix.os == 'macos-latest'
+    - name: Build Boost for Android on ${{ matrix.variation }}
+      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
+    - name: Prepare Binaries
+      run: |
+        set -x
+        mv build/out/* ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }}/ || true
+        # Get rid of boost include directory cause it takes a long time to pack and upload (~20 min)
+        find ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }} -type d -name "include" -exec rm -rf {} +
+        ls -alFR ${GITHUB_WORKSPACE}/bins
+      if: always()
+    - name: Upload Binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: binaries
+        path: ./bins
+      if: always()
+    - name: Prepare Logs
+      run: |
+        set -x
+        mv logs/*.log ${GITHUB_WORKSPACE}/logs/${{ matrix.variation }}/ || true
+        ls -alFR ${GITHUB_WORKSPACE}/logs
+      if: always()
+    - name: Upload Logs
+      uses: actions/upload-artifact@v1
+      with:
+        name: logs
+        path: ./logs
+      if: always()
