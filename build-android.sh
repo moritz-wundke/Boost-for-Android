@@ -435,7 +435,7 @@ fi
 # ---------
 # Bootstrap
 # ---------
-if [ ! -f ./$BOOST_DIR/bjam ]
+if [ ! -f ./$BOOST_DIR/b2 ]
 then
   # Make the initial bootstrap
   echo "Performing boost bootstrap"
@@ -471,7 +471,7 @@ then
           if [ "$ARCH" = "common" ]; then
               continue
           fi
-          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
+          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, b2 does not like them
           sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
           cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
           echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
@@ -563,7 +563,7 @@ echo "Building boost for android for $ARCH"
 
   LIBRARIES_BROKEN=""
   if [ "$TOOLSET" = "clang" ]; then
-      JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, bjam does not like them
+      JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, b2 does not like them
       TOOLSET_ARCH=${TOOLSET}-${JAMARCH}
       TARGET_OS=android
       if [ "$ARCH" = "armeabi" ]; then
@@ -592,27 +592,28 @@ echo "Building boost for android for $ARCH"
       unset WITHOUT_LIBRARIES
   fi
 
-  { ./bjam -q                         \
-         -d+2                         \
-         --ignore-site-config         \
-         -j$NCPU                      \
-         target-os=${TARGET_OS}       \
-         toolset=${TOOLSET_ARCH}      \
-         $cflags                      \
-         $cxxflags                    \
-         link=static                  \
-         threading=multi              \
-         --layout=versioned           \
-         $WITHOUT_LIBRARIES           \
-         $PYTHON_BUILD                \
-         -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
-         -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
-         --build-dir="./../$BUILD_DIR/build/$ARCH" \
-         --prefix="./../$BUILD_DIR/out/$ARCH" \
-         $LIBRARIES                   \
-         $LIBRARIES_BROKEN            \
-         install 2>&1                 \
-         || { dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf ./../$BUILD_DIR/out/$ARCH ; exit 1 ; }
+  { 
+    ./b2 -q                          \
+        -d+2                         \
+        --ignore-site-config         \
+        -j$NCPU                      \
+        target-os=${TARGET_OS}       \
+        toolset=${TOOLSET_ARCH}      \
+        $cflags                      \
+        $cxxflags                    \
+        link=static                  \
+        threading=multi              \
+        --layout=versioned           \
+        $WITHOUT_LIBRARIES           \
+        $PYTHON_BUILD                \
+        -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
+        -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
+        --build-dir="./../$BUILD_DIR/build/$ARCH" \
+        --prefix="./../$BUILD_DIR/out/$ARCH" \
+        $LIBRARIES                   \
+        $LIBRARIES_BROKEN            \
+        install 2>&1                 \
+        || { dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf ./../$BUILD_DIR/out/$ARCH ; exit 1 ; }
   } | tee -a $PROGDIR/build.log
 
   # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
