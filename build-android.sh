@@ -125,6 +125,12 @@ do_without_libraries () {
   for lib in $(echo $1 | tr ',' '\n') ; do LIBRARIES="--without-$lib ${LIBRARIES}"; done
 }
 
+LAYOUT=versioned
+register_option "--layout=<layout>" do_layout "Library naming layout [versioned, tagged, system]."
+do_layout () {
+	LAYOUT=$1;
+}
+
 register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
 do_prefix () {
     if [ -d $1 ]; then
@@ -603,7 +609,7 @@ echo "Building boost for android for $ARCH"
         $cxxflags                    \
         link=static                  \
         threading=multi              \
-        --layout=versioned           \
+        --layout=${LAYOUT}           \
         $WITHOUT_LIBRARIES           \
         $PYTHON_BUILD                \
         -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
