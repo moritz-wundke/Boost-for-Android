@@ -65,6 +65,8 @@ For more info about usage and available commands use `--help`.
 
 ### Including
 
+#### ndk-build
+
 Now that you got Boost compiled you must add it to your `Android.mk` file. Locate the `build` folder and copy the `include` and `lib` folders over to your project's `jni` folder. A recommended path inside your project is `/jni/boost/`.
 
 Add the following to your `Android.mk` (note that here we're using Boost 1.48 and have assumed that Boost resides inside `/jni/boost`):
@@ -76,6 +78,137 @@ Add the following to your `Android.mk` (note that here we're using Boost 1.48 an
     LOCAL_CPPFLAGS += -frtti
 
 Now use `ndk-build` to build and have fun with it!
+
+Note that you should build your project and Boost with the same version of NDK as the C++ STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
+
+#### CMake
+
+Now that you got Boost compiled you must add it to your `CMakeLists.txt` file.
+
+##### Linux
+
+run the included `install.sh` script to relocate Boost to the root project, and copy the Boost `include` and `lib` folder into a generated folder residing in the same directory
+
+Boost must be relocated to the root project in order to `avoid` Android Studio eating all your RAM due to scanning the huge `include` folder located in each architecture build output folder
+
+`install.sh` is comprised of a small set of helper scripts, and is basically just this:
+```BASH
+# import common functions
+. install-common.sh
+
+# relocate to root project
+. relocate-boost.sh
+
+# clean this folder if it exists
+# note that this folder should NOT exist
+# but it is better to be safe than sorry
+# NOTE: this function checks if its argument
+# NOTE: exists in the filesystem as any
+# NOTE: type of file or folder before cleaning
+cleanFolder "$origin"
+
+# create this folder
+mkdir "$origin"
+
+# change directory to this folder
+cd "$origin"
+
+# copy helper files from relocated folder into this folder
+cp -v "$boostdir/boost-dummy.cpp" "$boostdir/CMakeLists.txt" "$boostdir/copy-files.sh" "$boostdir/install-common.sh" .
+
+# copy include and lib folders from relocated folder into this folder
+./copy-files.sh "$boostdir"
+```
+
+the `install.sh` script will relocate the parent folder into the root project directory, this is to avoid gradle indexing the folder, as well as causing numurous build issues that arise from arbitary files that may be present such as example java programs (in which Boost `DOES NOT` contain)
+
+next `install.sh` will recreate the parent folder, since it no longer exists at the expected location
+
+next, `install.sh` copies helper scripts, the `CMakeLists.txt` cmake file, and a `boost-dummy.cpp` source file, which is used to build a single Boost library from the multiple Boost libraries
+
+finally, `install.sh` copies the `include` folder, and `lib` folders, of the all build architecture residing in the `build` folder, only the `first include` folder is actually copied, since i believe that it is safe to assume the `include` folders do not contain architecture specific code
+
+as an example, we shall assume we have built Boost for the architectures `arm64-v8a` and `armeabi-v7a`
+
+filesystem structure before invoking `install.sh`:
+```
+RootProject/app/src/main/jni/Boost-For-Android/build/out/arm64-v8a/include
+RootProject/app/src/main/jni/Boost-For-Android/build/out/arm64-v8a/lib
+RootProject/app/src/main/jni/Boost-For-Android/build/out/armeabi-v7a/include
+RootProject/app/src/main/jni/Boost-For-Android/build/out/armeabi-v7a/lib
+RootProject/gradlew
+...
+```
+filesystem structure after `install.sh`:
+```
+RootProject/Boost-For-Android/build/out/arm64-v8a/include
+RootProject/Boost-For-Android/build/out/arm64-v8a/lib
+RootProject/Boost-For-Android/build/out/armeabi-v7a/include
+RootProject/Boost-For-Android/build/out/armeabi-v7a/lib
+RootProject/app/src/main/jni/Boost-For-Android/build/out/include
+RootProject/app/src/main/jni/Boost-For-Android/build/out/arm64-v8a/lib
+RootProject/app/src/main/jni/Boost-For-Android/build/out/armeabi-v7a/lib
+RootProject/gradlew
+...
+```
+
+and as an additional example of what this actually looks like in action, with the library list ommited as it is long:
+```
+smallville7123@smallville7123-MacBookPro:/media/smallville7123/Untitled/USB/git/AndroidCompositor/app/src/main/jni/Boost-for-Android$ ./install.sh
+top level directory located at /media/smallville7123/Untitled/USB/git/AndroidCompositor
+basefolder = Boost-for-Android
+boostdir = /media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android
+relocating Boost...
+relocated Boost...
+'/media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android/boost-dummy.cpp' -> './boost-dummy.cpp'
+'/media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android/CMakeLists.txt' -> './CMakeLists.txt'
+'/media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android/copy-files.sh' -> './copy-files.sh'
+'/media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android/install-common.sh' -> './install-common.sh'
+top level directory located at /media/smallville7123/Untitled/USB/git/AndroidCompositor
+boostdir = /media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android
+copying directory: include
+origin .../arm64-v8a/include
+dest .../out/include
+copied /media/smallville7123/Untitled/USB/git/AndroidCompositor/Boost-for-Android/build/out/arm64-v8a/include
+creating directory: arm64-v8a/lib
+copying build/out/arm64-v8a/lib/*.a
+copying .../libboost_prg_exec_monitor-clang-mt-a64-1_73.a
+.../libboost_prg_exec_monitor-clang-mt-a64-1_73.a -> .../arm64-v8a/lib/libboost_prg_exec_monitor-clang-mt-a64-1_73.a
+...
+creating directory: armeabi-v7a/lib
+copying build/out/armeabi-v7a/lib/*.a
+copying .../libboost_prg_exec_monitor-clang-mt-a32-1_73.a
+.../libboost_prg_exec_monitor-clang-mt-a32-1_73.a -> .../armeabi-v7a/lib/libboost_prg_exec_monitor-clang-mt-a32-1_73.a
+...
+creating directory: x86/lib
+copying build/out/x86/lib/*.a
+copying .../libboost_prg_exec_monitor-clang-mt-x32-1_73.a
+.../libboost_prg_exec_monitor-clang-mt-x32-1_73.a -> .../x86/lib/libboost_prg_exec_monitor-clang-mt-x32-1_73.a
+...
+creating directory: x86_64/lib
+copying build/out/x86_64/lib/*.a
+copying .../libboost_prg_exec_monitor-clang-mt-x64-1_73.a
+.../libboost_prg_exec_monitor-clang-mt-x64-1_73.a -> .../x86_64/lib/libboost_prg_exec_monitor-clang-mt-x64-1_73.a
+...
+smallville7123@smallville7123-MacBookPro:/media/smallville7123/Untitled/USB/git/AndroidCompositor/app/src/main/jni/Boost-for-Android$
+```
+
+now that the `install.sh` script has been run, all you need to do is add this to your cmake file
+
+##### Windows
+
+no install script is provided
+
+##### what to add to your cmake file
+
+```CMAKE
+# this exports two variables, BOOST_INCLUDE, and BOOST_LIBRARY
+add_subdirectory(Boost-for-Android)
+include_directories(${BOOST_INCLUDE})
+
+# link with BOOST
+target_link_libraries(YOUR_LIBRARY YOUR_LIBS ${BOOST_LIBRARY})
+```
 
 Note that you should build your project and Boost with the same version of NDK as the C++ STL inside NDK r4 and NDK r5 are not compatible in some subtle details.
 
