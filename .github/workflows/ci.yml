@@ -8,7 +8,7 @@ jobs:
       matrix:
         boost_version: [1.70.0]
         abi: [armeabi-v7a]
-        os: [ubuntu-latest,macos-latest]
+        os: [ubuntu-latest]
         include:
           # includes a new variable of 'variation' for each host os
           - os: ubuntu-latest
