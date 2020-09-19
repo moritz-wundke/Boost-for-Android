@@ -49,21 +49,20 @@ jobs:
         find ${GITHUB_WORKSPACE}/bins/${{ matrix.variation }} -type d -name "include" -exec rm -rf {} +
         ls -alFR ${GITHUB_WORKSPACE}/bins
       if: always()
-    - name: Upload Binaries
-      uses: actions/upload-artifact@v1
-      with:
-        name: binaries
-        path: ./bins
-      if: always()
-    - name: Prepare Logs
+#    - name: Upload Binaries
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: binaries
+#        path: ./bins
+#      if: always()
+    - name: search h
       run: |
         set -x
-        mv logs/*.log ${GITHUB_WORKSPACE}/logs/${{ matrix.variation }}/ || true
-        ls -alFR ${GITHUB_WORKSPACE}/logs
+        find . -name *.h
       if: always()
-    - name: Upload Logs
-      uses: actions/upload-artifact@v1
-      with:
-        name: logs
-        path: ./logs
-      if: always()
+#    - name: Upload Logs
+#      uses: actions/upload-artifact@v1
+#      with:
+#        name: logs
+#        path: ./logs
+#      if: always()
