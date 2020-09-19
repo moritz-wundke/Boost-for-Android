@@ -6,6 +6,8 @@ jobs:
   build:
     strategy:
       matrix:
+        boost_version: [1.70.0]
+        abi: [armeabi-v7a]
         os: [ubuntu-latest,macos-latest]
         include:
           # includes a new variable of 'variation' for each host os
@@ -40,7 +42,7 @@ jobs:
         echo "::set-env name=NDK_ROOT::$NDK_ROOT"
       if: matrix.os == 'macos-latest'
     - name: Build Boost for Android on ${{ matrix.variation }}
-      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=1.70.0 --arch=armeabi-v7a --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
+      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=${{ matrix.boost_version }} --arch=${{ matrix.abi }} --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono "${NDK_ROOT}"
     - name: Prepare Binaries
       run: |
         set -x
@@ -52,7 +54,7 @@ jobs:
     - name: Upload Binaries
       uses: actions/upload-artifact@v1
       with:
-        name: binaries
+        name: binaries_${{ matrix.boost_version }}_${{ matrix.abi }}
         path: ./bins
       if: always()
     - name: Prepare Logs
@@ -64,6 +66,6 @@ jobs:
     - name: Upload Logs
       uses: actions/upload-artifact@v1
       with:
-        name: logs
+        name: logs_${{ matrix.boost_version }}
         path: ./logs
       if: always()
