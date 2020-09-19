@@ -5,3 +5,5 @@ logs
 build.log
 *.swp
 *.vim
+
+.idea
