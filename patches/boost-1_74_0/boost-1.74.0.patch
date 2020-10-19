@@ -1,0 +1,104 @@
+diff -u -r boost_1_74_0.orig/boost/asio/detail/config.hpp boost_1_74_0/boost/asio/detail/config.hpp
+--- boost_1_74_0.orig/boost/asio/detail/config.hpp	2020-08-11 22:55:31.000000000 +0800
++++ boost_1_74_0/boost/asio/detail/config.hpp	2020-10-15 10:32:34.000000000 +0800
+@@ -1052,7 +1052,11 @@
+ #    if (_LIBCPP_VERSION < 7000)
+ #     if (__cplusplus >= 201402)
+ #      if __has_include(<experimental/string_view>)
+-#       define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
++#       if __clang_major__ >= 7
++#        undef BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW
++#       else
++#        define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
++#       endif // __clang_major__ >= 7
+ #      endif // __has_include(<experimental/string_view>)
+ #     endif // (__cplusplus >= 201402)
+ #    endif // (_LIBCPP_VERSION < 7000)
+diff -u -r boost_1_74_0.orig/boost/config/user.hpp boost_1_74_0/boost/config/user.hpp
+--- boost_1_74_0.orig/boost/config/user.hpp	2020-08-11 22:55:39.000000000 +0800
++++ boost_1_74_0/boost/config/user.hpp	2020-10-15 10:37:56.000000000 +0800
+@@ -13,6 +13,13 @@
+ //  configuration policy:
+ //
+ 
++// Android defines
++// There is problem with std::atomic on android (and some other platforms).
++// See this link for more info:
++// https://code.google.com/p/android/issues/detail?id=42735#makechanges
++#define BOOST_ASIO_DISABLE_STD_ATOMIC 1
++
++
+ // define this to locate a compiler config file:
+ // #define BOOST_COMPILER_CONFIG <myheader>
+ 
+diff -u -r boost_1_74_0.orig/boost/system/error_code.hpp boost_1_74_0/boost/system/error_code.hpp
+--- boost_1_74_0.orig/boost/system/error_code.hpp	2020-08-11 22:57:00.000000000 +0800
++++ boost_1_74_0/boost/system/error_code.hpp	2020-10-15 10:38:21.000000000 +0800
+@@ -14,6 +14,7 @@
+ #include <boost/system/detail/config.hpp>
+ #include <boost/cstdint.hpp>
+ #include <boost/config.hpp>
++#include <stdio.h>
+ #include <ostream>
+ #include <string>
+ #include <functional>
+diff -u -r boost_1_74_0.orig/libs/filesystem/src/operations.cpp boost_1_74_0/libs/filesystem/src/operations.cpp
+--- boost_1_74_0.orig/libs/filesystem/src/operations.cpp	2020-08-11 22:55:50.000000000 +0800
++++ boost_1_74_0/libs/filesystem/src/operations.cpp	2020-10-15 10:56:57.000000000 +0800
+@@ -208,6 +208,21 @@
+ 
+ # if defined(BOOST_POSIX_API)
+ 
++#  if defined(__ANDROID__)
++#  define truncate libboost_truncate_wrapper
++// truncate() is present in Android libc only starting from ABI 21, so here's a simple wrapper
++static int libboost_truncate_wrapper(const char *path, off_t length)
++{
++  int fd = open(path, O_WRONLY);
++  if (fd == -1) {
++    return -1;
++  }
++  int status = ftruncate(fd, length);
++  close(fd);
++  return status;
++}
++#  endif
++
+ #   define BOOST_SET_CURRENT_DIRECTORY(P)(::chdir(P)== 0)
+ #   define BOOST_CREATE_HARD_LINK(F,T)(::link(T, F)== 0)
+ #   define BOOST_CREATE_SYMBOLIC_LINK(F,T,Flag)(::symlink(T, F)== 0)
+diff -u -r boost_1_74_0.orig/libs/filesystem/src/path.cpp boost_1_74_0/libs/filesystem/src/path.cpp
+--- boost_1_74_0.orig/libs/filesystem/src/path.cpp	2020-08-11 22:55:50.000000000 +0800
++++ boost_1_74_0/libs/filesystem/src/path.cpp	2020-10-15 10:42:37.000000000 +0800
+@@ -32,7 +32,8 @@
+ # include "windows_file_codecvt.hpp"
+ # include <windows.h>
+ #elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
+- || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
++ || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) \
++ || defined(__ANDROID__)
+ # include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+ #endif
+ 
+@@ -864,7 +865,8 @@
+     std::locale global_loc = std::locale();
+     return std::locale(global_loc, new windows_file_codecvt);
+ # elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
+-  || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
++  || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) \
++  || defined(__ANDROID__)
+     // "All BSD system functions expect their string parameters to be in UTF-8 encoding
+     // and nothing else." See
+     // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
+diff -u -r boost_1_74_0.orig/tools/build/src/tools/common.jam boost_1_74_0/tools/build/src/tools/common.jam
+--- boost_1_74_0.orig/tools/build/src/tools/common.jam	2020-08-11 22:57:21.000000000 +0800
++++ boost_1_74_0/tools/build/src/tools/common.jam	2020-10-15 10:44:11.000000000 +0800
+@@ -980,7 +980,7 @@
+     }
+ 
+     # Ditto, from Clang 4
+-    if ( $(tag) = clang || $(tag) = clangw ) && $(version[1]) && [ numbers.less 3 $(version[1]) ]
++    #if ( $(tag) = clang || $(tag) = clangw ) && [ numbers.less 3 $(version[1]) ]
+     {
+         version = $(version[1]) ;
+     }

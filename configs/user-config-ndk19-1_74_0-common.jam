@@ -1,0 +1,22 @@
+
+# --------------------------------------------------------------------
+
+using clang : %ARCH%
+:
+$(AndroidCompiler_%ARCH%)
+:
+<archiver>$(AndroidBinaryPrefix_%ARCH%)-ar
+<ranlib>$(AndroidBinaryPrefix_%ARCH%)-ranlib
+<compileflags>-fPIC
+<compileflags>-ffunction-sections
+<compileflags>-fdata-sections
+<compileflags>-funwind-tables
+<compileflags>-fstack-protector-strong
+<compileflags>-no-canonical-prefixes
+<compileflags>-Wformat
+<compileflags>-Werror=format-security
+<compileflags>-frtti
+<compileflags>-fexceptions
+<compileflags>-DNDEBUG
+<compileflags>-g
+<compileflags>-Oz
