@@ -549,7 +549,7 @@ echo "Building boost for android for $ARCH"
       echo "boost_locale selected - compiling ICONV and ICU"
       git clone --depth=1 https://github.com/pelya/libiconv-libicu-android.git
       cd libiconv-libicu-android
-      ./build.sh || exit 1
+      PATH=$AndroidNDKRoot:$PATH ./build.sh || exit 1
       cd ..
     fi
   fi
