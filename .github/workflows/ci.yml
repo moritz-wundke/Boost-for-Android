@@ -2,6 +2,9 @@ name: CI
 
 on: [pull_request]
 
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
 jobs:
   build:
     strategy:
