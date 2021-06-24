@@ -30,12 +30,16 @@ SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)" # " # This extra quote fixes syntax hig
 # -----------------------
 
 BOOST_VER1=1
-BOOST_VER2=74
+BOOST_VER2=76
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.74.0, 1.73.0, 1.71.0, 1.70.0, 1.69.0, 1.68.0, 1.67.0, 1.66.0, 1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.74.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.76.0 1.74.0, 1.73.0, 1.71.0, 1.70.0, 1.69.0, 1.68.0, 1.67.0, 1.66.0, 1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.74.0."
 boost_version()
 {
-  if [ "$1" = "1.74.0" ]; then
+  if [ "$1" = "1.76.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=76
+    BOOST_VER3=0
+  elif [ "$1" = "1.74.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=74
     BOOST_VER3=0
