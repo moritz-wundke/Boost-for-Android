@@ -30,12 +30,16 @@ SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)" # " # This extra quote fixes syntax hig
 # -----------------------
 
 BOOST_VER1=1
-BOOST_VER2=74
+BOOST_VER2=76
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.74.0, 1.73.0, 1.71.0, 1.70.0, 1.69.0, 1.68.0, 1.67.0, 1.66.0, 1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.74.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.76.0 1.74.0, 1.73.0, 1.71.0, 1.70.0, 1.69.0, 1.68.0, 1.67.0, 1.66.0, 1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.74.0."
 boost_version()
 {
-  if [ "$1" = "1.74.0" ]; then
+  if [ "$1" = "1.76.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=76
+    BOOST_VER3=0
+  elif [ "$1" = "1.74.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=74
     BOOST_VER3=0
@@ -205,7 +209,7 @@ echo "Building boost version: $BOOST_VER1.$BOOST_VER2.$BOOST_VER3"
 # Build constants
 # -----------------------
 
-BOOST_DOWNLOAD_LINK="http://dl.bintray.com/boostorg/release/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/source/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
+BOOST_DOWNLOAD_LINK="https://boostorg.jfrog.io/artifactory/main/release/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/source/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
 BOOST_TAR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
 BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
 BUILD_DIR="./build/"
@@ -369,11 +373,17 @@ case "$NDK_RN" in
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
 		TOOLSET=clang
 		;;
-	"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"22.0")
+	"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"21.4"|"22.0")
 		TOOLCHAIN=${TOOLCHAIN:-llvm}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
 		TOOLSET=clang
 		CONFIG_VARIANT=ndk19
+		;;
+	"23.0")
+		TOOLCHAIN=${TOOLCHAIN:-llvm}
+		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
+		TOOLSET=clang
+		CONFIG_VARIANT=ndk23
 		;;
 	*)
 		echo "Undefined or not supported Android NDK version: $NDK_RN"
@@ -390,7 +400,7 @@ if [ -z "${ARCHLIST}" ]; then
 
     case "$NDK_RN" in
       # NDK 17+: Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed.
-      "17.1"|"17.2"|"18.0"|"18.1"|"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"22.0")
+      "17.1"|"17.2"|"18.0"|"18.1"|"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"21.4"|"22.0"|"23.0")
         ARCHLIST="arm64-v8a armeabi-v7a x86 x86_64"
         ;;
       *)
