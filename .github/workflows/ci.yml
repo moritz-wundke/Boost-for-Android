@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        boost_version: [1.74.0,1.76.0]
+        boost_version: [1.74.0,1.76.0,1.77.0]
         abi: [armeabi-v7a,arm64-v8a,x86,x86_64]
         os: [ubuntu-latest,macos-latest]
         locale: [true, false]
@@ -20,6 +20,8 @@ jobs:
           - os: macos-latest
             variation: mac
           # specify ndk version for each boost version
+          - boost_version: 1.77.0
+            ndk_version: 23.0.7421159
           - boost_version: 1.76.0
             ndk_version: 23.0.7421159
           - boost_version: 1.74.0
