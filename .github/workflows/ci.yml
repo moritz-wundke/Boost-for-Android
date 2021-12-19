@@ -9,10 +9,9 @@ jobs:
   build:
     strategy:
       matrix:
-        boost_version: [1.74.0,1.76.0]
+        boost_version: [1.74.0,1.78.0]
         abi: [armeabi-v7a,arm64-v8a,x86,x86_64]
         os: [ubuntu-latest,macos-latest]
-        locale: [true, false]
         include:
           # includes a new variable of 'variation' for each host os
           - os: ubuntu-latest
@@ -20,15 +19,10 @@ jobs:
           - os: macos-latest
             variation: mac
           # specify ndk version for each boost version
-          - boost_version: 1.76.0
-            ndk_version: 23.0.7421159
+          - boost_version: 1.78.0
+            ndk_version: 23.1.7779620
           - boost_version: 1.74.0
             ndk_version: 21.4.7075529
-          # set locale library argument
-          - locale: true
-            locale-lib: ",locale"
-          - locale: false
-            locale-lib: ""
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -53,7 +47,7 @@ jobs:
         mkdir -p bins/${{ matrix.variation }}
         mkdir -p logs/${{ matrix.variation }}
     - name: Build Boost for Android on ${{ matrix.variation }}
-      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=${{ matrix.boost_version }} --arch=${{ matrix.abi }} --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono${{ matrix.locale-lib }} "${NDK_ROOT}"
+      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=${{ matrix.boost_version }} --arch=${{ matrix.abi }} --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono,locale "${NDK_ROOT}"
     - name: Prepare Binaries
       run: |
         set -x
