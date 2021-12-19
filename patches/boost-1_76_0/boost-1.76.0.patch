@@ -80,7 +80,7 @@ diff -u -r boost_1_76_0.orig/libs/filesystem/src/path.cpp boost_1_76_0/libs/file
  # include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
  #endif
  
-@@ -864,7 +865,8 @@
+@@ -871,7 +872,8 @@
      std::locale global_loc = std::locale();
      return std::locale(global_loc, new windows_file_codecvt);
  # elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
