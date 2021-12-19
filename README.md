@@ -9,26 +9,26 @@ Other versions of Boost are built only for arm architecture, they are using gcc 
 
 To compile Boost for Android you may use one of the following NDKs:
 
-| NDK / boost | 1.45 | 1.48 | 1.49 | 1.53 | 1.65 | 1.66 | 1.67 | 1.68 | 1.69 | 1.70 | 1.71 | 1.73 | 1.74 | 1.76 | 
-| ----------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php). | x |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r5 from the [official android repository](http://developer.android.com).                  | x |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x | x | x |   |   |   |   |   |   |   |   |   |   |   |
-| r8 from the [official android repository](http://developer.android.com).                  | x | x | x |   |   |   |   |   |   |   |   |   |   |   |
-| r8b from the [official android repository](http://developer.android.com).                 |   | x | x |   |   |   |   |   |   |   |   |   |   |   |
-| r8c from the [official android repository](http://developer.android.com).                 |   |   | x |   |   |   |   |   |   |   |   |   |   |   |
-| r8d from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |
-| r8e from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |
-| r10 from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |
-| r16 from the [official android repository](http://developer.android.com).                 |   |   |   |   | x | x | x | x |   | x |   |   |   |   |
-| r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x | x |   | x |   |   |   |   |
-| r18 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   | x |   |   |   |   |   |   |
-| r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x | x |   |   |   |   |
-| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x |   |   |   |   |   |
-| r19c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x |   |   |   |   |
-| r20 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   | x | x | x | x |   |
-| r23 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x |
+| NDK / boost | 1.45 | 1.48 | 1.49 | 1.53 | 1.65 | 1.66 | 1.67 | 1.68 | 1.69 | 1.70 | 1.71 | 1.73 | 1.74 | 1.76 | 1.78 |
+| ----------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php). | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r5 from the [official android repository](http://developer.android.com).                  | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x | x | x |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8 from the [official android repository](http://developer.android.com).                  | x | x | x |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8b from the [official android repository](http://developer.android.com).                 |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8c from the [official android repository](http://developer.android.com).                 |   |   | x |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8d from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |
+| r8e from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |
+| r10 from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |
+| r16 from the [official android repository](http://developer.android.com).                 |   |   |   |   | x | x | x | x |   | x |   |   |   |   |   |
+| r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x | x |   | x |   |   |   |   |   |
+| r18 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   | x |   |   |   |   |   |   |   |
+| r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x | x |   |   |   |   |   |
+| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x |   |   |   |   |   |   |
+| r19c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x |   |   |   |   |   |
+| r20 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   | x | x | x | x |   |   |
+| r23 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x |
 
 For NDK from r4 to r10, GCC with gnustl_static runtime library is used, only ARM architecture is supported.
 
