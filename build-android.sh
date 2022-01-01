@@ -562,10 +562,15 @@ echo "Building boost for android for $ARCH"
 
   if [ -n "$WITH_ICONV" ] || echo $LIBRARIES | grep locale; then
     if [ -e libiconv-libicu-android ]; then
+      echo "ICONV and ICU already downloaded"
+    else
+      echo "Downloading libiconv-libicu-android repo"
+      git clone --depth=1 https://github.com/pelya/libiconv-libicu-android.git || exit 1
+    fi
+    if [ -e libiconv-libicu-android/$ARCH/libicuuc.a ]; then
       echo "ICONV and ICU already compiled"
     else
       echo "boost_locale selected - compiling ICONV and ICU"
-      git clone --depth=1 https://github.com/pelya/libiconv-libicu-android.git
       cd libiconv-libicu-android
       ARCHS=$ARCH PATH=$AndroidNDKRoot:$PATH ./build.sh || exit 1
       cd ..
