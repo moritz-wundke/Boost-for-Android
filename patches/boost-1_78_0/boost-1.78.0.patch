@@ -39,7 +39,7 @@ diff -u -r boost_1_78_0.orig/libs/filesystem/src/operations.cpp boost_1_78_0/lib
  #include <limits.h>
  
 +#if defined(__ANDROID__)
-+#define BOOST_FILESYSTEM_DISABLE_STATX // statx syscall crashes the app on Android 10 because of seccomp error
++#define BOOST_FILESYSTEM_DISABLE_STATX 1 // statx syscall crashes the app on Android 10 because of seccomp error
 +#endif
 +
  #if defined(linux) || defined(__linux) || defined(__linux__)
