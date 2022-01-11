@@ -1,6 +1,6 @@
 diff -u -r boost_1_78_0.orig/boost/asio/detail/config.hpp boost_1_78_0/boost/asio/detail/config.hpp
---- boost_1_78_0.orig/boost/asio/detail/config.hpp
-+++ boost_1_78_0/boost/asio/detail/config.hpp
+--- boost_1_78_0.orig/boost/asio/detail/config.hpp	2021-12-02 08:47:30.000000000 +0200
++++ boost_1_78_0/boost/asio/detail/config.hpp	2022-01-10 15:40:11.339065214 +0200
 @@ -1143,7 +1143,11 @@
  #    if (_LIBCPP_VERSION < 7000)
  #     if (__cplusplus >= 201402)
@@ -15,8 +15,8 @@ diff -u -r boost_1_78_0.orig/boost/asio/detail/config.hpp boost_1_78_0/boost/asi
  #     endif // (__cplusplus >= 201402)
  #    endif // (_LIBCPP_VERSION < 7000)
 diff -u -r boost_1_78_0.orig/boost/config/user.hpp boost_1_78_0/boost/config/user.hpp
---- boost_1_78_0.orig/boost/config/user.hpp
-+++ boost_1_78_0/boost/config/user.hpp
+--- boost_1_78_0.orig/boost/config/user.hpp	2021-12-02 08:47:31.000000000 +0200
++++ boost_1_78_0/boost/config/user.hpp	2022-01-10 15:40:11.339065214 +0200
 @@ -13,6 +13,13 @@
  //  configuration policy:
  //
@@ -32,9 +32,20 @@ diff -u -r boost_1_78_0.orig/boost/config/user.hpp boost_1_78_0/boost/config/use
  // #define BOOST_COMPILER_CONFIG <myheader>
  
 diff -u -r boost_1_78_0.orig/libs/filesystem/src/operations.cpp boost_1_78_0/libs/filesystem/src/operations.cpp
---- boost_1_78_0.orig/libs/filesystem/src/operations.cpp
-+++ boost_1_78_0/libs/filesystem/src/operations.cpp
-@@ -293,6 +293,21 @@
+--- boost_1_78_0.orig/libs/filesystem/src/operations.cpp	2021-12-02 08:47:31.000000000 +0200
++++ boost_1_78_0/libs/filesystem/src/operations.cpp	2022-01-11 21:00:18.714593422 +0200
+@@ -72,6 +72,10 @@
+ #endif
+ #include <limits.h>
+ 
++#if defined(__ANDROID__)
++#define BOOST_FILESYSTEM_DISABLE_STATX // statx syscall crashes the app on Android 10 because of seccomp error
++#endif
++
+ #if defined(linux) || defined(__linux) || defined(__linux__)
+ 
+ #include <sys/vfs.h>
+@@ -293,6 +297,21 @@
  
  #if defined(BOOST_POSIX_API)
  
@@ -57,9 +68,10 @@ diff -u -r boost_1_78_0.orig/libs/filesystem/src/operations.cpp boost_1_78_0/lib
  #define BOOST_CREATE_HARD_LINK(F, T) (::link(T, F) == 0)
  #define BOOST_MOVE_FILE(OLD, NEW) (::rename(OLD, NEW) == 0)
 diff -u -r boost_1_78_0.orig/libs/filesystem/src/path.cpp boost_1_78_0/libs/filesystem/src/path.cpp
---- boost_1_78_0.orig/libs/filesystem/src/path.cpp
-+++ boost_1_78_0/libs/filesystem/src/path.cpp
-@@ -28,6 +28,6 @@
+--- boost_1_78_0.orig/libs/filesystem/src/path.cpp	2021-12-02 08:47:31.000000000 +0200
++++ boost_1_78_0/libs/filesystem/src/path.cpp	2022-01-10 15:40:11.339065214 +0200
+@@ -27,7 +27,7 @@
+ #include "windows_file_codecvt.hpp"
  #include "windows_tools.hpp"
  #include <windows.h>
 -#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
@@ -67,7 +79,8 @@ diff -u -r boost_1_78_0.orig/libs/filesystem/src/path.cpp boost_1_78_0/libs/file
  #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
  #endif
  
-@@ -1366,6 +1366,6 @@
+@@ -1365,7 +1365,7 @@
+ #if defined(BOOST_WINDOWS_API)
      std::locale global_loc = std::locale();
      return std::locale(global_loc, new boost::filesystem::detail::windows_file_codecvt());
 -#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
@@ -76,8 +89,8 @@ diff -u -r boost_1_78_0.orig/libs/filesystem/src/path.cpp boost_1_78_0/libs/file
      // and nothing else." See
      // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
 diff -u -r boost_1_78_0.orig/tools/build/src/tools/common.jam boost_1_78_0/tools/build/src/tools/common.jam
---- boost_1_78_0.orig/tools/build/src/tools/common.jam
-+++ boost_1_78_0/tools/build/src/tools/common.jam
+--- boost_1_78_0.orig/tools/build/src/tools/common.jam	2021-12-02 08:47:38.000000000 +0200
++++ boost_1_78_0/tools/build/src/tools/common.jam	2022-01-10 15:40:11.343065248 +0200
 @@ -981,7 +981,7 @@
      }
  
