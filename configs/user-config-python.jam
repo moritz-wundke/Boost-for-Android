@@ -1,6 +1,6 @@
 using python
     : %PYTHON_VERSION%  # version
     : %PYTHON_INSTALL_DIR%/bin/python  # cmd-or-prefix
-    : %PYTHON_INSTALL_DIR%/include/python%PYTHON_VERSION%m # includes
+    : %PYTHON_INCLUDE_DIR% # includes
     : %PYTHON_INSTALL_DIR%/lib # libraries
     ;
