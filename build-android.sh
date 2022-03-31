@@ -197,6 +197,9 @@ do_with_python () {
   for pylib in ${WITH_PYTHON}/lib/python*; do
     pyvers_=$(basename $pylib)
     PYTHON_VERSION=${pyvers_#python}
+    for pyinclude in ${WITH_PYTHON}/include/python${PYTHON_VERSION}*; do
+        PYTHON_INCLUDE_DIR=${pyinclude}
+    done
   done
 }
 
@@ -510,7 +513,7 @@ then
 
   if [ -n "$WITH_PYTHON" ]; then
     echo "Sed: $WITH_PYTHON"
-    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
+    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g;s:%PYTHON_INCLUDE_DIR%:${PYTHON_INCLUDE_DIR}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
     cat $BOOST_DIR/tools/build/src/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config.jam
   fi
 
