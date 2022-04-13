@@ -39,6 +39,10 @@ boost_version()
     BOOST_VER1=1
     BOOST_VER2=78
     BOOST_VER3=0
+  elif [ "$1" = "1.77.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=77
+    BOOST_VER3=0
   elif [ "$1" = "1.76.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=76
