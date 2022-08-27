@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        boost_version: [1.74.0,1.78.0]
+        boost_version: [1.79.0,1.80.0]
         abi: [armeabi-v7a,arm64-v8a,x86,x86_64]
         os: [ubuntu-latest,macos-latest]
         include:
@@ -19,10 +19,10 @@ jobs:
           - os: macos-latest
             variation: mac
           # specify ndk version for each boost version
-          - boost_version: 1.78.0
-            ndk_version: 23.1.7779620
-          - boost_version: 1.74.0
-            ndk_version: 21.4.7075529
+          - boost_version: 1.79.0
+            ndk_version: 25.0.8775105
+          - boost_version: 1.80.0
+            ndk_version: 25.1.8937393
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -35,7 +35,7 @@ jobs:
     - name: Setup Android Environment
       uses: android-actions/setup-android@v2
     - name: Install Android NDK
-      run: sdkmanager --install "ndk;${{ matrix.ndk_version }}" --channel=1
+      run: sdkmanager --install "ndk;${{ matrix.ndk_version }}"
     - name: Setup Environment Variables
       run: |
         set -x
