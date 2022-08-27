@@ -1,0 +1,102 @@
+diff -u -r boost_1_79_0.orig/boost/asio/detail/config.hpp boost_1_79_0/boost/asio/detail/config.hpp
+--- boost_1_79_0.orig/boost/asio/detail/config.hpp
++++ boost_1_79_0/boost/asio/detail/config.hpp
+@@ -1143,7 +1143,11 @@
+ #    if (_LIBCPP_VERSION < 7000)
+ #     if (__cplusplus >= 201402)
+ #      if __has_include(<experimental/string_view>)
+-#       define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
++#       if __clang_major__ >= 7
++#        undef BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW
++#       else
++#        define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
++#       endif // __clang_major__ >= 7
+ #      endif // __has_include(<experimental/string_view>)
+ #     endif // (__cplusplus >= 201402)
+ #    endif // (_LIBCPP_VERSION < 7000)
+diff -u -r boost_1_79_0.orig/boost/config/user.hpp boost_1_79_0/boost/config/user.hpp
+--- boost_1_79_0.orig/boost/config/user.hpp
++++ boost_1_79_0/boost/config/user.hpp
+@@ -13,6 +13,13 @@
+ //  configuration policy:
+ //
+ 
++// Android defines
++// There is problem with std::atomic on android (and some other platforms).
++// See this link for more info:
++// https://issuetracker.google.com/issues/36964000
++#define BOOST_ASIO_DISABLE_STD_ATOMIC 1
++
++
+ // define this to locate a compiler config file:
+ // #define BOOST_COMPILER_CONFIG <myheader>
+ 
+diff -u -r boost_1_79_0.orig/libs/filesystem/src/operations.cpp boost_1_79_0/libs/filesystem/src/operations.cpp
+--- boost_1_79_0.orig/libs/filesystem/src/operations.cpp
++++ boost_1_79_0/libs/filesystem/src/operations.cpp
+@@ -72,6 +72,10 @@
+ #endif
+ #include <limits.h>
+ 
++#if defined(__ANDROID__)
++#define BOOST_FILESYSTEM_DISABLE_STATX 1 // statx syscall crashes the app on Android 10 because of seccomp error
++#endif
++
+ #if defined(linux) || defined(__linux) || defined(__linux__)
+ 
+ #include <sys/vfs.h>
+@@ -221,6 +225,21 @@
+ 
+ #if defined(BOOST_POSIX_API)
+ 
++#if defined(__ANDROID__)
++#define truncate libboost_truncate_wrapper
++// truncate() is present in Android libc only starting from ABI 21, so here's a simple wrapper
++static int libboost_truncate_wrapper(const char *path, off_t length)
++{
++  int fd = open(path, O_WRONLY);
++  if (fd == -1) {
++    return -1;
++  }
++  int status = ftruncate(fd, length);
++  close(fd);
++  return status;
++}
++#endif
++
+ #define BOOST_SET_CURRENT_DIRECTORY(P) (::chdir(P) == 0)
+ #define BOOST_CREATE_HARD_LINK(F, T) (::link(T, F) == 0)
+ #define BOOST_MOVE_FILE(OLD, NEW) (::rename(OLD, NEW) == 0)
+diff -u -r boost_1_79_0.orig/libs/filesystem/src/path.cpp boost_1_79_0/libs/filesystem/src/path.cpp
+--- boost_1_79_0.orig/libs/filesystem/src/path.cpp
++++ boost_1_79_0/libs/filesystem/src/path.cpp
+@@ -28,7 +28,7 @@
+ #include "windows_file_codecvt.hpp"
+ #include "windows_tools.hpp"
+ #include <windows.h>
+-#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
++#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) || defined(__ANDROID__)
+ #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+ #endif
+ 
+@@ -1378,7 +1378,7 @@
+ #if defined(BOOST_WINDOWS_API)
+     std::locale global_loc = std::locale();
+     return std::locale(global_loc, new boost::filesystem::detail::windows_file_codecvt());
+-#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
++#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) || defined(__ANDROID__)
+     // "All BSD system functions expect their string parameters to be in UTF-8 encoding
+     // and nothing else." See
+     // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
+diff -u -r boost_1_79_0.orig/tools/build/src/tools/common.jam boost_1_79_0/tools/build/src/tools/common.jam
+--- boost_1_79_0.orig/tools/build/src/tools/common.jam
++++ boost_1_79_0/tools/build/src/tools/common.jam
+@@ -981,7 +981,7 @@
+     }
+ 
+     # Ditto, from Clang 4
+-    if ( $(tag) = clang || $(tag) = clangw ) && $(version[1]) && [ numbers.less 3 $(version[1]) ]
++    #if( $(tag) = clang || $(tag) = clangw ) && $(version[1]) && [ numbers.less 3 $(version[1]) ]
+     {
+         version = $(version[1]) ;
+     }
