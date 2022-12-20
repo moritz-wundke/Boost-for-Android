@@ -545,13 +545,15 @@ then
       PATCHDIR=`dirname $PATCH`
       PATCHNAME=`basename $PATCH`
       log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
-      cd $SRC_DIR && patch -p1 < $dir/$PATCH && cd $PROGDIR
+      cd $SRC_DIR
+      patch -p1 < $dir/$PATCH
       if [ $? != 0 ] ; then
         dump "ERROR: Patch failure !! Please check your patches directory!"
         dump "       Try to perform a clean build using --clean ."
-        dump "       Problem patch: $dir/$PATCHNAME into $SRC_DIR/$PATCHDIR"
+        dump "       Problem patch: $dir/$PATCH into $SRC_DIR"
         exit 1
       fi
+      cd $PROGDIR
     done
   done
 fi
