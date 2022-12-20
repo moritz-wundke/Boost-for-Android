@@ -493,6 +493,9 @@ then
 
 fi
 
+  # Apply patches to boost
+BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
+
 # ---------
 # Bootstrap
 # ---------
@@ -518,34 +521,10 @@ then
   cd $PROGDIR
 
   # -------------------------------------------------------------
-  # Patching will be done only if we had a successfull bootstrap!
+  # Patching will be done only if we had a successful bootstrap!
   # -------------------------------------------------------------
 
-  # Apply patches to boost
-  BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
   PATCH_BOOST_DIR="$SCRIPTDIR/patches/boost-${BOOST_VER}"
-
-  if [ "$TOOLSET" = "clang" ]; then
-      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      for FILE in "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
-          ARCH="`echo $FILE | sed s%$SCRIPTDIR/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
-          if [ "$ARCH" = "common" ]; then
-              continue
-          fi
-          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, b2 does not like them
-          sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      done
-  else
-      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
-  fi
-
-  if [ -n "$WITH_PYTHON" ]; then
-    echo "Sed: $WITH_PYTHON"
-    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g;s:%PYTHON_INCLUDE_DIR%:${PYTHON_INCLUDE_DIR}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
-    cat $BOOST_DIR/tools/build/src/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config.jam
-  fi
 
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
@@ -575,6 +554,34 @@ then
       fi
     done
   done
+fi
+
+if [ ! -f $SCRIPTDIR/user-config.jam ]
+then
+  echo "# ------------------------------------"
+  echo "# Creating $SCRIPTDIR/user-config.jam "
+  echo "# ------------------------------------"
+  if [ "$TOOLSET" = "clang" ]; then
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam "$SCRIPTDIR"/user-config.jam || exit 1
+      for FILE in "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
+          ARCH="`echo $FILE | sed s%$SCRIPTDIR/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
+          if [ "$ARCH" = "common" ]; then
+              continue
+          fi
+          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, b2 does not like them
+          sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> "$SCRIPTDIR"/user-config.jam || exit 1
+          cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> "$SCRIPTDIR"/user-config.jam || exit 1
+          echo ';' >> "$SCRIPTDIR"/user-config.jam || exit 1
+      done
+  else
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam "$SCRIPTDIR"/user-config.jam || exit 1
+  fi
+
+  if [ -n "$WITH_PYTHON" ]; then
+    echo "Sed: $WITH_PYTHON"
+    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g;s:%PYTHON_INCLUDE_DIR%:${PYTHON_INCLUDE_DIR}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
+    cat $BOOST_DIR/tools/build/src/user-config-python.jam >> $SCRIPTDIR/user-config.jam
+  fi
 fi
 
 echo "# ---------------"
@@ -662,8 +669,9 @@ echo "Building boost for android for $ARCH"
 
   echo "Silently building Boost, this can take minutes..."
   {
-    time ./b2 -q                          \
+    time ./b2 -q                     \
         -d+2                         \
+        --user-config=$SCRIPTDIR/user-config.jam \
         --ignore-site-config         \
         -j$NCPU                      \
         target-os=${TARGET_OS}       \
