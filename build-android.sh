@@ -546,6 +546,7 @@ then
       PATCHNAME=`basename $PATCH`
       log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
       cd $SRC_DIR
+      patch --version
       echo "Running: `which patch` -p1 < $dir/$PATCH in `pwd`"
       patch -p1 < $dir/$PATCH
       if [ $? != 0 ] ; then
