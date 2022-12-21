@@ -507,10 +507,10 @@ then
   cd $BOOST_DIR
   case "$HOST_OS" in
     windows)
-        cmd //c "bootstrap.bat" 2>&1 | tee -a $PROGDIR/build.log
+        cmd //c "bootstrap.bat" > $PROGDIR/build.log 2>&1
         ;;
     *)  # Linux and others
-        ./bootstrap.sh 2>&1 | tee -a $PROGDIR/build.log
+        ./bootstrap.sh > $PROGDIR/build.log 2>&1
     esac
 
 
@@ -518,6 +518,13 @@ then
   	dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
   	exit 1
   fi
+
+  #
+  # Well we are going to need headers generated. if we are going to patch them.
+  #
+  echo "Performing header generation"
+  ./b2 headers
+
   cd $PROGDIR
 
   # -------------------------------------------------------------

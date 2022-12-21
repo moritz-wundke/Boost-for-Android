@@ -1,6 +1,6 @@
-diff -u -r boost_1_80_0.orig/boost/asio/detail/config.hpp boost_1_80_0.boost/asio/detail/config.hpp
---- boost_1_80_0.orig/boost/asio/detail/config.hpp
-+++ boost_1_80_0.boost/asio/detail/config.hpp
+diff -u -r boost_1_80_0.orig/libs/asio/include/boost/asio/detail/config.hpp boost_1_80_0/libs/asio/include/boost/asio/detail/config.hpp
+--- boost_1_80_0.orig/libs/asio/include/boost/asio/detail/config.hpp
++++ boost_1_80_0/libs/asio/include/boost/asio/detail/config.hpp
 @@ -1251,7 +1251,11 @@
  #    if (_LIBCPP_VERSION < 7000)
  #     if (__cplusplus >= 201402)
@@ -14,10 +14,10 @@ diff -u -r boost_1_80_0.orig/boost/asio/detail/config.hpp boost_1_80_0.boost/asi
  #      endif // __has_include(<experimental/string_view>)
  #     endif // (__cplusplus >= 201402)
  #    endif // (_LIBCPP_VERSION < 7000)
-diff -u -r boost_1_80_0.orig/boost/config/user.hpp boost_1_80_0.boost/config/user.hpp
---- boost_1_80_0.orig/boost/config/user.hpp
-+++ boost_1_80_0.boost/config/user.hpp
-@@ -13,6 +13,13 @@
+diff -u -r boost_1_80_0.orig/libs/config/include/boost/config/user.hpp boost_1_80_0/libs/config/include/boost/config/user.hpp
+--- boost_1_80_0.orig//libs/config/include/boost/config/user.hpp
++++ boost_1_80_0//libs/config/include/boost/config/user.hpp
+@@ -12,6 +12,13 @@
  //  configuration policy:
  //
  
@@ -31,9 +31,9 @@ diff -u -r boost_1_80_0.orig/boost/config/user.hpp boost_1_80_0.boost/config/use
  // define this to locate a compiler config file:
  // #define BOOST_COMPILER_CONFIG <myheader>
  
-diff -u -r boost_1_80_0.orig/libs/filesystem/src/operations.cpp boost_1_80_0.libs/filesystem/src/operations.cpp
+diff -u -r boost_1_80_0.orig/libs/filesystem/src/operations.cpp boost_1_80_0/libs/filesystem/src/operations.cpp
 --- boost_1_80_0.orig/libs/filesystem/src/operations.cpp
-+++ boost_1_80_0.libs/filesystem/src/operations.cpp
++++ boost_1_80_0/libs/filesystem/src/operations.cpp
 @@ -75,6 +75,10 @@
  #endif
  #include <limits.h>
@@ -67,9 +67,9 @@ diff -u -r boost_1_80_0.orig/libs/filesystem/src/operations.cpp boost_1_80_0.lib
  #define BOOST_SET_CURRENT_DIRECTORY(P) (::chdir(P) == 0)
  #define BOOST_CREATE_HARD_LINK(F, T) (::link(T, F) == 0)
  #define BOOST_MOVE_FILE(OLD, NEW) (::rename(OLD, NEW) == 0)
-diff -u -r boost_1_80_0.orig/libs/filesystem/src/path.cpp boost_1_80_0.libs/filesystem/src/path.cpp
+diff -u -r boost_1_80_0.orig/libs/filesystem/src/path.cpp boost_1_80_0/libs/filesystem/src/path.cpp
 --- boost_1_80_0.orig/libs/filesystem/src/path.cpp
-+++ boost_1_80_0.libs/filesystem/src/path.cpp
++++ boost_1_80_0/libs/filesystem/src/path.cpp
 @@ -28,7 +28,7 @@
  #include "windows_file_codecvt.hpp"
  #include "windows_tools.hpp"
@@ -88,9 +88,9 @@ diff -u -r boost_1_80_0.orig/libs/filesystem/src/path.cpp boost_1_80_0.libs/file
      // "All BSD system functions expect their string parameters to be in UTF-8 encoding
      // and nothing else." See
      // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
-diff -u -r boost_1_80_0.orig/tools/build/src/tools/common.jam boost_1_80_0.tools/build/src/tools/common.jam
+diff -u -r boost_1_80_0.orig/tools/build/src/tools/common.jam boost_1_80_0/tools/build/src/tools/common.jam
 --- boost_1_80_0.orig/tools/build/src/tools/common.jam
-+++ boost_1_80_0.tools/build/src/tools/common.jam
++++ boost_1_80_0/tools/build/src/tools/common.jam
 @@ -981,7 +981,7 @@
      }
  
