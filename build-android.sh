@@ -142,9 +142,10 @@ select_toolchain () {
     TOOLCHAIN=$1
 }
 
+EXTRA_PARAMS=
 register_option "--extra=<params>" add_extra_params "Add extra b2 parameters for the build."
 add_extra_params () {
-  EXTRA_PARAMS=$1
+  for param in $(echo $1 | tr ',' '\n') ; do EXTRA_PARAMS="${EXTRA_PARAMS} $param"; done
 }
 
 CLEAN=no
@@ -507,10 +508,10 @@ then
   cd $BOOST_DIR
   case "$HOST_OS" in
     windows)
-        cmd //c "bootstrap.bat" > $PROGDIR/build.log 2>&1
+        cmd //c "bootstrap.bat" 2>&1 | teelog
         ;;
     *)  # Linux and others
-        ./bootstrap.sh > $PROGDIR/build.log 2>&1
+        ./bootstrap.sh 2>&1 | teelog
     esac
 
 
@@ -535,7 +536,7 @@ then
 
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
-      echo "Could not find directory '$dir' while looking for patches"
+      echo "Could not find directory '$dir' while looking for patches" 2>&1 | teelog
       exit 1
     fi
 
@@ -631,7 +632,7 @@ echo "Building boost for android for $ARCH"
 
   cd $BOOST_DIR
 
-  echo "Adding pathname: `dirname $CXXPATH`"
+  echo "Adding pathname: `dirname $CXXPATH`" | teelog
   # `AndroidBinariesPath` could be used by user-config-*.jam
   export AndroidBinariesPath=`dirname $CXXPATH`
   export PATH=$AndroidBinariesPath:$PATH
@@ -677,9 +678,13 @@ echo "Building boost for android for $ARCH"
       unset WITHOUT_LIBRARIES
   fi
 
-  echo "Silently building Boost, this can take minutes..."
+  if [ $VERBOSE = 'no' ]; then
+    echo "Silently building Boost, this can take minutes..."
+  fi
+
   {
-    time ./b2 -q                     \
+    set -x
+    $TIME_CMD ./b2 -q                \
         -d+2                         \
         --user-config=$SCRIPTDIR/user-config.jam \
         --ignore-site-config         \
@@ -696,17 +701,16 @@ echo "Building boost for android for $ARCH"
         -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
         -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
         --build-dir="$BUILD_DIR"     \
-        --prefix="$PREFIX_ARCH_DIR"  \
+        --prefix="$PREFIX"  \
         $EXTRA_PARAMS                \
         $LIBRARIES                   \
         $LIBRARIES_BROKEN            \
-        install > $PROGDIR/build.log 2>&1 \
-        || { dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf $PREFIX_ARCH_DIR ; exit 1 ; }
-  }
-
+        install 2>&1 \
+        || { set +x; dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf $PREFIX ; exit 1 ; }
+  } | teelog
+)
   #
   # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
-)
 
 dump "Done!"
 
