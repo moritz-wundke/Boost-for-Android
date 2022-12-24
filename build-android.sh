@@ -520,12 +520,6 @@ then
   	exit 1
   fi
 
-  #
-  # Well we are going to need headers generated. if we are going to patch them.
-  #
-  echo "Performing header generation"
-  ./b2 headers
-
   cd $PROGDIR
 
   # -------------------------------------------------------------
