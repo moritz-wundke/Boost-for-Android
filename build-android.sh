@@ -687,6 +687,7 @@ echo "Building boost for android for $ARCH"
         $cflags                      \
         $cxxflags                    \
         link=static                  \
+        runtime-link=static          \
         threading=multi              \
         --layout=${LAYOUT}           \
         $WITHOUT_LIBRARIES           \
