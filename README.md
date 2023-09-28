@@ -25,12 +25,22 @@ To compile Boost for Android you may use one of the following NDKs:
 | r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x | x |   | x |   |   |   |   |   |   |   |   |   |
 | r18 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   | x |   |   |   |   |   |   |   |   |   |   |   |
 | r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x | x |   |   |   |   |   |   |   |   |   |
-| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x |   |   |   |   |   |   |   |   |   |   |
-| r19c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x |   |   |   |   |   |   |   |   |   |
-| r20 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   | x | x | x | x |   |   |   |   |   |   |
-| r23 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x |   |   |   |
-| r25 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x |
-| r26 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x |
+| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r19b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r19c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r20 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r20b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r21 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r21b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r21c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r21d from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r21e from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |
+| r23 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x |
+| r23b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x |
+| r25 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x |
+| r25b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x |
+| r25c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x |
+| r26 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x |
 
 For NDK from r4 to r10, GCC with gnustl_static runtime library is used, only ARM architecture is supported.
 
