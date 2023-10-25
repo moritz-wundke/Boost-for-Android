@@ -131,3 +131,4 @@ add full path to the gnustl_static library to the link paths. Example:
 Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed. Attempting to build any of these ABIs will result in an error.
 This project will exclude these architectures for compiling with NDK 17.
 
+
