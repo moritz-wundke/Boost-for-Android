@@ -25,7 +25,7 @@ jobs:
             ndk_version: 25.2.9519653
       fail-fast: false
 
-    runs-on: ${{ matrix.os }}
+    runs-on: [ubuntu-latest,macos-latest]
 
     steps:
     - name: Checkout Sources
