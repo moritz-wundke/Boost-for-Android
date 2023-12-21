@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        boost_version: [1.79.0,1.82.0]
+        boost_version: [1.79.0,1.84.0]
         abi: [armeabi-v7a,arm64-v8a,x86,x86_64]
         os: [ubuntu-latest,macos-latest]
         include:
