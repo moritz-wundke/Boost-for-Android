@@ -68,7 +68,7 @@ Windows:
 ```
 build-android.bat $(NDK_ROOT)
 ```
-NOTE: Do not forget to replace backslash with slashes in $(NDK_ROOT). For example set $(NDK_ROOT) to D:/android-ndk-r8e instead of D:\android-ndk-r8e
+NOTE: Do not forget to replace backslash with slashes in `$(NDK_ROOT)`. For example set `$(NDK_ROOT)` to D:/android-ndk-r8e instead of D:\android-ndk-r8e
 
 On windows you will need MSYS to be able to launch the corresponding bat files (http://www.mingw.org/wiki/MSYS).
 
