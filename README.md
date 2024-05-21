@@ -1,7 +1,7 @@
 # Boost for Android [![Build Status: GitHub Actions](https://github.com/moritz-wundke/Boost-for-Android/workflows/CI/badge.svg)](https://github.com/moritz-wundke/Boost-for-Android/actions)
 Boost for android is a set of tools to compile the main part of the [Boost C++ Libraries](http://www.boost.org/) for the Android platform.
 
-Currently supported boost versions are 1.45.0, 1.48.0, 1.49.0, 1.53.0, 1.54.0, 1.55.0, 1.65.1, 1.66.0, 1.67.0, 1.68.0, 1.69.0, 1.70.0, 1.71.0, 1.73.0, 1.74.0, 1.76.0, 1.77.0, 1.78.0, 1.79.0 and 1.80.0.
+Currently supported boost versions are 1.45.0, 1.48.0, 1.49.0, 1.53.0, 1.54.0, 1.55.0, 1.65.1, 1.66.0, 1.67.0, 1.68.0, 1.69.0, 1.70.0, 1.71.0, 1.73.0, 1.74.0, 1.76.0, 1.77.0, 1.78.0, 1.79.0, 1.80.0 and 1.82.0.
 
 x86, mips, and 64-bit architectures are built with Boost 1.65.1 and NDK r16-beta2, this version uses clang toolchain with llvm libc++ STL library.
 
@@ -9,27 +9,38 @@ Other versions of Boost are built only for arm architecture, they are using gcc 
 
 To compile Boost for Android you may use one of the following NDKs:
 
-| NDK / boost | 1.45 | 1.48 | 1.49 | 1.53 | 1.65 | 1.66 | 1.67 | 1.68 | 1.69 | 1.70 | 1.71 | 1.73 | 1.74 | 1.76 | 1.77 | 1.78 | 1.79 | 1.80 |
-| ----------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php). | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r5 from the [official android repository](http://developer.android.com).                  | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r8 from the [official android repository](http://developer.android.com).                  | x | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r8b from the [official android repository](http://developer.android.com).                 |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r8c from the [official android repository](http://developer.android.com).                 |   |   | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r8d from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r8e from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r10 from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| r16 from the [official android repository](http://developer.android.com).                 |   |   |   |   | x | x | x | x |   | x |   |   |   |   |   |   |   |   |
-| r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x | x |   | x |   |   |   |   |   |   |   |   |
-| r18 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   | x |   |   |   |   |   |   |   |   |   |   |
-| r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x | x |   |   |   |   |   |   |   |   |
-| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x |   |   |   |   |   |   |   |   |   |
-| r19c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x |   |   |   |   |   |   |   |   |
-| r20 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   | x | x | x | x |   |   |   |   |   |
-| r23 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x |   |   |
-| r25 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | x | x |
+| NDK / boost | 1.45 | 1.48 | 1.49 | 1.53 | 1.65 | 1.66 | 1.67 | 1.68 | 1.69 | 1.70 | 1.71 | 1.73 | 1.74 | 1.76 | 1.77 | 1.78 | 1.79 | 1.80 | 1.82 | 1.83 | 1.84 |
+| ----------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| r4 customized by [Dmitry Moskalchuk aka CrystaX](http://www.crystax.net/android/ndk.php). | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r5 from the [official android repository](http://developer.android.com).                  | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r5 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r7 customized by [CrystaX](http://www.crystax.net/android/ndk.php).                       | x | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8 from the [official android repository](http://developer.android.com).                  | x | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8b from the [official android repository](http://developer.android.com).                 |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8c from the [official android repository](http://developer.android.com).                 |   |   | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8d from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r8e from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r10 from the [official android repository](http://developer.android.com).                 |   |   | x | x |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r16 from the [official android repository](http://developer.android.com).                 |   |   |   |   | x | x | x | x |   | x |   |   |   |   |   |   |   |   |   |   |   |
+| r17b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   | x | x |   | x |   |   |   |   |   |   |   |   |   |   |   |
+| r18 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   | x |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| r18b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   | x | x | x |   |   |   |   |   |   |   |   |   |   |   |
+| r19 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r19b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r19c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r20 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r20b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r21 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r21b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r21c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r21d from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r21e from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   | x | x | x | x | x |   |   |   |   |   |   |   |   |
+| r23 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x | x | x |
+| r23b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x | x | x |
+| r25 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x | x | x |
+| r25b from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x | x | x |
+| r25c from the [official android repository](http://developer.android.com).                |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x | x | x |
+| r26 from the [official android repository](http://developer.android.com).                 |   |   |   |   |   |   |   |   |   |   |   |   | x | x | x | x | x | x | x | x | x |
 
 For NDK from r4 to r10, GCC with gnustl_static runtime library is used, only ARM architecture is supported.
 
@@ -57,10 +68,10 @@ Windows:
 ```
 build-android.bat $(NDK_ROOT)
 ```
-NOTE: Do not forget to replace backslash with slashes in $(NDK_ROOT). For example set $(NDK_ROOT) to D:/android-ndk-r8e instead of D:\android-ndk-r8e
-    
+NOTE: Do not forget to replace backslash with slashes in `$(NDK_ROOT)`. For example set `$(NDK_ROOT)` to D:/android-ndk-r8e instead of D:\android-ndk-r8e
+
 On windows you will need MSYS to be able to launch the corresponding bat files (http://www.mingw.org/wiki/MSYS).
-    
+
 This command will download and build boost against the NDK specified and output the final headers and libs in the `build` folder. Make sure to provide an absolute path the the NDK folder!
 
 For more info about usage and available commands use `--help`.
@@ -87,7 +98,7 @@ The projects is split into two main branches, the master and devel. The master b
 
 ## Troubleshooting
 
-In case you encounter bunch of linker errors when building your app with boost, 
+In case you encounter bunch of linker errors when building your app with boost,
 this might help:
 
 ### Building from a 64 bit machine (Linux)
@@ -101,7 +112,7 @@ To install them just use the following
 
 ### NDK 7 (CrystaX)
 
-Add `-lgnustl_static` *AFTER* all boost libraries to the LOCAL_LDLIBS line in 
+Add `-lgnustl_static` *AFTER* all boost libraries to the LOCAL_LDLIBS line in
 Android.mk. Example:
 
     LOCAL_LDLIBS += lboost_system-gcc-md lboost_thread-gcc-md -lgnustl_static
@@ -119,4 +130,5 @@ add full path to the gnustl_static library to the link paths. Example:
 
 Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed. Attempting to build any of these ABIs will result in an error.
 This project will exclude these architectures for compiling with NDK 17.
+
 

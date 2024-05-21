@@ -30,12 +30,24 @@ SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)" # " # This extra quote fixes syntax hig
 # -----------------------
 
 BOOST_VER1=1
-BOOST_VER2=78
+BOOST_VER2=84
 BOOST_VER3=0
-register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.80.0 1.79.0 1.78.0 1.76.0 1.74.0, 1.73.0, 1.71.0, 1.70.0, 1.69.0, 1.68.0, 1.67.0, 1.66.0, 1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.74.0."
+register_option "--boost=<version>" boost_version "Boost version to be used, one of {1.84.0 1.83.0 1.82.0 1.80.0 1.79.0 1.78.0 1.76.0 1.74.0, 1.73.0, 1.71.0, 1.70.0, 1.69.0, 1.68.0, 1.67.0, 1.66.0, 1.65.1, 1.55.0, 1.54.0, 1.53.0, 1.49.0, 1.48.0, 1.45.0}, default is 1.84.0."
 boost_version()
 {
-  if [ "$1" = "1.80.0" ]; then
+  if [ "$1" = "1.84.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=84
+    BOOST_VER3=0
+  elif [ "$1" = "1.83.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=83
+    BOOST_VER3=0
+  elif [ "$1" = "1.82.0" ]; then
+    BOOST_VER1=1
+    BOOST_VER2=82
+    BOOST_VER3=0
+  elif [ "$1" = "1.80.0" ]; then
     BOOST_VER1=1
     BOOST_VER2=80
     BOOST_VER3=0
@@ -397,7 +409,7 @@ case "$NDK_RN" in
 		TOOLSET=clang
 		CONFIG_VARIANT=ndk19
 		;;
-	"22.1"|"23.0"|"23.1"|"25.0"|"25.1")
+	"22.1"|"23.0"|"23.1"|"25.0"|"25.1"|"25.2"|"26.0")
 		TOOLCHAIN=${TOOLCHAIN:-llvm}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
 		TOOLSET=clang
@@ -418,7 +430,7 @@ if [ -z "${ARCHLIST}" ]; then
 
     case "$NDK_RN" in
       # NDK 17+: Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed.
-      "17.1"|"17.2"|"18.0"|"18.1"|"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"21.4"|"22.1"|"23.0"|"23.1"|"25.0"|"25.1")
+      "17.1"|"17.2"|"18.0"|"18.1"|"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"21.4"|"22.1"|"23.0"|"23.1"|"25.0"|"25.1"|"25.2"|"26.0")
         ARCHLIST="arm64-v8a armeabi-v7a x86 x86_64"
         ;;
       *)
@@ -661,7 +673,7 @@ echo "Building boost for android for $ARCH"
   fi
 
   {
-    $TIME_CMD ./b2 -q                \
+    ./b2 -q                          \
         -d+2                         \
         --user-config=$SCRIPTDIR/user-config.jam \
         --ignore-site-config         \
