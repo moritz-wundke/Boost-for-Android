@@ -1,6 +1,6 @@
-diff -urN boost_1_85_0.orig/boost/asio/detail/config.hpp boost_1_85_0/boost/asio/detail/config.hpp
---- boost_1_85_0.orig/boost/asio/detail/config.hpp	2024-04-11 13:48:00.000000000 -0500
-+++ boost_1_85_0/boost/asio/detail/config.hpp	2024-06-18 10:32:44.578013858 -0500
+diff -urN boost_1_85_0.orig/libs/asio/include/boost/asio/detail/config.hpp boost_1_85_0/libs/asio/include/boost/asio/detail/config.hpp
+--- boost_1_85_0.orig/libs/asio/include/boost/asio/detail/config.hpp	2024-04-11 13:48:00.000000000 -0500
++++ boost_1_85_0/libs/asio/include/boost/asio/detail/config.hpp	2024-06-18 10:32:44.578013858 -0500
 @@ -492,7 +492,11 @@
  #    if (_LIBCPP_VERSION < 7000)
  #     if (__cplusplus >= 201402)
@@ -14,9 +14,9 @@ diff -urN boost_1_85_0.orig/boost/asio/detail/config.hpp boost_1_85_0/boost/asio
  #      endif // __has_include(<experimental/string_view>)
  #     endif // (__cplusplus >= 201402)
  #    endif // (_LIBCPP_VERSION < 7000)
-diff -urN boost_1_85_0.orig/boost/asio/detail/config.hpp.orig boost_1_85_0/boost/asio/detail/config.hpp.orig
---- boost_1_85_0.orig/boost/asio/detail/config.hpp.orig	1969-12-31 18:00:00.000000000 -0600
-+++ boost_1_85_0/boost/asio/detail/config.hpp.orig	2024-06-18 10:32:44.578013858 -0500
+diff -urN boost_1_85_0.orig/libs/asio/include/boost/asio/detail/config.hpp.orig boost_1_85_0/libs/asio/include/boost/asio/detail/config.hpp.orig
+--- boost_1_85_0.orig/libs/asio/include/boost/asio/detail/config.hpp.orig	1969-12-31 18:00:00.000000000 -0600
++++ boost_1_85_0/libs/asio/include/boost/asio/detail/config.hpp.orig	2024-06-18 10:32:44.578013858 -0500
 @@ -0,0 +1,1397 @@
 +//
 +// detail/config.hpp
@@ -1415,9 +1415,9 @@ diff -urN boost_1_85_0.orig/boost/asio/detail/config.hpp.orig boost_1_85_0/boost
 +#endif // !defined(BOOST_ASIO_HAS_SNPRINTF)
 +
 +#endif // BOOST_ASIO_DETAIL_CONFIG_HPP
-diff -urN boost_1_85_0.orig/boost/config/user.hpp boost_1_85_0/boost/config/user.hpp
---- boost_1_85_0.orig/boost/config/user.hpp	2024-04-11 13:48:00.000000000 -0500
-+++ boost_1_85_0/boost/config/user.hpp	2024-06-18 10:32:44.578013858 -0500
+diff -urN boost_1_85_0.orig/libs/config/include/boost/config/user.hpp boost_1_85_0/libs/config/include/boost/config/user.hpp
+--- boost_1_85_0.orig/libs/config/include/boost/config/user.hpp	2024-04-11 13:48:00.000000000 -0500
++++ boost_1_85_0/libs/config/include/boost/config/user.hpp	2024-06-18 10:32:44.578013858 -0500
 @@ -13,6 +13,13 @@
  //  configuration policy:
  //
