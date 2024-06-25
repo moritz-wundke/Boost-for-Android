@@ -78,6 +78,20 @@ log2 ()
     fi
 }
 
+# use | teelog for this
+teelog ()
+{
+    if [ "$VERBOSE" = "yes" ] ; then
+        if [ -n "$TMPLOG" ] ; then
+          cat | tee -a $TMPLOG
+        else
+          cat
+        fi
+    else
+      cat >> $TMPLOG
+    fi
+}
+
 run ()
 {
     if [ "$VERBOSE" = "yes" ] ; then
