@@ -17,7 +17,7 @@
 #
 # <License>
 #
-# Build boost for android completly. It will download boost 1.45.0
+# Build boost for android completely. It will download boost 1.45.0
 # prepare the build system and finally build it for android
 
 SCRIPTDIR="$(cd "$(dirname "$0")"; pwd)" # " # This extra quote fixes syntax highlighting in mcedit
@@ -142,18 +142,21 @@ select_toolchain () {
     TOOLCHAIN=$1
 }
 
+EXTRA_PARAMS=
+register_option "--extra=<params>" add_extra_params "Add extra b2 parameters for the build."
+add_extra_params () {
+  for param in $(echo $1 | tr ',' '\n') ; do EXTRA_PARAMS="${EXTRA_PARAMS} $param"; done
+}
+
 CLEAN=no
 register_option "--clean"    do_clean     "Delete all previously downloaded and built files, then exit."
 do_clean () {	CLEAN=yes; }
 
 DOWNLOAD=no
 register_option "--download" do_download  "Only download required files and clean up previus build. No build will be performed."
-
 do_download ()
 {
 	DOWNLOAD=yes
-	# Clean previus stuff too!
-	CLEAN=yes
 }
 
 #LIBRARIES=--with-libraries=date_time,filesystem,program_options,regex,signals,system,thread,iostreams,locale
@@ -173,13 +176,6 @@ LAYOUT=versioned
 register_option "--layout=<layout>" do_layout "Library naming layout [versioned, tagged, system]."
 do_layout () {
 	LAYOUT=$1;
-}
-
-register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
-do_prefix () {
-    if [ -d $1 ]; then
-        PREFIX=$1;
-    fi
 }
 
 ARCHLIST=
@@ -231,6 +227,28 @@ do_with_python () {
   done
 }
 
+BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
+register_option "--src-dir=<boost_src_dir>" add_boost_dir "Override the default Boost source directory."
+add_boost_dir () {
+    if [ -d $1 ]; then
+        BOOST_DIR=$1;
+    fi
+}
+
+BUILD_DIR="./build/"
+register_option "--build-dir=<build_dir>" add_build_dir "Set the temporary build dir."
+add_build_dir () {
+  BUILD_DIR=$1;
+}
+
+PREFIX="$BUILD_DIR/out/"
+register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
+do_prefix () {
+  PREFIX=$1;
+}
+
+
+
 PROGRAM_PARAMETERS="<ndk-root>"
 PROGRAM_DESCRIPTION=\
 "       Boost For Android\n"\
@@ -243,20 +261,18 @@ echo "Building boost version: $BOOST_VER1.$BOOST_VER2.$BOOST_VER3"
 # -----------------------
 # Build constants
 # -----------------------
-
-BOOST_DOWNLOAD_LINK="https://archives.boost.io/release/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/source/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
+BOOST_DOWNLOAD_LINK="https://boostorg.jfrog.io/artifactory/main/release/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/source/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
 BOOST_TAR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
-BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
-BUILD_DIR="./build/"
+
 
 # -----------------------
 
 if [ $CLEAN = yes ] ; then
 	echo "Cleaning: $BUILD_DIR"
-	rm -f -r $PROGDIR/$BUILD_DIR
+	rm -f -r $BUILD_DIR
 
 	echo "Cleaning: $BOOST_DIR"
-	rm -f -r $PROGDIR/$BOOST_DIR
+	rm -f -r $BOOST_DIR
 
 	echo "Cleaning: $BOOST_TAR"
 	rm -f $PROGDIR/$BOOST_TAR
@@ -267,23 +283,6 @@ if [ $CLEAN = yes ] ; then
 
   [ "$DOWNLOAD" = "yes" ] || exit 0
 fi
-
-# It is almost never desirable to have the boost-X_Y_Z directory from
-# previous builds as this script doesn't check in which state it's
-# been left (bootstrapped, patched, built, ...). Unless maybe during
-# a debug, in which case it's easy for a developer to comment out
-# this code.
-
-if [ -d "$PROGDIR/$BOOST_DIR" ]; then
-	echo "Cleaning: $BOOST_DIR"
-	rm -f -r $PROGDIR/$BOOST_DIR
-fi
-
-if [ -d "$PROGDIR/$BUILD_DIR" ]; then
-	echo "Cleaning: $BUILD_DIR"
-	rm -f -r $PROGDIR/$BUILD_DIR
-fi
-
 
 AndroidNDKRoot=$PARAMETERS
 if [ -z "$AndroidNDKRoot" ] ; then
@@ -414,7 +413,7 @@ case "$NDK_RN" in
 		TOOLSET=clang
 		CONFIG_VARIANT=ndk19
 		;;
-	"22.1"|"23.0"|"23.1"|"25.0"|"25.1"|"25.2"|"26.0"|"26.1"|"26.2"|"26.3"|"27.0")
+	"22.1"|"23.0"|"23.1"|"25.0"|"25.1"|"25.2"|"26.0"|"26.1"|"26.2"|"26.3"|"27.0"|"27.1"|"27.2")
 		TOOLCHAIN=${TOOLCHAIN:-llvm}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
 		TOOLSET=clang
@@ -462,39 +461,46 @@ fi
 # Download required files
 # -----------------------
 
-# Downalod and unzip boost in a temporal folder and
-if [ ! -f $BOOST_TAR ]
+# Download and unzip boost in a temporary folder and
+if [ "${DOWNLOAD}" = "yes" ]
 then
-	echo "Downloading boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} please wait..."
-	prepare_download
-	download_file $BOOST_DOWNLOAD_LINK $PROGDIR/$BOOST_TAR
-fi
+  if [ ! -f $BOOST_TAR ]
+  then
+    echo "Downloading boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} please wait..."
+    prepare_download
+    download_file $BOOST_DOWNLOAD_LINK $PROGDIR/$BOOST_TAR
 
-if [ ! -f $PROGDIR/$BOOST_TAR ]
-then
-	echo "Failed to download boost! Please download boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} manually\nand save it in this directory as $BOOST_TAR"
-	exit 1
-fi
+    if [ ! -f $PROGDIR/$BOOST_TAR ]
+    then
+      echo "Failed to download boost! Please download boost ${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3} manually\nand save it in this directory as $BOOST_TAR"
+      exit 1
+    fi
+  fi
 
-if [ ! -d $PROGDIR/$BOOST_DIR ]
-then
+  # clean any previous directory
+  if [ -d $BOOST_DIR ]
+  then
+    rm -rf $BOOST_DIR
+  fi
+
 	echo "Unpacking boost"
 	if [ "$OPTION_PROGRESS" = "yes" ] ; then
-		pv $PROGDIR/$BOOST_TAR | tar xjf - -C $PROGDIR
+		pv $PROGDIR/$BOOST_TAR | tar xjf - -C $BOOST_DIR
 	else
-		tar xjf $PROGDIR/$BOOST_TAR
+		tar xjf $PROGDIR/$BOOST_TAR -C $BOOST_DIR
 	fi
+
+	echo "All required files has been downloaded and unpacked!"
+
 fi
 
-if [ $DOWNLOAD = yes ] ; then
-	echo "All required files has been downloaded and unpacked!"
-	exit 0
-fi
+  # Apply patches to boost
+BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
 
 # ---------
 # Bootstrap
 # ---------
-if [ ! -f ./$BOOST_DIR/b2 ]
+if [ ! -f $BOOST_DIR/b2 ]
 then
   # Make the initial bootstrap
   echo "Performing boost bootstrap"
@@ -502,10 +508,10 @@ then
   cd $BOOST_DIR
   case "$HOST_OS" in
     windows)
-        cmd //c "bootstrap.bat" 2>&1 | tee -a $PROGDIR/build.log
+        cmd //c "bootstrap.bat" 2>&1 | teelog
         ;;
     *)  # Linux and others
-        ./bootstrap.sh 2>&1 | tee -a $PROGDIR/build.log
+        ./bootstrap.sh 2>&1 | teelog
     esac
 
 
@@ -513,41 +519,18 @@ then
   	dump "ERROR: Could not perform boostrap! See $TMPLOG for more info."
   	exit 1
   fi
+
   cd $PROGDIR
 
   # -------------------------------------------------------------
-  # Patching will be done only if we had a successfull bootstrap!
+  # Patching will be done only if we had a successful bootstrap!
   # -------------------------------------------------------------
 
-  # Apply patches to boost
-  BOOST_VER=${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}
   PATCH_BOOST_DIR="$SCRIPTDIR/patches/boost-${BOOST_VER}"
-
-  if [ "$TOOLSET" = "clang" ]; then
-      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      for FILE in "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
-          ARCH="`echo $FILE | sed s%$SCRIPTDIR/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
-          if [ "$ARCH" = "common" ]; then
-              continue
-          fi
-          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, b2 does not like them
-          sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-          echo ';' >> $BOOST_DIR/tools/build/src/user-config.jam || exit 1
-      done
-  else
-      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam $BOOST_DIR/tools/build/v2/user-config.jam || exit 1
-  fi
-
-  if [ -n "$WITH_PYTHON" ]; then
-    echo "Sed: $WITH_PYTHON"
-    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g;s:%PYTHON_INCLUDE_DIR%:${PYTHON_INCLUDE_DIR}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
-    cat $BOOST_DIR/tools/build/src/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config.jam
-  fi
 
   for dir in $PATCH_BOOST_DIR; do
     if [ ! -d "$dir" ]; then
-      echo "Could not find directory '$dir' while looking for patches"
+      echo "Could not find directory '$dir' while looking for patches" 2>&1 | teelog
       exit 1
     fi
 
@@ -560,19 +543,50 @@ then
 
     for PATCH in $PATCHES; do
       PATCH=`echo $PATCH | sed -e s%^\./%%g`
-      SRC_DIR=$PROGDIR/$BOOST_DIR
+      SRC_DIR=$BOOST_DIR
       PATCHDIR=`dirname $PATCH`
       PATCHNAME=`basename $PATCH`
       log "Applying $PATCHNAME into $SRC_DIR/$PATCHDIR"
-      cd $SRC_DIR && patch -p1 < $dir/$PATCH && cd $PROGDIR
+      cd $SRC_DIR
+      echo "Running: `which patch` -p1 < $dir/$PATCH in `pwd`"
+      patch -p1 < $dir/$PATCH
       if [ $? != 0 ] ; then
         dump "ERROR: Patch failure !! Please check your patches directory!"
         dump "       Try to perform a clean build using --clean ."
-        dump "       Problem patch: $dir/$PATCHNAME"
+        dump "       Problem patch: $dir/$PATCH into $SRC_DIR"
         exit 1
       fi
+      cd $PROGDIR
     done
   done
+fi
+
+if [ ! -f $SCRIPTDIR/user-config.jam ]
+then
+  echo "# ------------------------------------"
+  echo "# Creating $SCRIPTDIR/user-config.jam "
+  echo "# ------------------------------------"
+  if [ "$TOOLSET" = "clang" ]; then
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam "$SCRIPTDIR"/user-config.jam || exit 1
+      for FILE in "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-*.jam; do
+          ARCH="`echo $FILE | sed s%$SCRIPTDIR/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-%% | sed s/[.]jam//`"
+          if [ "$ARCH" = "common" ]; then
+              continue
+          fi
+          JAMARCH="`echo ${ARCH} | tr -d '_-'`" # Remove all dashes, b2 does not like them
+          sed "s/%ARCH%/${JAMARCH}/g" "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-common.jam >> "$SCRIPTDIR"/user-config.jam || exit 1
+          cat "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}-$ARCH.jam >> "$SCRIPTDIR"/user-config.jam || exit 1
+          echo ';' >> "$SCRIPTDIR"/user-config.jam || exit 1
+      done
+  else
+      cp "$SCRIPTDIR"/configs/user-config-${CONFIG_VARIANT}-${BOOST_VER}.jam "$SCRIPTDIR"/user-config.jam || exit 1
+  fi
+
+  if [ -n "$WITH_PYTHON" ]; then
+    echo "Sed: $WITH_PYTHON"
+    sed -e "s:%PYTHON_VERSION%:${PYTHON_VERSION}:g;s:%PYTHON_INSTALL_DIR%:${WITH_PYTHON}:g;s:%PYTHON_INCLUDE_DIR%:${PYTHON_INCLUDE_DIR}:g" "$SCRIPTDIR"/configs/user-config-python.jam >> $BOOST_DIR/tools/build/src/user-config-python.jam || exit 1
+    cat $BOOST_DIR/tools/build/src/user-config-python.jam >> $SCRIPTDIR/user-config.jam
+  fi
 fi
 
 echo "# ---------------"
@@ -590,6 +604,8 @@ for ARCH in $ARCHLIST; do
 
 echo "Building boost for android for $ARCH"
 (
+
+  PREFIX_ARCH_DIR="$PREFIX/$ARCH"
 
   if [ -n "$WITH_ICONV" ] || echo $LIBRARIES | grep locale; then
     if [ -e libiconv-libicu-android ]; then
@@ -610,7 +626,7 @@ echo "Building boost for android for $ARCH"
 
   cd $BOOST_DIR
 
-  echo "Adding pathname: `dirname $CXXPATH`"
+  echo "Adding pathname: `dirname $CXXPATH`" | teelog
   # `AndroidBinariesPath` could be used by user-config-*.jam
   export AndroidBinariesPath=`dirname $CXXPATH`
   export PATH=$AndroidBinariesPath:$PATH
@@ -656,9 +672,14 @@ echo "Building boost for android for $ARCH"
       unset WITHOUT_LIBRARIES
   fi
 
+  if [ $VERBOSE = 'no' ]; then
+    echo "Silently building Boost, this can take minutes..."
+  fi
+
   {
-    ./b2 -q                          \
+    $TIME_CMD ./b2 -q                \
         -d+2                         \
+        --user-config=$SCRIPTDIR/user-config.jam \
         --ignore-site-config         \
         -j$NCPU                      \
         target-os=${TARGET_OS}       \
@@ -666,30 +687,25 @@ echo "Building boost for android for $ARCH"
         $cflags                      \
         $cxxflags                    \
         link=static                  \
+        runtime-link=static          \
         threading=multi              \
         --layout=${LAYOUT}           \
         $WITHOUT_LIBRARIES           \
         $PYTHON_BUILD                \
         -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
         -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
-        --build-dir="./../$BUILD_DIR/build/$ARCH" \
-        --prefix="./../$BUILD_DIR/out/$ARCH" \
+        --build-dir="$BUILD_DIR"     \
+        --prefix="$PREFIX"  \
+        $EXTRA_PARAMS                \
         $LIBRARIES                   \
         $LIBRARIES_BROKEN            \
-        install 2>&1                 \
-        || { dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf ./../$BUILD_DIR/out/$ARCH ; exit 1 ; }
-  } | tee -a $PROGDIR/build.log
-
-  # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
+        install 2>&1 \
+        || { dump "ERROR: Failed to build boost for android for $ARCH!" ; rm -rf $PREFIX ; exit 1 ; }
+  } | teelog
 )
+  #
+  # PIPESTATUS variable is defined only in Bash, and we are using /bin/sh, which is not Bash on newer Debian/Ubuntu
 
 dump "Done!"
-
-if [ $PREFIX ]; then
-    echo "Prefix set, copying files to $PREFIX"
-    mkdir -p $PREFIX/$ARCH
-    cp -r $PROGDIR/$BUILD_DIR/out/$ARCH/lib $PREFIX/$ARCH/
-    cp -r $PROGDIR/$BUILD_DIR/out/$ARCH/include $PREFIX/$ARCH/
-fi
 
 done # for ARCH in $ARCHLIST
