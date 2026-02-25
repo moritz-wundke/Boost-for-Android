@@ -92,6 +92,83 @@ index 82b2c7d52..9cddb21ff 100644
      // "All BSD system functions expect their string parameters to be in UTF-8 encoding
      // and nothing else." See
      // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
+diff --git a/libs/process/src/shell.cpp b/libs/process/src/shell.cpp
+index 0fffc501a..bf4bbfd83 100644
+--- a/libs/process/src/shell.cpp
++++ b/libs/process/src/shell.cpp
+@@ -19,7 +19,7 @@
+ #if defined(BOOST_PROCESS_V2_WINDOWS)
+ #include <windows.h>
+ #include <shellapi.h>
+-#else
++#elif !defined(__OpenBSD__) && !defined(__ANDROID__)
+ #include <wordexp.h>
+ #endif
+ 
+@@ -30,7 +30,7 @@ BOOST_PROCESS_V2_DECL const error_category& get_shell_category()
+ {
+     return system_category();
+ }
+-#else
++#elif !defined(__OpenBSD__) && !defined(__ANDROID__)
+ 
+ struct shell_category_t final : public error_category
+ {
+@@ -38,7 +38,7 @@ struct shell_category_t final : public error_category
+ 
+     const char* name() const noexcept
+     {
+-        return "process.v2.utf8";
++        return "process.v2.shell";
+     }
+     std::string message(int value) const
+     {
+@@ -66,6 +66,13 @@ BOOST_PROCESS_V2_DECL const error_category& get_shell_category()
+     return instance;
+ }
+ 
++#else
++
++const error_category& get_shell_category()
++{
++    return system_category();
++}
++
+ #endif
+ 
+ #if defined (BOOST_PROCESS_V2_WINDOWS)
+@@ -92,7 +99,7 @@ auto shell::args() const-> args_type
+     return input_.c_str();
+ }
+ 
+-#else
++#elif !defined(__OpenBSD__) && !defined(__ANDROID__)
+ 
+ void shell::parse_()
+ {
+@@ -135,6 +142,22 @@ auto shell::args() const -> args_type
+         return const_cast<const char**>(argv());
+ }
+ 
++#else
++
++void shell::parse_()
++{
++    error_code ec;
++    BOOST_PROCESS_V2_ASSIGN_EC(ec, ENOTSUP, system_category());
++    throw system_error(ec, "shell::parse");
++}
++
++shell::~shell() = default;
++
++auto shell::args() const -> args_type
++{
++    return nullptr;
++}
++
+ #endif
+ 
+ BOOST_PROCESS_V2_END_NAMESPACE
 diff --git a/tools/build/src/tools/common.jam b/tools/build/src/tools/common.jam
 index 42f2833c9..83215e0e9 100644
 --- a/tools/build/src/tools/common.jam

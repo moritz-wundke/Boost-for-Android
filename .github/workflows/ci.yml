@@ -49,7 +49,7 @@ jobs:
         mkdir -p bins/${{ matrix.variation }}
         mkdir -p logs/${{ matrix.variation }}
     - name: Build Boost for Android on ${{ matrix.variation }}
-      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=${{ matrix.boost_version }} --arch=${{ matrix.abi }} --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono,locale "${NDK_ROOT}"
+      run: CXXFLAGS="-std=c++14" ./build-android.sh --boost=${{ matrix.boost_version }} --arch=${{ matrix.abi }} --with-libraries=atomic,random,date_time,filesystem,system,thread,chrono,locale,process "${NDK_ROOT}"
     - name: Prepare Binaries
       run: |
         set -x
