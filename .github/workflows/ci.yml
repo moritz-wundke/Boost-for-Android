@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        boost_version: [1.79.0,1.84.0]
+        boost_version: [1.79.0,1.84.0,1.86.0]
         abi: [armeabi-v7a,arm64-v8a,x86,x86_64]
         os: [ubuntu-latest,macos-latest]
         include:
@@ -23,13 +23,15 @@ jobs:
             ndk_version: 25.0.8775105
           - boost_version: 1.84.0
             ndk_version: 25.2.9519653
+          - boost_version: 1.86.0
+            ndk_version: 25.2.9519653
       fail-fast: false
 
-    runs-on: [ubuntu-latest,macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout Sources
-      uses: actions/checkout@v1
+      uses: actions/checkout@v6
       with:
         fetch-depth: 1
     - name: Setup Android Environment
@@ -57,9 +59,9 @@ jobs:
         ls -alFR ${GITHUB_WORKSPACE}/bins
       if: always()
     - name: Upload Binaries
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v6
       with:
-        name: binaries_${{ matrix.boost_version }}_${{ matrix.abi }}
+        name: binaries_${{ matrix.boost_version }}_${{ matrix.abi }}_${{ matrix.os }}
         path: ./bins
       if: always()
     - name: Prepare Logs
@@ -69,8 +71,8 @@ jobs:
         ls -alFR ${GITHUB_WORKSPACE}/logs
       if: always()
     - name: Upload Logs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v6
       with:
-        name: logs_${{ matrix.boost_version }}
+        name: logs_${{ matrix.boost_version }}_${{ matrix.abi }}_${{ matrix.os }}
         path: ./logs
       if: always()
