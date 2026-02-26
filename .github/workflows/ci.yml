@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        boost_version: [1.79.0,1.84.0,1.87.0]
+        boost_version: [1.79.0,1.84.0,1.90.0]
         abi: [armeabi-v7a,arm64-v8a,x86,x86_64]
         os: [ubuntu-latest,macos-latest]
         include:
@@ -23,7 +23,7 @@ jobs:
             ndk_version: 25.0.8775105
           - boost_version: 1.84.0
             ndk_version: 25.2.9519653
-          - boost_version: 1.87.0
+          - boost_version: 1.90.0
             ndk_version: 25.2.9519653
       fail-fast: false
 
