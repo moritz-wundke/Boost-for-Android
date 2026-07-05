@@ -1,6 +1,6 @@
 name: CI
 
-on: [pull_request]
+on: [pull_request, push]
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -24,7 +24,7 @@ jobs:
           - boost_version: 1.84.0
             ndk_version: 25.2.9519653
           - boost_version: 1.91.0
-            ndk_version: 25.2.9519653
+            ndk_version: 28.2.13676358
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
